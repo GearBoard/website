@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  # Database Service
+  db:
+    image: bitnami/postgresql:latest
+    container_name: gearboard-db
+    restart: always
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/bitnami/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Application Service (Optional for local dev, good for prod test)
+  app:
+    build: .
+    container_name: gearboard-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    # Override command to ensure migrations runs before start in prod container
+    command: sh -c "npx prisma migrate deploy && node dist/index.js"
+
+volumes:
+  postgres_data:

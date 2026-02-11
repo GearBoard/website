@@ -1,0 +1,172 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          BigInt   @id @default(autoincrement())
+  studentId   String   @unique @map("student_id")
+  username    String   @unique
+  email       String   @unique
+  profileURL  String?  @map("profile_url")
+  description String?
+  contract    String?
+  role        String
+  reputation  Int      @default(0)
+  departmentId BigInt?  @map("department_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  department    Department? @relation(fields: [departmentId], references: [id])
+  posts         Post[]
+  answers       Answer[]
+  votes         Vote[]
+  bookmarks     Bookmark[]
+  followedBy    Follow[]    @relation("followedUser")
+  following     Follow[]    @relation("followingUser")
+  reports       Report[]
+
+  @@map("users")
+}
+
+model Department {
+  id        BigInt @id @default(autoincrement())
+  facultyId BigInt @map("faculty_id")
+  name      String
+
+  users   User[]
+  courses Course[]
+
+  @@map("departments")
+}
+
+model Course {
+  id           BigInt @id @default(autoincrement())
+  departmentId BigInt @map("department_id")
+  code         String?
+  name         String?
+
+  department Department @relation(fields: [departmentId], references: [id])
+  posts      Post[]
+
+  @@map("courses")
+}
+
+model Post {
+  id           BigInt   @id @default(autoincrement())
+  userId       BigInt   @map("user_id")
+  courseId     BigInt?  @map("course_id")
+  title        String?
+  body         String?  @db.Text
+  academicYear Int?     @map("academic_year")
+  semester     Int?
+  viewCount    Int      @default(0) @map("view_count")
+  answerCount  Int      @default(0) @map("answer_count")
+  score        Int      @default(0)
+  isClosed     Boolean  @default(false) @map("is_closed")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user      User     @relation(fields: [userId], references: [id])
+  course    Course?  @relation(fields: [courseId], references: [id])
+  answers   Answer[]
+  tags      QuestionTag[]
+  bookmarks Bookmark[]
+
+  @@map("post")
+}
+
+model Answer {
+  id         BigInt   @id @default(autoincrement())
+  questionId BigInt   @map("question_id")
+  userId     BigInt   @map("user_id")
+  body       String?  @db.Text
+  score      Int      @default(0)
+  isAccepted Boolean  @default(false) @map("is_accepted")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  question Post @relation(fields: [questionId], references: [id])
+  user     User @relation(fields: [userId], references: [id])
+
+  @@map("answers")
+}
+
+model Tag {
+  id   BigInt @id @default(autoincrement())
+  name String @unique
+
+  questions QuestionTag[]
+
+  @@map("tags")
+}
+
+model QuestionTag {
+  questionId BigInt @map("question_id")
+  tagId      BigInt @map("tag_id")
+
+  question Post @relation(fields: [questionId], references: [id])
+  tag      Tag  @relation(fields: [tagId], references: [id])
+
+  @@id([questionId, tagId])
+  @@map("question_tags")
+}
+
+model Vote {
+  id         BigInt   @id @default(autoincrement())
+  userId     BigInt   @map("user_id")
+  targetType String   @map("target_type") // 'question' | 'answer'
+  targetId   BigInt   @map("target_id")
+  value      Int
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, targetType, targetId])
+  @@map("votes")
+}
+
+model Bookmark {
+  userId     BigInt   @map("user_id")
+  questionId BigInt   @map("question_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user     User @relation(fields: [userId], references: [id])
+  question Post @relation(fields: [questionId], references: [id])
+
+  @@unique([userId, questionId])
+  @@map("bookmarks")
+}
+
+model Follow {
+  followingUserId BigInt   @map("following_user_id")
+  followedUserId  BigInt   @map("followed_user_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  followingUser User @relation("followingUser", fields: [followingUserId], references: [id])
+  followedUser  User @relation("followedUser", fields: [followedUserId], references: [id])
+
+  @@unique([followingUserId, followedUserId])
+  @@map("follows")
+}
+
+model Report {
+  id         BigInt   @id @default(autoincrement())
+  reporterId BigInt?  @map("reporter_id")
+  targetType String?  @map("target_type") // 'question' | 'answer' | 'comment'
+  targetId   BigInt?  @map("target_id")
+  reason     String?  @db.Text
+  status     String?  @default("pending")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  reporter User? @relation(fields: [reporterId], references: [id])
+
+  @@map("reports")
+}
