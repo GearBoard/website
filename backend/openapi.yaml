@@ -1,0 +1,708 @@
+openapi: 3.0.3
+info:
+  title: GearBoard Backend API
+  description: API Specification for GearBoard application (Q&A Platform)
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Local Development Server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # --- Common Schemas ---
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: "Invalid request parameters"
+
+    # --- Master Data Schemas ---
+    Faculty:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+
+    Department:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        faculty_id:
+          type: integer
+          format: int64
+
+    Course:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        code:
+          type: string
+          example: "CS101"
+        name:
+          type: string
+          example: "Intro to Computer Science"
+        department_id:
+          type: integer
+          format: int64
+
+    # --- User Schemas ---
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        student_id:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [student, moderator, admin]
+        reputation:
+          type: integer
+        faculty:
+          $ref: "#/components/schemas/Faculty"
+        department:
+          $ref: "#/components/schemas/Department"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        role:
+          type: string
+        reputation:
+          type: integer
+        faculty:
+          $ref: "#/components/schemas/Faculty"
+        department:
+          $ref: "#/components/schemas/Department"
+        # Public profile might limit personal info like student_id/email
+
+    # --- Post/Question Schemas ---
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        body:
+          type: string
+        academic_year:
+          type: integer
+        semester:
+          type: integer
+        view_count:
+          type: integer
+        score:
+          type: integer
+        is_closed:
+          type: boolean
+        course:
+          $ref: "#/components/schemas/Course"
+        user:
+          $ref: "#/components/schemas/UserProfile"
+        tags:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    PostDetail:
+      allOf:
+        - $ref: "#/components/schemas/Post"
+        - type: object
+          properties:
+            answers:
+              type: array
+              items:
+                $ref: "#/components/schemas/Answer"
+
+    # --- Answer Schemas ---
+    Answer:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        question_id:
+          type: integer
+          format: int64
+        body:
+          type: string
+        score:
+          type: integer
+        is_accepted:
+          type: boolean
+        user:
+          $ref: "#/components/schemas/UserProfile"
+        created_at:
+          type: string
+          format: date-time
+
+security:
+  - BearerAuth: []
+
+paths:
+  # --- Authentication ---
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login with external token
+      security: [] # Public endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+                  description: Google/Firebase token
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                  isNewUser:
+                    type: boolean
+        "400":
+          description: Invalid Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Logout
+      responses:
+        "204":
+          description: Logout successful (No Content)
+        "401":
+          description: Unauthorized
+
+  # --- Users ---
+  /users/me:
+    get:
+      tags: [Users]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+    patch:
+      tags: [Users]
+      summary: Update current user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                student_id:
+                  type: string
+                department_id:
+                  type: integer
+                username:
+                  type: string
+      responses:
+        "200":
+          description: Updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid Input
+        "401":
+          description: Unauthorized
+
+  /users/{id}/profile:
+    get:
+      tags: [Users]
+      summary: Get public profile of a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Public profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "404":
+          description: User not found
+
+  # --- Master Data ---
+  /faculties:
+    get:
+      tags: [Master Data]
+      summary: List all faculties
+      security: []
+      responses:
+        "200":
+          description: List of faculties
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Faculty"
+
+  /departments:
+    get:
+      tags: [Master Data]
+      summary: List all departments
+      security: []
+      parameters:
+        - name: faculty_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of departments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Department"
+
+  /courses:
+    get:
+      tags: [Master Data]
+      summary: List all courses
+      security: []
+      parameters:
+        - name: department_id
+          in: query
+          schema:
+            type: integer
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+
+  # --- Posts (Questions) ---
+  /posts:
+    get:
+      tags: [Posts]
+      summary: List questions
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [latest, popular]
+            default: latest
+        - name: course_id
+          in: query
+          schema:
+            type: integer
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of questions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
+                  meta:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      page:
+                        type: integer
+                      last_page:
+                        type: integer
+    post:
+      tags: [Posts]
+      summary: Create a new question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, body, course_id]
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+                course_id:
+                  type: integer
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "201":
+          description: Created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "400":
+          description: Invalid Input
+        "401":
+          description: Unauthorized
+
+  /posts/{id}:
+    get:
+      tags: [Posts]
+      summary: Get question detail with answers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Question detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostDetail"
+        "404":
+          description: Post not found
+    put:
+      tags: [Posts]
+      summary: Update question
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+                is_closed:
+                  type: boolean
+      responses:
+        "200":
+          description: Updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "403":
+          description: Forbidden (Not owner)
+        "404":
+          description: Post not found
+    delete:
+      tags: [Posts]
+      summary: Delete question
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200": # Or 204
+          description: Deleted successfully
+        "403":
+          description: Forbidden
+        "404":
+          description: Post not found
+
+  # --- Answers ---
+  /posts/{id}/answers:
+    post:
+      tags: [Answers]
+      summary: Answer a question
+      parameters:
+        - name: id
+          in: path
+          description: Question ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body:
+                  type: string
+      responses:
+        "201":
+          description: Answer created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Answer"
+        "400":
+          description: Invalid Input
+        "404":
+          description: Question not found
+
+  /answers/{id}:
+    put:
+      tags: [Answers]
+      summary: Update answer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body:
+                  type: string
+      responses:
+        "200":
+          description: Updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Answer"
+        "403":
+          description: Forbidden
+        "404":
+          description: Answer not found
+    delete:
+      tags: [Answers]
+      summary: Delete answer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Deleted successfully
+        "403":
+          description: Forbidden
+        "404":
+          description: Answer not found
+
+  /answers/{id}/accept:
+    post:
+      tags: [Answers]
+      summary: Accept answer (Mark as correct)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200": # Can return updated Answer or Question
+          description: Accepted successfully
+        "403":
+          description: Forbidden (Not question owner)
+        "404":
+          description: Answer not found
+
+  # --- Interaction ---
+  /votes:
+    post:
+      tags: [Interactions]
+      summary: Vote on question or answer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target_type, target_id, value]
+              properties:
+                target_type:
+                  type: string
+                  enum: [question, answer]
+                target_id:
+                  type: integer
+                  format: int64
+                value:
+                  type: integer
+                  enum: [1, -1]
+      responses:
+        "200":
+          description: Vote registered
+        "400":
+          description: Invalid input
+
+  /bookmarks:
+    post:
+      tags: [Interactions]
+      summary: Bookmark a post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [post_id]
+              properties:
+                post_id:
+                  type: integer
+                  format: int64
+      responses:
+        "201":
+          description: Bookmarked
+        "404":
+          description: Post not found
+
+  /bookmarks/{post_id}:
+    delete:
+      tags: [Interactions]
+      summary: Remove bookmark
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Bookmark removed
+        "404":
+          description: Bookmark/Post not found
+
+  # --- Media ---
+  /upload/image:
+    post:
+      tags: [Media]
+      summary: Upload an image
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file: # Assuming 'file' field name
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Upload successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+        "400":
+          description: Invalid file
