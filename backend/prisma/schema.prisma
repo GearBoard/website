@@ -10,54 +10,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Enums
-enum Role {
-  USER
-  ADMIN
-  MODERATOR
-}
-
-enum ReportStatus {
-  PENDING
-  RESOLVED
-  DISMISSED
-}
-
 model User {
-  id          Int       @id @default(autoincrement())
-  studentId   String    @map("student_id")
-  username    String
-  email       String    @unique
-  profileUrl  String?   @map("profileURL")
+  id          BigInt   @id @default(autoincrement())
+  studentId   String   @unique @map("student_id")
+  username    String   @unique
+  email       String   @unique
+  profileURL  String?  @map("profile_url")
   description String?
   contract    String?
-  role        Role      @default(USER) // Changed from String to Enum
-  reputation  Int       @default(0)
+  role        String
+  reputation  Int      @default(0)
+  departmentId BigInt?  @map("department_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  departmentId Int?        @map("department_id")
-  department   Department? @relation(fields: [departmentId], references: [id])
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  posts     Post[]
-  answers   Answer[]
-  bookmarks Bookmark[]
-  votes     Vote[]
-  reports   Report[] // Reports made by this user
-  reportsReceived Report[] @relation("ReportedUser") // Reports received by this user
-
-  // Follow System (Self-Relation)
-  followedBy Follow[] @relation("followedUser")
-  following  Follow[] @relation("followingUser")
+  department    Department? @relation(fields: [departmentId], references: [id])
+  posts         Post[]
+  answers       Answer[]
+  votes         Vote[]
+  bookmarks     Bookmark[]
+  followedBy    Follow[]    @relation("followedUser")
+  following     Follow[]    @relation("followingUser")
+  reports       Report[]
 
   @@map("users")
 }
 
 model Department {
-  id        Int    @id @default(autoincrement())
-  facultyId Int    @map("faculty_id")
+  id        BigInt @id @default(autoincrement())
+  facultyId BigInt @map("faculty_id")
   name      String
 
   users   User[]
@@ -67,155 +48,125 @@ model Department {
 }
 
 model Course {
-  id           Int        @id @default(autoincrement())
-  departmentId Int        @map("department_id")
-  department   Department @relation(fields: [departmentId], references: [id])
+  id           BigInt @id @default(autoincrement())
+  departmentId BigInt @map("department_id")
   code         String?
   name         String?
 
-  posts Post[]
+  department Department @relation(fields: [departmentId], references: [id])
+  posts      Post[]
 
   @@map("courses")
 }
 
-model Tag {
-  id   Int     @id @default(autoincrement())
-  name String?
-
-  posts QuestionTag[]
-
-  @@map("tags")
-}
-
 model Post {
-  id       Int  @id @default(autoincrement())
-  userId   Int  @map("user_id")
-  user     User @relation(fields: [userId], references: [id], onDelete: Cascade) // Cascade delete user -> delete their posts
-
-  courseId Int?    @map("course_id")
-  course   Course? @relation(fields: [courseId], references: [id])
-
+  id           BigInt   @id @default(autoincrement())
+  userId       BigInt   @map("user_id")
+  courseId     BigInt?  @map("course_id")
   title        String?
-  body         String? @db.Text
-  academicYear Int?    @map("academic_year")
+  body         String?  @db.Text
+  academicYear Int?     @map("academic_year")
   semester     Int?
-  viewCount    Int     @default(0) @map("view_count")
-  answerCount  Int     @default(0) @map("answer_count")
-  score        Int     @default(0)
-  isClosed     Boolean @default(false) @map("is_closed")
+  viewCount    Int      @default(0) @map("view_count")
+  answerCount  Int      @default(0) @map("answer_count")
+  score        Int      @default(0)
+  isClosed     Boolean  @default(false) @map("is_closed")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  // Relations
+  user      User     @relation(fields: [userId], references: [id])
+  course    Course?  @relation(fields: [courseId], references: [id])
   answers   Answer[]
   tags      QuestionTag[]
   bookmarks Bookmark[]
-  votes     Vote[]
-  reports   Report[]
 
   @@map("post")
 }
 
 model Answer {
-  id         Int  @id @default(autoincrement())
-  questionId Int  @map("question_id")
-  post       Post @relation(fields: [questionId], references: [id], onDelete: Cascade) // Cascade delete post -> delete answers
+  id         BigInt   @id @default(autoincrement())
+  questionId BigInt   @map("question_id")
+  userId     BigInt   @map("user_id")
+  body       String?  @db.Text
+  score      Int      @default(0)
+  isAccepted Boolean  @default(false) @map("is_accepted")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
-  userId Int  @map("user_id")
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  body       String? @db.Text
-  score      Int     @default(0)
-  isAccepted Boolean @default(false) @map("is_accepted")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  votes   Vote[]
-  reports Report[]
+  question Post @relation(fields: [questionId], references: [id])
+  user     User @relation(fields: [userId], references: [id])
 
   @@map("answers")
 }
 
-model QuestionTag {
-  questionId Int  @map("question_id")
-  post       Post @relation(fields: [questionId], references: [id], onDelete: Cascade)
+model Tag {
+  id   BigInt @id @default(autoincrement())
+  name String @unique
 
-  tagId Int @map("tag_id")
-  tag   Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  questions QuestionTag[]
+
+  @@map("tags")
+}
+
+model QuestionTag {
+  questionId BigInt @map("question_id")
+  tagId      BigInt @map("tag_id")
+
+  question Post @relation(fields: [questionId], references: [id])
+  tag      Tag  @relation(fields: [tagId], references: [id])
 
   @@id([questionId, tagId])
   @@map("question_tags")
 }
 
+model Vote {
+  id         BigInt   @id @default(autoincrement())
+  userId     BigInt   @map("user_id")
+  targetType String   @map("target_type") // 'question' | 'answer'
+  targetId   BigInt   @map("target_id")
+  value      Int
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, targetType, targetId])
+  @@map("votes")
+}
+
 model Bookmark {
-  userId Int  @map("user_id")
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     BigInt   @map("user_id")
+  questionId BigInt   @map("question_id")
+  createdAt  DateTime @default(now()) @map("created_at")
 
-  questionId Int  @map("question_id")
-  post       Post @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user     User @relation(fields: [userId], references: [id])
+  question Post @relation(fields: [questionId], references: [id])
 
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@id([userId, questionId])
+  @@unique([userId, questionId])
   @@map("bookmarks")
 }
 
 model Follow {
-  followingUserId Int  @map("following_user_id")
-  followingUser   User @relation("followingUser", fields: [followingUserId], references: [id], onDelete: Cascade)
+  followingUserId BigInt   @map("following_user_id")
+  followedUserId  BigInt   @map("followed_user_id")
+  createdAt       DateTime @default(now()) @map("created_at")
 
-  followedUserId Int  @map("followed_user_id")
-  followedUser   User @relation("followedUser", fields: [followedUserId], references: [id], onDelete: Cascade)
+  followingUser User @relation("followingUser", fields: [followingUserId], references: [id])
+  followedUser  User @relation("followedUser", fields: [followedUserId], references: [id])
 
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@id([followingUserId, followedUserId])
+  @@unique([followingUserId, followedUserId])
   @@map("follows")
 }
 
-model Vote {
-  id      Int  @id @default(autoincrement())
-  userId  Int  @map("user_id")
-  user    User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  value   Int // 1 or -1
-
-  // Strict Polymorphic Relations (Nullable)
-  postId   Int?  @map("post_id")
-  post     Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
-
-  answerId Int?    @map("answer_id")
-  answer   Answer? @relation(fields: [answerId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  // Ensure unique vote per target per user
-  @@unique([userId, postId])
-  @@unique([userId, answerId])
-  @@map("votes")
-}
-
 model Report {
-  id         Int          @id @default(autoincrement())
-  reporterId Int          @map("reporter_id")
-  reporter   User         @relation(fields: [reporterId], references: [id], onDelete: Cascade)
-  
-  reason     String?      @db.Text
-  status     ReportStatus @default(PENDING) // Enum
+  id         BigInt   @id @default(autoincrement())
+  reporterId BigInt?  @map("reporter_id")
+  targetType String?  @map("target_type") // 'question' | 'answer' | 'comment'
+  targetId   BigInt?  @map("target_id")
+  reason     String?  @db.Text
+  status     String?  @default("pending")
+  createdAt  DateTime @default(now()) @map("created_at")
 
-  // Strict Relations for Targets
-  postId   Int?  @map("post_id")
-  post     Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
-
-  answerId Int?    @map("answer_id")
-  answer   Answer? @relation(fields: [answerId], references: [id], onDelete: Cascade)
-
-  // You might want to report Users too?
-  reportedUserId Int?  @map("reported_user_id")
-  reportedUser   User? @relation("ReportedUser", fields: [reportedUserId], references: [id], onDelete: Cascade) // Define relation name if ambiguous
-
-  createdAt DateTime @default(now()) @map("created_at")
+  reporter User? @relation(fields: [reporterId], references: [id])
 
   @@map("reports")
 }

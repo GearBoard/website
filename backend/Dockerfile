@@ -1,29 +1,44 @@
-# Base stage
-FROM node:18-alpine AS base
-WORKDIR /usr/src/app
+# Build Stage
+FROM node:20-alpine AS builder
 
-# Dependencies stage
-FROM base AS deps
-COPY package.json package-lock.json* ./
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies (including devDependencies for build)
 RUN npm ci
 
-# Builder stage (if you are using TypeScript or a build step)
-FROM base AS builder
-COPY --from=deps /usr/src/app/node_modules ./node_modules
+# Copy source code and prisma schema
 COPY . .
-RUN npx prisma generate
-# RUN npm run build # Uncomment if you have a build script
 
-# Runner stage
-FROM base AS runner
+# Generate Prisma Client
+RUN npx prisma generate
+
+# Build TypeScript code
+RUN npm run build
+
+# Production Stage
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
 ENV NODE_ENV=production
-COPY --from=deps /usr/src/app/node_modules ./node_modules
-COPY --from=builder /usr/src/app/prisma ./prisma
-COPY . . 
 
-# Generate Prisma Client again just in case (optional but safe)
+# Copy package files
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm ci --only=production
+
+# Copy built assets from builder
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+
+# Generate Prisma Client for production
 RUN npx prisma generate
 
+# Expose port
 EXPOSE 3000
 
 # Start command
