@@ -1,7 +1,6 @@
 export type SuccessResponseDto<T> = {
   success: true;
   data: T;
-  message: string;
 };
 
 export type ErrorResponseDto = {
@@ -11,8 +10,8 @@ export type ErrorResponseDto = {
 
 export type ApiResponseDto<T> = SuccessResponseDto<T> | ErrorResponseDto;
 
-export function successResponse<T>(data: T, message: string): SuccessResponseDto<T> {
-  return { success: true, data, message };
+export function successResponse<T>(data: T): SuccessResponseDto<T> {
+  return { success: true, data };
 }
 
 export function errorResponse(message: string): ErrorResponseDto {

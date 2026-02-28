@@ -1,29 +1,15 @@
-import { prisma } from "../../config/prisma.js";
-import type { CreateUserRequestDto } from "./user.dto.js";
-import type { UserEntity } from "./user.entity.js";
+import type { CreateUserRequestDto, UserResponseDto } from "./user.dto.js";
+import { toDto } from "./user.mapper.js";
+import { userRepository } from "./user.repository.js";
 
 export const userService = {
-  async getById(id: bigint): Promise<UserEntity | null> {
-    const user = await prisma.user.findUnique({
-      where: { id },
-    });
-
-    return user as UserEntity | null;
+  async getById(id: bigint): Promise<UserResponseDto | null> {
+    const user = await userRepository.findById(id);
+    return user ? toDto(user) : null;
   },
 
-  async create(dto: CreateUserRequestDto): Promise<UserEntity> {
-    const user = await prisma.user.create({
-      data: {
-        studentId: dto.studentId,
-        username: dto.username,
-        email: dto.email,
-        profileURL: dto.profileURL ?? null,
-        description: dto.description ?? null,
-        role: dto.role,
-        departmentId: dto.departmentId ? BigInt(dto.departmentId) : null,
-      },
-    });
-
-    return user as UserEntity;
+  async create(data: CreateUserRequestDto): Promise<UserResponseDto> {
+    const user = await userRepository.create(data);
+    return toDto(user);
   },
 };

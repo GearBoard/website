@@ -1,0 +1,95 @@
+{
+  "info": {
+    "name": "Gearboard API",
+    "description": "API collection for Gearboard backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "1"]
+            },
+            "description": "Get a user by id. Path param `id` must be a valid positive integer (e.g. 1)."
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"6230123456\",\n  \"username\": \"johndoe\",\n  \"email\": \"john@student.chula.ac.th\",\n  \"role\": \"student\",\n  \"profileURL\": \"https://example.com/avatar.png\",\n  \"description\": \"Engineering student\",\n  \"departmentId\": \"1\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            },
+            "description": "Create a new user. Body is validated by Zod; departmentId can be string (e.g. \"1\") or number and will be coerced to bigint."
+          }
+        },
+        {
+          "name": "Create User (minimal)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"6230999999\",\n  \"username\": \"minimaluser\",\n  \"email\": \"minimal@student.chula.ac.th\",\n  \"role\": \"student\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            },
+            "description": "Create user with only required fields (studentId, username, email, role). profileURL, description, departmentId are optional."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Root",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            },
+            "description": "Simple health check."
+          }
+        }
+      ]
+    }
+  ]
+}

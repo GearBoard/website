@@ -12,10 +12,10 @@ backend/
 │   │   ├── env.ts           # Loads PORT, DATABASE_URL
 │   │   └── prisma.ts        # Prisma client
 │   ├── modules/             # Feature modules
-│   │   ├── user/            # user.controller, service, route, dto, entity
+│   │   ├── user/            # controller, service, route, dto, schema, mapper, repository
 │   │   └── auth/
 │   └── common/
-│       ├── middleware/      # error, auth
+│       ├── middleware/      # error, auth, validate
 │       └── utils/           # response, jwt, pagination
 ├── prisma/
 │   ├── schema.prisma
@@ -33,16 +33,26 @@ backend/
 
 Each feature module (e.g. `user`) is built from these pieces:
 
-| Layer    | Role |
-|----------|------|
-| **Route**   | Declares HTTP paths and methods, and wires them to handlers (e.g. `GET /:id` → `userController.getById`). |
-| **Handler** | HTTP layer: reads request (params, body), calls the service, then returns response (success/error + DTO). No business logic. |
-| **Service** | Business logic and data access: uses Prisma, returns **entities**. |
-| **Entity**  | Shape of data inside the service layer (e.g. from the DB: `id` as bigint, `createdAt` as Date). Used only in service and when mapping to DTO. |
-| **DTO**     | Shape of data at the API boundary: request body/params and response body (e.g. ids as strings, dates as ISO strings). Handlers accept request DTOs and return response DTOs. |
+| Layer          | Role                                                                                                                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Route**      | Declares HTTP paths and methods, wires **validation middleware** and controller (e.g. `GET /:id` → `validateParams(getUserByIdSchema)` → `userController.getById`).                                                |
+| **Validation** | Middleware (`validateBody` / `validateParams`) runs Zod schemas on `req.body` or `req.params`; on success overwrites `req.body` or sets `req.validatedParams`, then `next()`. On failure returns 400 with message. |
+| **Controller** | HTTP layer: uses validated `req.body` or `req.validatedParams`, calls the service, returns response (success/error + DTO). No business logic.                                                                      |
+| **Service**    | Business logic: calls repository, maps results to DTOs and returns them.                                                                                                                                           |
+| **Repository** | Data access: uses Prisma, returns Prisma model types.                                                                                                                                                              |
+| **Schema**     | Zod schemas for request validation (params, body); inferred types become request DTOs.                                                                                                                             |
+| **DTO**        | Shape of data at the API boundary: request (from schema) and response (e.g. ids as strings, dates as ISO).                                                                                                         |
+| **Mapper**     | Maps Prisma/model types to response DTOs.                                                                                                                                                                          |
 
 - **Base path:** `/api`
 - **Response:** Success `{ "success": true, "data": ..., "message": "..." }` · Error `{ "success": false, "message": "..." }`
+
+**Current endpoints (user module):**
+
+| Method | Path             | Description    |
+| ------ | ---------------- | -------------- |
+| GET    | `/api/users/:id` | Get user by id |
+| POST   | `/api/users`     | Create user    |
 
 ---
 
