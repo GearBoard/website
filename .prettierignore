@@ -1,5 +1,8 @@
 node_modules
 dist
 generated
+.next
+out
+build
 *.min.js
 package-lock.json

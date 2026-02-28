@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build & generated
+dist/
+generated/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Misc
+.DS_Store
+*.pem
+
+# Logs
+*.log
+npm-debug.log*
