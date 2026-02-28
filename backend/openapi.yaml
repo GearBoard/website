@@ -4,7 +4,7 @@ info:
   description: API Specification for GearBoard application (Q&A Platform)
   version: 1.0.0
 servers:
-  - url: http://localhost:8000
+  - url: http://localhost:4000
     description: Local Development Server
 
 components:

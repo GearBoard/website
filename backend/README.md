@@ -1,66 +1,101 @@
 # GearBoard Backend
 
-## Prerequisites
+Express + TypeScript + Prisma API. Response shape: `{ success, data?, message }`.
 
-- Node.js (v18+)
-- Docker & Docker Compose
+---
 
-## Getting Started
+## Project structure
 
-### 1. Start the Database
+```
+backend/
+├── src/
+│   ├── app.ts              # Express app, middleware, Swagger
+│   ├── server.ts            # Entry: starts HTTP server
+│   ├── routes.ts            # Mounts all API routes under /api
+│   ├── config/
+│   │   ├── env.ts           # Loads PORT, DATABASE_URL
+│   │   └── prisma.ts        # Prisma client
+│   ├── modules/             # Feature modules
+│   │   ├── user/            # user.controller, service, route, dto, entity
+│   │   └── auth/
+│   └── common/
+│       ├── middleware/      # error, auth
+│       └── utils/           # response, jwt, pagination
+├── prisma/
+│   ├── schema.prisma
+│   ├── migrations/
+│   └── seed.ts
+├── generated/               # Prisma Client (do not edit)
+├── prisma.config.ts
+├── openapi.yaml             # Swagger spec
+└── docker-compose.yml       # PostgreSQL (and optional app)
+```
 
-We use Docker to run PostgreSQL. You can start it with a single command:
+---
+
+## API structure
+
+Each feature module (e.g. `user`) is built from these pieces:
+
+| Layer    | Role |
+|----------|------|
+| **Route**   | Declares HTTP paths and methods, and wires them to handlers (e.g. `GET /:id` → `userController.getById`). |
+| **Handler** | HTTP layer: reads request (params, body), calls the service, then returns response (success/error + DTO). No business logic. |
+| **Service** | Business logic and data access: uses Prisma, returns **entities**. |
+| **Entity**  | Shape of data inside the service layer (e.g. from the DB: `id` as bigint, `createdAt` as Date). Used only in service and when mapping to DTO. |
+| **DTO**     | Shape of data at the API boundary: request body/params and response body (e.g. ids as strings, dates as ISO strings). Handlers accept request DTOs and return response DTOs. |
+
+- **Base path:** `/api`
+- **Response:** Success `{ "success": true, "data": ..., "message": "..." }` · Error `{ "success": false, "message": "..." }`
+
+---
+
+## Run database and server
+
+**1. Copy env and set your DB URL:**
+
+```bash
+cp .env.example .env
+# Edit .env: set DATABASE_URL (and PORT if needed)
+```
+
+**2. Start PostgreSQL (Docker):**
 
 ```bash
 npm run db.create
-# OR
-docker-compose up -d db
+# or: docker-compose up -d db
 ```
 
-### 2. Setup Schema
-
-Push the Prisma schema to your database:
+**3. Apply schema and (optional) seed:**
 
 ```bash
 npm run db.push
+npm run db.seed   # optional
 ```
 
-### 3. Seed Data (Optional)
-
-Populate the database with initial testing data:
-
-```bash
-npm run db.seed
-```
-
-### 4. Run the Server
-
-Start the development server:
+**4. Run the server:**
 
 ```bash
 npm run dev
 ```
 
-The server will start at `http://localhost:3000`.
+Server runs at `http://localhost:4000` (or the `PORT` in `.env`).
 
-## Available Scripts
+---
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Run server in watch mode |
-| `npm run build` | Build TypeScript code |
-| `npm run start` | Run built server |
-| `npm run check` | Type check without emitting files |
-| `npm run db.create` | Start DB container |
-| `npm run db.start` | Start DB container (if stopped) |
-| `npm run db.stop` | Stop DB container |
-| `npm run db.down` | Remove DB container and volumes |
-| `npm run db.studio` | Open Prisma Studio GUI |
-| `npm run db.push` | Sync schema with DB (Prototyping) |
-| `npm run db.migrate` | Create/Run migrations (Production) |
-| `npm run db.seed` | Run seed script |
+## TablePlus
 
-## Database Connection
+1. **New connection** → PostgreSQL.
+2. **Host:** `localhost` · **Port:** `5432`
+3. **User / Password / Database:** use the same values as in your `DATABASE_URL` (e.g. user from the URL, password, and database name).
+4. Test and connect.
 
-The database connects via the URL defined in `.env`:
-`DATABASE_URL="postgresql://postgres:postgres@localhost:5432/gearboard?schema=public"`
+If the DB is in Docker, ensure the container is running (`docker-compose up -d db`) and that `DATABASE_URL` in `.env` matches the credentials you configured for the container (e.g. Bitnami image: `POSTGRESQL_USER`, `POSTGRESQL_PASSWORD`, `POSTGRESQL_DATABASE` in the same `.env` or in docker-compose).
+
+---
+
+## Swagger
+
+- **URL:** `http://localhost:4000/docs` (with server running).
+- **Spec:** Served from `openapi.yaml`.
+- Use the UI to try endpoints and see request/response schemas.
