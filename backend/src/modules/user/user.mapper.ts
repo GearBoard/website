@@ -4,14 +4,13 @@ import type { UserResponseDto } from "./user.dto.js";
 export function toDto(user: User): UserResponseDto {
   return {
     id: user.id.toString(),
-    studentId: user.studentId,
     username: user.username,
     email: user.email,
-    profileURL: user.profileURL,
+    image: user.image,
     description: user.description,
     role: user.role,
-    reputation: user.reputation,
     departmentId: user.departmentId === null ? null : user.departmentId.toString(),
+    provider: user.provider,
     createdAt: user.createdAt.toISOString(),
     updatedAt: user.updatedAt.toISOString(),
   };

@@ -3,13 +3,13 @@ import "dotenv/config";
 import { prisma } from "../src/config/prisma.js";
 
 const departments = [
-  { facultyId: 1n, name: "Computer Engineering" },
-  { facultyId: 1n, name: "Electrical Engineering" },
-  { facultyId: 1n, name: "Mechanical Engineering" },
-  { facultyId: 1n, name: "Civil Engineering" },
-  { facultyId: 2n, name: "Mathematics" },
-  { facultyId: 2n, name: "Physics" },
-  { facultyId: 2n, name: "Chemistry" },
+  { name: "Computer Engineering" },
+  { name: "Electrical Engineering" },
+  { name: "Mechanical Engineering" },
+  { name: "Civil Engineering" },
+  { name: "Mathematics" },
+  { name: "Physics" },
+  { name: "Chemistry" },
 ];
 
 async function main() {

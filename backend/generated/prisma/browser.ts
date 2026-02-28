@@ -28,47 +28,42 @@ export type User = Prisma.UserModel
  */
 export type Department = Prisma.DepartmentModel
 /**
- * Model Course
- * 
- */
-export type Course = Prisma.CourseModel
-/**
  * Model Post
  * 
  */
 export type Post = Prisma.PostModel
 /**
- * Model Answer
+ * Model PostImage
  * 
  */
-export type Answer = Prisma.AnswerModel
+export type PostImage = Prisma.PostImageModel
 /**
  * Model Tag
  * 
  */
 export type Tag = Prisma.TagModel
 /**
- * Model QuestionTag
+ * Model PostTag
  * 
  */
-export type QuestionTag = Prisma.QuestionTagModel
+export type PostTag = Prisma.PostTagModel
 /**
- * Model Vote
+ * Model Comment
  * 
  */
-export type Vote = Prisma.VoteModel
+export type Comment = Prisma.CommentModel
+/**
+ * Model CommentImage
+ * 
+ */
+export type CommentImage = Prisma.CommentImageModel
+/**
+ * Model Like
+ * 
+ */
+export type Like = Prisma.LikeModel
 /**
  * Model Bookmark
  * 
  */
 export type Bookmark = Prisma.BookmarkModel
-/**
- * Model Follow
- * 
- */
-export type Follow = Prisma.FollowModel
-/**
- * Model Report
- * 
- */
-export type Report = Prisma.ReportModel

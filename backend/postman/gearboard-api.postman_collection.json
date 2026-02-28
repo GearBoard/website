@@ -39,14 +39,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"studentId\": \"6230123456\",\n  \"username\": \"johndoe\",\n  \"email\": \"john@student.chula.ac.th\",\n  \"role\": \"student\",\n  \"profileURL\": \"https://example.com/avatar.png\",\n  \"description\": \"Engineering student\",\n  \"departmentId\": \"1\"\n}"
+              "raw": "{\n  \"username\": \"johndoe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"secret123\",\n  \"role\": \"USER\",\n  \"image\": \"https://example.com/avatar.png\",\n  \"description\": \"Engineering student\",\n  \"departmentId\": \"1\",\n  \"provider\": \"LOCAL\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/users",
               "host": ["{{baseUrl}}"],
               "path": ["api", "users"]
             },
-            "description": "Create a new user. Body is validated by Zod; departmentId can be string (e.g. \"1\") or number and will be coerced to bigint."
+            "description": "Create a new user. Required: username, email. Optional: password, role (USER | ADMIN, default USER), image, description, departmentId (string or number), provider (LOCAL | GOOGLE, default LOCAL)."
           }
         },
         {
@@ -61,14 +61,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"studentId\": \"6230999999\",\n  \"username\": \"minimaluser\",\n  \"email\": \"minimal@student.chula.ac.th\",\n  \"role\": \"student\"\n}"
+              "raw": "{\n  \"username\": \"minimaluser\",\n  \"email\": \"minimal@example.com\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/users",
               "host": ["{{baseUrl}}"],
               "path": ["api", "users"]
             },
-            "description": "Create user with only required fields (studentId, username, email, role). profileURL, description, departmentId are optional."
+            "description": "Create user with only required fields (username, email). password, role, image, description, departmentId, provider are optional (role defaults to USER)."
           }
         }
       ]

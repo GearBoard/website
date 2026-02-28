@@ -3,170 +3,174 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../../generated/prisma"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
 }
 
+//////////////////////////
+// USER
+//////////////////////////
+
 model User {
-  id          BigInt   @id @default(autoincrement())
-  studentId   String   @unique @map("student_id")
-  username    String   @unique
-  email       String   @unique
-  profileURL  String?  @map("profile_url")
+  id          BigInt     @id @default(autoincrement())
+  username    String     @unique
+  email       String     @unique
+  password    String?    // null if login via Google
+  image       String?    // profile picture
   description String?
-  contract    String?
-  role        String
-  reputation  Int      @default(0)
-  departmentId BigInt?  @map("department_id")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  role        UserRole   @default(USER)
+  departmentId BigInt?
+  provider    AuthProvider @default(LOCAL)
 
-  department    Department? @relation(fields: [departmentId], references: [id])
-  posts         Post[]
-  answers       Answer[]
-  votes         Vote[]
-  bookmarks     Bookmark[]
-  followedBy    Follow[]    @relation("followedUser")
-  following     Follow[]    @relation("followingUser")
-  reports       Report[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@map("users")
+  posts      Post[]
+  comments   Comment[]
+  likes      Like[]
+  bookmarks  Bookmark[]
+  department Department? @relation(fields: [departmentId], references: [id])
 }
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
+
+//////////////////////////
+// DEPARTMENT
+//////////////////////////
 
 model Department {
-  id        BigInt @id @default(autoincrement())
-  facultyId BigInt @map("faculty_id")
-  name      String
+  id   BigInt @id @default(autoincrement())
+  name String
 
-  users   User[]
-  courses Course[]
-
-  @@map("departments")
+  users User[]
 }
 
-model Course {
-  id           BigInt @id @default(autoincrement())
-  departmentId BigInt @map("department_id")
-  code         String?
-  name         String?
-
-  department Department @relation(fields: [departmentId], references: [id])
-  posts      Post[]
-
-  @@map("courses")
-}
+//////////////////////////
+// POST (QUESTION)
+//////////////////////////
 
 model Post {
-  id           BigInt   @id @default(autoincrement())
-  userId       BigInt   @map("user_id")
-  courseId     BigInt?  @map("course_id")
-  title        String?
-  body         String?  @db.Text
-  academicYear Int?     @map("academic_year")
-  semester     Int?
-  viewCount    Int      @default(0) @map("view_count")
-  answerCount  Int      @default(0) @map("answer_count")
-  score        Int      @default(0)
-  isClosed     Boolean  @default(false) @map("is_closed")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id          BigInt   @id @default(autoincrement())
+  userId      BigInt
+  title       String
+  description String   @db.Text
+  isClosed    Boolean  @default(false)
+  likeCount   Int      @default(0)
+  commentCount Int     @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  user      User     @relation(fields: [userId], references: [id])
-  course    Course?  @relation(fields: [courseId], references: [id])
-  answers   Answer[]
-  tags      QuestionTag[]
+  user      User        @relation(fields: [userId], references: [id])
+  tags      PostTag[]
+  images    PostImage[]
+  comments  Comment[]
+  likes     Like[]
   bookmarks Bookmark[]
-
-  @@map("post")
 }
 
-model Answer {
-  id         BigInt   @id @default(autoincrement())
-  questionId BigInt   @map("question_id")
-  userId     BigInt   @map("user_id")
-  body       String?  @db.Text
-  score      Int      @default(0)
-  isAccepted Boolean  @default(false) @map("is_accepted")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+//////////////////////////
+// POST IMAGES
+//////////////////////////
 
-  question Post @relation(fields: [questionId], references: [id])
-  user     User @relation(fields: [userId], references: [id])
+model PostImage {
+  id      BigInt @id @default(autoincrement())
+  postId  BigInt
+  url     String
 
-  @@map("answers")
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
+
+//////////////////////////
+// TAG
+//////////////////////////
 
 model Tag {
-  id   BigInt @id @default(autoincrement())
-  name String @unique
+  id    BigInt @id @default(autoincrement())
+  name  String @unique
 
-  questions QuestionTag[]
-
-  @@map("tags")
+  posts PostTag[]
 }
 
-model QuestionTag {
-  questionId BigInt @map("question_id")
-  tagId      BigInt @map("tag_id")
+model PostTag {
+  postId BigInt
+  tagId  BigInt
 
-  question Post @relation(fields: [questionId], references: [id])
-  tag      Tag  @relation(fields: [tagId], references: [id])
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id])
 
-  @@id([questionId, tagId])
-  @@map("question_tags")
+  @@id([postId, tagId])
 }
 
-model Vote {
-  id         BigInt   @id @default(autoincrement())
-  userId     BigInt   @map("user_id")
-  targetType String   @map("target_type") // 'question' | 'answer'
-  targetId   BigInt   @map("target_id")
-  value      Int
-  createdAt  DateTime @default(now()) @map("created_at")
+//////////////////////////
+// COMMENT (supports reply)
+//////////////////////////
+
+model Comment {
+  id        BigInt   @id @default(autoincrement())
+  postId    BigInt
+  userId    BigInt
+  parentId  BigInt?  // for reply(can be null)
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post   Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User    @relation(fields: [userId], references: [id])
+  parent Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentReplies")
+
+  images CommentImage[]
+}
+
+//////////////////////////
+// COMMENT IMAGE
+//////////////////////////
+
+model CommentImage {
+  id        BigInt @id @default(autoincrement())
+  commentId BigInt
+  url       String
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+}
+
+//////////////////////////
+// LIKE
+//////////////////////////
+
+model Like {
+  userId BigInt
+  postId BigInt
+  createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, targetType, targetId])
-  @@map("votes")
+  @@id([userId, postId])
 }
+
+//////////////////////////
+// BOOKMARK
+//////////////////////////
 
 model Bookmark {
-  userId     BigInt   @map("user_id")
-  questionId BigInt   @map("question_id")
-  createdAt  DateTime @default(now()) @map("created_at")
+  userId BigInt
+  postId BigInt
+  createdAt DateTime @default(now())
 
-  user     User @relation(fields: [userId], references: [id])
-  question Post @relation(fields: [questionId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, questionId])
-  @@map("bookmarks")
-}
-
-model Follow {
-  followingUserId BigInt   @map("following_user_id")
-  followedUserId  BigInt   @map("followed_user_id")
-  createdAt       DateTime @default(now()) @map("created_at")
-
-  followingUser User @relation("followingUser", fields: [followingUserId], references: [id])
-  followedUser  User @relation("followedUser", fields: [followedUserId], references: [id])
-
-  @@unique([followingUserId, followedUserId])
-  @@map("follows")
-}
-
-model Report {
-  id         BigInt   @id @default(autoincrement())
-  reporterId BigInt?  @map("reporter_id")
-  targetType String?  @map("target_type") // 'question' | 'answer' | 'comment'
-  targetId   BigInt?  @map("target_id")
-  reason     String?  @db.Text
-  status     String?  @default("pending")
-  createdAt  DateTime @default(now()) @map("created_at")
-
-  reporter User? @relation(fields: [reporterId], references: [id])
-
-  @@map("reports")
+  @@id([userId, postId])
 }

@@ -53,15 +53,14 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Department: 'Department',
-  Course: 'Course',
   Post: 'Post',
-  Answer: 'Answer',
+  PostImage: 'PostImage',
   Tag: 'Tag',
-  QuestionTag: 'QuestionTag',
-  Vote: 'Vote',
-  Bookmark: 'Bookmark',
-  Follow: 'Follow',
-  Report: 'Report'
+  PostTag: 'PostTag',
+  Comment: 'Comment',
+  CommentImage: 'CommentImage',
+  Like: 'Like',
+  Bookmark: 'Bookmark'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -82,15 +81,14 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const UserScalarFieldEnum = {
   id: 'id',
-  studentId: 'studentId',
   username: 'username',
   email: 'email',
-  profileURL: 'profileURL',
+  password: 'password',
+  image: 'image',
   description: 'description',
-  contract: 'contract',
   role: 'role',
-  reputation: 'reputation',
   departmentId: 'departmentId',
+  provider: 'provider',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -100,35 +98,20 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 
 export const DepartmentScalarFieldEnum = {
   id: 'id',
-  facultyId: 'facultyId',
   name: 'name'
 } as const
 
 export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof typeof DepartmentScalarFieldEnum]
 
 
-export const CourseScalarFieldEnum = {
-  id: 'id',
-  departmentId: 'departmentId',
-  code: 'code',
-  name: 'name'
-} as const
-
-export type CourseScalarFieldEnum = (typeof CourseScalarFieldEnum)[keyof typeof CourseScalarFieldEnum]
-
-
 export const PostScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  courseId: 'courseId',
   title: 'title',
-  body: 'body',
-  academicYear: 'academicYear',
-  semester: 'semester',
-  viewCount: 'viewCount',
-  answerCount: 'answerCount',
-  score: 'score',
+  description: 'description',
   isClosed: 'isClosed',
+  likeCount: 'likeCount',
+  commentCount: 'commentCount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -136,18 +119,13 @@ export const PostScalarFieldEnum = {
 export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof PostScalarFieldEnum]
 
 
-export const AnswerScalarFieldEnum = {
+export const PostImageScalarFieldEnum = {
   id: 'id',
-  questionId: 'questionId',
-  userId: 'userId',
-  body: 'body',
-  score: 'score',
-  isAccepted: 'isAccepted',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  postId: 'postId',
+  url: 'url'
 } as const
 
-export type AnswerScalarFieldEnum = (typeof AnswerScalarFieldEnum)[keyof typeof AnswerScalarFieldEnum]
+export type PostImageScalarFieldEnum = (typeof PostImageScalarFieldEnum)[keyof typeof PostImageScalarFieldEnum]
 
 
 export const TagScalarFieldEnum = {
@@ -158,55 +136,52 @@ export const TagScalarFieldEnum = {
 export type TagScalarFieldEnum = (typeof TagScalarFieldEnum)[keyof typeof TagScalarFieldEnum]
 
 
-export const QuestionTagScalarFieldEnum = {
-  questionId: 'questionId',
+export const PostTagScalarFieldEnum = {
+  postId: 'postId',
   tagId: 'tagId'
 } as const
 
-export type QuestionTagScalarFieldEnum = (typeof QuestionTagScalarFieldEnum)[keyof typeof QuestionTagScalarFieldEnum]
+export type PostTagScalarFieldEnum = (typeof PostTagScalarFieldEnum)[keyof typeof PostTagScalarFieldEnum]
 
 
-export const VoteScalarFieldEnum = {
+export const CommentScalarFieldEnum = {
   id: 'id',
+  postId: 'postId',
   userId: 'userId',
-  targetType: 'targetType',
-  targetId: 'targetId',
-  value: 'value',
+  parentId: 'parentId',
+  content: 'content',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CommentScalarFieldEnum = (typeof CommentScalarFieldEnum)[keyof typeof CommentScalarFieldEnum]
+
+
+export const CommentImageScalarFieldEnum = {
+  id: 'id',
+  commentId: 'commentId',
+  url: 'url'
+} as const
+
+export type CommentImageScalarFieldEnum = (typeof CommentImageScalarFieldEnum)[keyof typeof CommentImageScalarFieldEnum]
+
+
+export const LikeScalarFieldEnum = {
+  userId: 'userId',
+  postId: 'postId',
   createdAt: 'createdAt'
 } as const
 
-export type VoteScalarFieldEnum = (typeof VoteScalarFieldEnum)[keyof typeof VoteScalarFieldEnum]
+export type LikeScalarFieldEnum = (typeof LikeScalarFieldEnum)[keyof typeof LikeScalarFieldEnum]
 
 
 export const BookmarkScalarFieldEnum = {
   userId: 'userId',
-  questionId: 'questionId',
+  postId: 'postId',
   createdAt: 'createdAt'
 } as const
 
 export type BookmarkScalarFieldEnum = (typeof BookmarkScalarFieldEnum)[keyof typeof BookmarkScalarFieldEnum]
-
-
-export const FollowScalarFieldEnum = {
-  followingUserId: 'followingUserId',
-  followedUserId: 'followedUserId',
-  createdAt: 'createdAt'
-} as const
-
-export type FollowScalarFieldEnum = (typeof FollowScalarFieldEnum)[keyof typeof FollowScalarFieldEnum]
-
-
-export const ReportScalarFieldEnum = {
-  id: 'id',
-  reporterId: 'reporterId',
-  targetType: 'targetType',
-  targetId: 'targetId',
-  reason: 'reason',
-  status: 'status',
-  createdAt: 'createdAt'
-} as const
-
-export type ReportScalarFieldEnum = (typeof ReportScalarFieldEnum)[keyof typeof ReportScalarFieldEnum]
 
 
 export const SortOrder = {

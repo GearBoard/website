@@ -29,37 +29,25 @@ export type AggregatePost = {
 export type PostAvgAggregateOutputType = {
   id: number | null
   userId: number | null
-  courseId: number | null
-  academicYear: number | null
-  semester: number | null
-  viewCount: number | null
-  answerCount: number | null
-  score: number | null
+  likeCount: number | null
+  commentCount: number | null
 }
 
 export type PostSumAggregateOutputType = {
   id: bigint | null
   userId: bigint | null
-  courseId: bigint | null
-  academicYear: number | null
-  semester: number | null
-  viewCount: number | null
-  answerCount: number | null
-  score: number | null
+  likeCount: number | null
+  commentCount: number | null
 }
 
 export type PostMinAggregateOutputType = {
   id: bigint | null
   userId: bigint | null
-  courseId: bigint | null
   title: string | null
-  body: string | null
-  academicYear: number | null
-  semester: number | null
-  viewCount: number | null
-  answerCount: number | null
-  score: number | null
+  description: string | null
   isClosed: boolean | null
+  likeCount: number | null
+  commentCount: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -67,15 +55,11 @@ export type PostMinAggregateOutputType = {
 export type PostMaxAggregateOutputType = {
   id: bigint | null
   userId: bigint | null
-  courseId: bigint | null
   title: string | null
-  body: string | null
-  academicYear: number | null
-  semester: number | null
-  viewCount: number | null
-  answerCount: number | null
-  score: number | null
+  description: string | null
   isClosed: boolean | null
+  likeCount: number | null
+  commentCount: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -83,15 +67,11 @@ export type PostMaxAggregateOutputType = {
 export type PostCountAggregateOutputType = {
   id: number
   userId: number
-  courseId: number
   title: number
-  body: number
-  academicYear: number
-  semester: number
-  viewCount: number
-  answerCount: number
-  score: number
+  description: number
   isClosed: number
+  likeCount: number
+  commentCount: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -101,37 +81,25 @@ export type PostCountAggregateOutputType = {
 export type PostAvgAggregateInputType = {
   id?: true
   userId?: true
-  courseId?: true
-  academicYear?: true
-  semester?: true
-  viewCount?: true
-  answerCount?: true
-  score?: true
+  likeCount?: true
+  commentCount?: true
 }
 
 export type PostSumAggregateInputType = {
   id?: true
   userId?: true
-  courseId?: true
-  academicYear?: true
-  semester?: true
-  viewCount?: true
-  answerCount?: true
-  score?: true
+  likeCount?: true
+  commentCount?: true
 }
 
 export type PostMinAggregateInputType = {
   id?: true
   userId?: true
-  courseId?: true
   title?: true
-  body?: true
-  academicYear?: true
-  semester?: true
-  viewCount?: true
-  answerCount?: true
-  score?: true
+  description?: true
   isClosed?: true
+  likeCount?: true
+  commentCount?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -139,15 +107,11 @@ export type PostMinAggregateInputType = {
 export type PostMaxAggregateInputType = {
   id?: true
   userId?: true
-  courseId?: true
   title?: true
-  body?: true
-  academicYear?: true
-  semester?: true
-  viewCount?: true
-  answerCount?: true
-  score?: true
+  description?: true
   isClosed?: true
+  likeCount?: true
+  commentCount?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -155,15 +119,11 @@ export type PostMaxAggregateInputType = {
 export type PostCountAggregateInputType = {
   id?: true
   userId?: true
-  courseId?: true
   title?: true
-  body?: true
-  academicYear?: true
-  semester?: true
-  viewCount?: true
-  answerCount?: true
-  score?: true
+  description?: true
   isClosed?: true
+  likeCount?: true
+  commentCount?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -258,15 +218,11 @@ export type PostGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type PostGroupByOutputType = {
   id: bigint
   userId: bigint
-  courseId: bigint | null
-  title: string | null
-  body: string | null
-  academicYear: number | null
-  semester: number | null
-  viewCount: number
-  answerCount: number
-  score: number
+  title: string
+  description: string
   isClosed: boolean
+  likeCount: number
+  commentCount: number
   createdAt: Date
   updatedAt: Date
   _count: PostCountAggregateOutputType | null
@@ -297,42 +253,36 @@ export type PostWhereInput = {
   NOT?: Prisma.PostWhereInput | Prisma.PostWhereInput[]
   id?: Prisma.BigIntFilter<"Post"> | bigint | number
   userId?: Prisma.BigIntFilter<"Post"> | bigint | number
-  courseId?: Prisma.BigIntNullableFilter<"Post"> | bigint | number | null
-  title?: Prisma.StringNullableFilter<"Post"> | string | null
-  body?: Prisma.StringNullableFilter<"Post"> | string | null
-  academicYear?: Prisma.IntNullableFilter<"Post"> | number | null
-  semester?: Prisma.IntNullableFilter<"Post"> | number | null
-  viewCount?: Prisma.IntFilter<"Post"> | number
-  answerCount?: Prisma.IntFilter<"Post"> | number
-  score?: Prisma.IntFilter<"Post"> | number
+  title?: Prisma.StringFilter<"Post"> | string
+  description?: Prisma.StringFilter<"Post"> | string
   isClosed?: Prisma.BoolFilter<"Post"> | boolean
+  likeCount?: Prisma.IntFilter<"Post"> | number
+  commentCount?: Prisma.IntFilter<"Post"> | number
   createdAt?: Prisma.DateTimeFilter<"Post"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Post"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  course?: Prisma.XOR<Prisma.CourseNullableScalarRelationFilter, Prisma.CourseWhereInput> | null
-  answers?: Prisma.AnswerListRelationFilter
-  tags?: Prisma.QuestionTagListRelationFilter
+  tags?: Prisma.PostTagListRelationFilter
+  images?: Prisma.PostImageListRelationFilter
+  comments?: Prisma.CommentListRelationFilter
+  likes?: Prisma.LikeListRelationFilter
   bookmarks?: Prisma.BookmarkListRelationFilter
 }
 
 export type PostOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  courseId?: Prisma.SortOrderInput | Prisma.SortOrder
-  title?: Prisma.SortOrderInput | Prisma.SortOrder
-  body?: Prisma.SortOrderInput | Prisma.SortOrder
-  academicYear?: Prisma.SortOrderInput | Prisma.SortOrder
-  semester?: Prisma.SortOrderInput | Prisma.SortOrder
-  viewCount?: Prisma.SortOrder
-  answerCount?: Prisma.SortOrder
-  score?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   isClosed?: Prisma.SortOrder
+  likeCount?: Prisma.SortOrder
+  commentCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
-  course?: Prisma.CourseOrderByWithRelationInput
-  answers?: Prisma.AnswerOrderByRelationAggregateInput
-  tags?: Prisma.QuestionTagOrderByRelationAggregateInput
+  tags?: Prisma.PostTagOrderByRelationAggregateInput
+  images?: Prisma.PostImageOrderByRelationAggregateInput
+  comments?: Prisma.CommentOrderByRelationAggregateInput
+  likes?: Prisma.LikeOrderByRelationAggregateInput
   bookmarks?: Prisma.BookmarkOrderByRelationAggregateInput
 }
 
@@ -342,36 +292,29 @@ export type PostWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.PostWhereInput[]
   NOT?: Prisma.PostWhereInput | Prisma.PostWhereInput[]
   userId?: Prisma.BigIntFilter<"Post"> | bigint | number
-  courseId?: Prisma.BigIntNullableFilter<"Post"> | bigint | number | null
-  title?: Prisma.StringNullableFilter<"Post"> | string | null
-  body?: Prisma.StringNullableFilter<"Post"> | string | null
-  academicYear?: Prisma.IntNullableFilter<"Post"> | number | null
-  semester?: Prisma.IntNullableFilter<"Post"> | number | null
-  viewCount?: Prisma.IntFilter<"Post"> | number
-  answerCount?: Prisma.IntFilter<"Post"> | number
-  score?: Prisma.IntFilter<"Post"> | number
+  title?: Prisma.StringFilter<"Post"> | string
+  description?: Prisma.StringFilter<"Post"> | string
   isClosed?: Prisma.BoolFilter<"Post"> | boolean
+  likeCount?: Prisma.IntFilter<"Post"> | number
+  commentCount?: Prisma.IntFilter<"Post"> | number
   createdAt?: Prisma.DateTimeFilter<"Post"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Post"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  course?: Prisma.XOR<Prisma.CourseNullableScalarRelationFilter, Prisma.CourseWhereInput> | null
-  answers?: Prisma.AnswerListRelationFilter
-  tags?: Prisma.QuestionTagListRelationFilter
+  tags?: Prisma.PostTagListRelationFilter
+  images?: Prisma.PostImageListRelationFilter
+  comments?: Prisma.CommentListRelationFilter
+  likes?: Prisma.LikeListRelationFilter
   bookmarks?: Prisma.BookmarkListRelationFilter
 }, "id">
 
 export type PostOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  courseId?: Prisma.SortOrderInput | Prisma.SortOrder
-  title?: Prisma.SortOrderInput | Prisma.SortOrder
-  body?: Prisma.SortOrderInput | Prisma.SortOrder
-  academicYear?: Prisma.SortOrderInput | Prisma.SortOrder
-  semester?: Prisma.SortOrderInput | Prisma.SortOrder
-  viewCount?: Prisma.SortOrder
-  answerCount?: Prisma.SortOrder
-  score?: Prisma.SortOrder
+  title?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   isClosed?: Prisma.SortOrder
+  likeCount?: Prisma.SortOrder
+  commentCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PostCountOrderByAggregateInput
@@ -387,121 +330,102 @@ export type PostScalarWhereWithAggregatesInput = {
   NOT?: Prisma.PostScalarWhereWithAggregatesInput | Prisma.PostScalarWhereWithAggregatesInput[]
   id?: Prisma.BigIntWithAggregatesFilter<"Post"> | bigint | number
   userId?: Prisma.BigIntWithAggregatesFilter<"Post"> | bigint | number
-  courseId?: Prisma.BigIntNullableWithAggregatesFilter<"Post"> | bigint | number | null
-  title?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
-  body?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
-  academicYear?: Prisma.IntNullableWithAggregatesFilter<"Post"> | number | null
-  semester?: Prisma.IntNullableWithAggregatesFilter<"Post"> | number | null
-  viewCount?: Prisma.IntWithAggregatesFilter<"Post"> | number
-  answerCount?: Prisma.IntWithAggregatesFilter<"Post"> | number
-  score?: Prisma.IntWithAggregatesFilter<"Post"> | number
+  title?: Prisma.StringWithAggregatesFilter<"Post"> | string
+  description?: Prisma.StringWithAggregatesFilter<"Post"> | string
   isClosed?: Prisma.BoolWithAggregatesFilter<"Post"> | boolean
+  likeCount?: Prisma.IntWithAggregatesFilter<"Post"> | number
+  commentCount?: Prisma.IntWithAggregatesFilter<"Post"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Post"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Post"> | Date | string
 }
 
 export type PostCreateInput = {
   id?: bigint | number
-  title?: string | null
-  body?: string | null
-  academicYear?: number | null
-  semester?: number | null
-  viewCount?: number
-  answerCount?: number
-  score?: number
+  title: string
+  description: string
   isClosed?: boolean
+  likeCount?: number
+  commentCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPostsInput
-  course?: Prisma.CourseCreateNestedOneWithoutPostsInput
-  answers?: Prisma.AnswerCreateNestedManyWithoutQuestionInput
-  tags?: Prisma.QuestionTagCreateNestedManyWithoutQuestionInput
-  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutQuestionInput
+  tags?: Prisma.PostTagCreateNestedManyWithoutPostInput
+  images?: Prisma.PostImageCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentCreateNestedManyWithoutPostInput
+  likes?: Prisma.LikeCreateNestedManyWithoutPostInput
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutPostInput
 }
 
 export type PostUncheckedCreateInput = {
   id?: bigint | number
   userId: bigint | number
-  courseId?: bigint | number | null
-  title?: string | null
-  body?: string | null
-  academicYear?: number | null
-  semester?: number | null
-  viewCount?: number
-  answerCount?: number
-  score?: number
+  title: string
+  description: string
   isClosed?: boolean
+  likeCount?: number
+  commentCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  answers?: Prisma.AnswerUncheckedCreateNestedManyWithoutQuestionInput
-  tags?: Prisma.QuestionTagUncheckedCreateNestedManyWithoutQuestionInput
-  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutQuestionInput
+  tags?: Prisma.PostTagUncheckedCreateNestedManyWithoutPostInput
+  images?: Prisma.PostImageUncheckedCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutPostInput
+  likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutPostInput
 }
 
 export type PostUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  academicYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  semester?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
-  answerCount?: Prisma.IntFieldUpdateOperationsInput | number
-  score?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
-  course?: Prisma.CourseUpdateOneWithoutPostsNestedInput
-  answers?: Prisma.AnswerUpdateManyWithoutQuestionNestedInput
-  tags?: Prisma.QuestionTagUpdateManyWithoutQuestionNestedInput
-  bookmarks?: Prisma.BookmarkUpdateManyWithoutQuestionNestedInput
+  tags?: Prisma.PostTagUpdateManyWithoutPostNestedInput
+  images?: Prisma.PostImageUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutPostNestedInput
+  likes?: Prisma.LikeUpdateManyWithoutPostNestedInput
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  courseId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  academicYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  semester?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
-  answerCount?: Prisma.IntFieldUpdateOperationsInput | number
-  score?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  answers?: Prisma.AnswerUncheckedUpdateManyWithoutQuestionNestedInput
-  tags?: Prisma.QuestionTagUncheckedUpdateManyWithoutQuestionNestedInput
-  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutQuestionNestedInput
+  tags?: Prisma.PostTagUncheckedUpdateManyWithoutPostNestedInput
+  images?: Prisma.PostImageUncheckedUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutPostNestedInput
+  likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutPostNestedInput
 }
 
 export type PostCreateManyInput = {
   id?: bigint | number
   userId: bigint | number
-  courseId?: bigint | number | null
-  title?: string | null
-  body?: string | null
-  academicYear?: number | null
-  semester?: number | null
-  viewCount?: number
-  answerCount?: number
-  score?: number
+  title: string
+  description: string
   isClosed?: boolean
+  likeCount?: number
+  commentCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type PostUpdateManyMutationInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  academicYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  semester?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
-  answerCount?: Prisma.IntFieldUpdateOperationsInput | number
-  score?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -509,15 +433,11 @@ export type PostUpdateManyMutationInput = {
 export type PostUncheckedUpdateManyInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  courseId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  academicYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  semester?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
-  answerCount?: Prisma.IntFieldUpdateOperationsInput | number
-  score?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -535,15 +455,11 @@ export type PostOrderByRelationAggregateInput = {
 export type PostCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  courseId?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  body?: Prisma.SortOrder
-  academicYear?: Prisma.SortOrder
-  semester?: Prisma.SortOrder
-  viewCount?: Prisma.SortOrder
-  answerCount?: Prisma.SortOrder
-  score?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   isClosed?: Prisma.SortOrder
+  likeCount?: Prisma.SortOrder
+  commentCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -551,26 +467,18 @@ export type PostCountOrderByAggregateInput = {
 export type PostAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  courseId?: Prisma.SortOrder
-  academicYear?: Prisma.SortOrder
-  semester?: Prisma.SortOrder
-  viewCount?: Prisma.SortOrder
-  answerCount?: Prisma.SortOrder
-  score?: Prisma.SortOrder
+  likeCount?: Prisma.SortOrder
+  commentCount?: Prisma.SortOrder
 }
 
 export type PostMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  courseId?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  body?: Prisma.SortOrder
-  academicYear?: Prisma.SortOrder
-  semester?: Prisma.SortOrder
-  viewCount?: Prisma.SortOrder
-  answerCount?: Prisma.SortOrder
-  score?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   isClosed?: Prisma.SortOrder
+  likeCount?: Prisma.SortOrder
+  commentCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -578,15 +486,11 @@ export type PostMaxOrderByAggregateInput = {
 export type PostMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  courseId?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  body?: Prisma.SortOrder
-  academicYear?: Prisma.SortOrder
-  semester?: Prisma.SortOrder
-  viewCount?: Prisma.SortOrder
-  answerCount?: Prisma.SortOrder
-  score?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   isClosed?: Prisma.SortOrder
+  likeCount?: Prisma.SortOrder
+  commentCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -594,12 +498,8 @@ export type PostMinOrderByAggregateInput = {
 export type PostSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  courseId?: Prisma.SortOrder
-  academicYear?: Prisma.SortOrder
-  semester?: Prisma.SortOrder
-  viewCount?: Prisma.SortOrder
-  answerCount?: Prisma.SortOrder
-  score?: Prisma.SortOrder
+  likeCount?: Prisma.SortOrder
+  commentCount?: Prisma.SortOrder
 }
 
 export type PostScalarRelationFilter = {
@@ -649,72 +549,30 @@ export type PostUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.PostScalarWhereInput | Prisma.PostScalarWhereInput[]
 }
 
-export type PostCreateNestedManyWithoutCourseInput = {
-  create?: Prisma.XOR<Prisma.PostCreateWithoutCourseInput, Prisma.PostUncheckedCreateWithoutCourseInput> | Prisma.PostCreateWithoutCourseInput[] | Prisma.PostUncheckedCreateWithoutCourseInput[]
-  connectOrCreate?: Prisma.PostCreateOrConnectWithoutCourseInput | Prisma.PostCreateOrConnectWithoutCourseInput[]
-  createMany?: Prisma.PostCreateManyCourseInputEnvelope
-  connect?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
-export type PostUncheckedCreateNestedManyWithoutCourseInput = {
-  create?: Prisma.XOR<Prisma.PostCreateWithoutCourseInput, Prisma.PostUncheckedCreateWithoutCourseInput> | Prisma.PostCreateWithoutCourseInput[] | Prisma.PostUncheckedCreateWithoutCourseInput[]
-  connectOrCreate?: Prisma.PostCreateOrConnectWithoutCourseInput | Prisma.PostCreateOrConnectWithoutCourseInput[]
-  createMany?: Prisma.PostCreateManyCourseInputEnvelope
-  connect?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
-}
-
-export type PostUpdateManyWithoutCourseNestedInput = {
-  create?: Prisma.XOR<Prisma.PostCreateWithoutCourseInput, Prisma.PostUncheckedCreateWithoutCourseInput> | Prisma.PostCreateWithoutCourseInput[] | Prisma.PostUncheckedCreateWithoutCourseInput[]
-  connectOrCreate?: Prisma.PostCreateOrConnectWithoutCourseInput | Prisma.PostCreateOrConnectWithoutCourseInput[]
-  upsert?: Prisma.PostUpsertWithWhereUniqueWithoutCourseInput | Prisma.PostUpsertWithWhereUniqueWithoutCourseInput[]
-  createMany?: Prisma.PostCreateManyCourseInputEnvelope
-  set?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
-  disconnect?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
-  delete?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
-  connect?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
-  update?: Prisma.PostUpdateWithWhereUniqueWithoutCourseInput | Prisma.PostUpdateWithWhereUniqueWithoutCourseInput[]
-  updateMany?: Prisma.PostUpdateManyWithWhereWithoutCourseInput | Prisma.PostUpdateManyWithWhereWithoutCourseInput[]
-  deleteMany?: Prisma.PostScalarWhereInput | Prisma.PostScalarWhereInput[]
-}
-
-export type PostUncheckedUpdateManyWithoutCourseNestedInput = {
-  create?: Prisma.XOR<Prisma.PostCreateWithoutCourseInput, Prisma.PostUncheckedCreateWithoutCourseInput> | Prisma.PostCreateWithoutCourseInput[] | Prisma.PostUncheckedCreateWithoutCourseInput[]
-  connectOrCreate?: Prisma.PostCreateOrConnectWithoutCourseInput | Prisma.PostCreateOrConnectWithoutCourseInput[]
-  upsert?: Prisma.PostUpsertWithWhereUniqueWithoutCourseInput | Prisma.PostUpsertWithWhereUniqueWithoutCourseInput[]
-  createMany?: Prisma.PostCreateManyCourseInputEnvelope
-  set?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
-  disconnect?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
-  delete?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
-  connect?: Prisma.PostWhereUniqueInput | Prisma.PostWhereUniqueInput[]
-  update?: Prisma.PostUpdateWithWhereUniqueWithoutCourseInput | Prisma.PostUpdateWithWhereUniqueWithoutCourseInput[]
-  updateMany?: Prisma.PostUpdateManyWithWhereWithoutCourseInput | Prisma.PostUpdateManyWithWhereWithoutCourseInput[]
-  deleteMany?: Prisma.PostScalarWhereInput | Prisma.PostScalarWhereInput[]
-}
-
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
+export type IntFieldUpdateOperationsInput = {
+  set?: number
   increment?: number
   decrement?: number
   multiply?: number
   divide?: number
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
-export type PostCreateNestedOneWithoutAnswersInput = {
-  create?: Prisma.XOR<Prisma.PostCreateWithoutAnswersInput, Prisma.PostUncheckedCreateWithoutAnswersInput>
-  connectOrCreate?: Prisma.PostCreateOrConnectWithoutAnswersInput
+export type PostCreateNestedOneWithoutImagesInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutImagesInput, Prisma.PostUncheckedCreateWithoutImagesInput>
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutImagesInput
   connect?: Prisma.PostWhereUniqueInput
 }
 
-export type PostUpdateOneRequiredWithoutAnswersNestedInput = {
-  create?: Prisma.XOR<Prisma.PostCreateWithoutAnswersInput, Prisma.PostUncheckedCreateWithoutAnswersInput>
-  connectOrCreate?: Prisma.PostCreateOrConnectWithoutAnswersInput
-  upsert?: Prisma.PostUpsertWithoutAnswersInput
+export type PostUpdateOneRequiredWithoutImagesNestedInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutImagesInput, Prisma.PostUncheckedCreateWithoutImagesInput>
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutImagesInput
+  upsert?: Prisma.PostUpsertWithoutImagesInput
   connect?: Prisma.PostWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PostUpdateToOneWithWhereWithoutAnswersInput, Prisma.PostUpdateWithoutAnswersInput>, Prisma.PostUncheckedUpdateWithoutAnswersInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PostUpdateToOneWithWhereWithoutImagesInput, Prisma.PostUpdateWithoutImagesInput>, Prisma.PostUncheckedUpdateWithoutImagesInput>
 }
 
 export type PostCreateNestedOneWithoutTagsInput = {
@@ -729,6 +587,34 @@ export type PostUpdateOneRequiredWithoutTagsNestedInput = {
   upsert?: Prisma.PostUpsertWithoutTagsInput
   connect?: Prisma.PostWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.PostUpdateToOneWithWhereWithoutTagsInput, Prisma.PostUpdateWithoutTagsInput>, Prisma.PostUncheckedUpdateWithoutTagsInput>
+}
+
+export type PostCreateNestedOneWithoutCommentsInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutCommentsInput, Prisma.PostUncheckedCreateWithoutCommentsInput>
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutCommentsInput
+  connect?: Prisma.PostWhereUniqueInput
+}
+
+export type PostUpdateOneRequiredWithoutCommentsNestedInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutCommentsInput, Prisma.PostUncheckedCreateWithoutCommentsInput>
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutCommentsInput
+  upsert?: Prisma.PostUpsertWithoutCommentsInput
+  connect?: Prisma.PostWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PostUpdateToOneWithWhereWithoutCommentsInput, Prisma.PostUpdateWithoutCommentsInput>, Prisma.PostUncheckedUpdateWithoutCommentsInput>
+}
+
+export type PostCreateNestedOneWithoutLikesInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutLikesInput, Prisma.PostUncheckedCreateWithoutLikesInput>
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutLikesInput
+  connect?: Prisma.PostWhereUniqueInput
+}
+
+export type PostUpdateOneRequiredWithoutLikesNestedInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutLikesInput, Prisma.PostUncheckedCreateWithoutLikesInput>
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutLikesInput
+  upsert?: Prisma.PostUpsertWithoutLikesInput
+  connect?: Prisma.PostWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PostUpdateToOneWithWhereWithoutLikesInput, Prisma.PostUpdateWithoutLikesInput>, Prisma.PostUncheckedUpdateWithoutLikesInput>
 }
 
 export type PostCreateNestedOneWithoutBookmarksInput = {
@@ -747,38 +633,34 @@ export type PostUpdateOneRequiredWithoutBookmarksNestedInput = {
 
 export type PostCreateWithoutUserInput = {
   id?: bigint | number
-  title?: string | null
-  body?: string | null
-  academicYear?: number | null
-  semester?: number | null
-  viewCount?: number
-  answerCount?: number
-  score?: number
+  title: string
+  description: string
   isClosed?: boolean
+  likeCount?: number
+  commentCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  course?: Prisma.CourseCreateNestedOneWithoutPostsInput
-  answers?: Prisma.AnswerCreateNestedManyWithoutQuestionInput
-  tags?: Prisma.QuestionTagCreateNestedManyWithoutQuestionInput
-  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutQuestionInput
+  tags?: Prisma.PostTagCreateNestedManyWithoutPostInput
+  images?: Prisma.PostImageCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentCreateNestedManyWithoutPostInput
+  likes?: Prisma.LikeCreateNestedManyWithoutPostInput
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutPostInput
 }
 
 export type PostUncheckedCreateWithoutUserInput = {
   id?: bigint | number
-  courseId?: bigint | number | null
-  title?: string | null
-  body?: string | null
-  academicYear?: number | null
-  semester?: number | null
-  viewCount?: number
-  answerCount?: number
-  score?: number
+  title: string
+  description: string
   isClosed?: boolean
+  likeCount?: number
+  commentCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  answers?: Prisma.AnswerUncheckedCreateNestedManyWithoutQuestionInput
-  tags?: Prisma.QuestionTagUncheckedCreateNestedManyWithoutQuestionInput
-  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutQuestionInput
+  tags?: Prisma.PostTagUncheckedCreateNestedManyWithoutPostInput
+  images?: Prisma.PostImageUncheckedCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutPostInput
+  likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutPostInput
 }
 
 export type PostCreateOrConnectWithoutUserInput = {
@@ -813,203 +695,125 @@ export type PostScalarWhereInput = {
   NOT?: Prisma.PostScalarWhereInput | Prisma.PostScalarWhereInput[]
   id?: Prisma.BigIntFilter<"Post"> | bigint | number
   userId?: Prisma.BigIntFilter<"Post"> | bigint | number
-  courseId?: Prisma.BigIntNullableFilter<"Post"> | bigint | number | null
-  title?: Prisma.StringNullableFilter<"Post"> | string | null
-  body?: Prisma.StringNullableFilter<"Post"> | string | null
-  academicYear?: Prisma.IntNullableFilter<"Post"> | number | null
-  semester?: Prisma.IntNullableFilter<"Post"> | number | null
-  viewCount?: Prisma.IntFilter<"Post"> | number
-  answerCount?: Prisma.IntFilter<"Post"> | number
-  score?: Prisma.IntFilter<"Post"> | number
+  title?: Prisma.StringFilter<"Post"> | string
+  description?: Prisma.StringFilter<"Post"> | string
   isClosed?: Prisma.BoolFilter<"Post"> | boolean
+  likeCount?: Prisma.IntFilter<"Post"> | number
+  commentCount?: Prisma.IntFilter<"Post"> | number
   createdAt?: Prisma.DateTimeFilter<"Post"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Post"> | Date | string
 }
 
-export type PostCreateWithoutCourseInput = {
+export type PostCreateWithoutImagesInput = {
   id?: bigint | number
-  title?: string | null
-  body?: string | null
-  academicYear?: number | null
-  semester?: number | null
-  viewCount?: number
-  answerCount?: number
-  score?: number
+  title: string
+  description: string
   isClosed?: boolean
+  likeCount?: number
+  commentCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPostsInput
-  answers?: Prisma.AnswerCreateNestedManyWithoutQuestionInput
-  tags?: Prisma.QuestionTagCreateNestedManyWithoutQuestionInput
-  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutQuestionInput
+  tags?: Prisma.PostTagCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentCreateNestedManyWithoutPostInput
+  likes?: Prisma.LikeCreateNestedManyWithoutPostInput
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutPostInput
 }
 
-export type PostUncheckedCreateWithoutCourseInput = {
+export type PostUncheckedCreateWithoutImagesInput = {
   id?: bigint | number
   userId: bigint | number
-  title?: string | null
-  body?: string | null
-  academicYear?: number | null
-  semester?: number | null
-  viewCount?: number
-  answerCount?: number
-  score?: number
+  title: string
+  description: string
   isClosed?: boolean
+  likeCount?: number
+  commentCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  answers?: Prisma.AnswerUncheckedCreateNestedManyWithoutQuestionInput
-  tags?: Prisma.QuestionTagUncheckedCreateNestedManyWithoutQuestionInput
-  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutQuestionInput
+  tags?: Prisma.PostTagUncheckedCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutPostInput
+  likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutPostInput
 }
 
-export type PostCreateOrConnectWithoutCourseInput = {
+export type PostCreateOrConnectWithoutImagesInput = {
   where: Prisma.PostWhereUniqueInput
-  create: Prisma.XOR<Prisma.PostCreateWithoutCourseInput, Prisma.PostUncheckedCreateWithoutCourseInput>
+  create: Prisma.XOR<Prisma.PostCreateWithoutImagesInput, Prisma.PostUncheckedCreateWithoutImagesInput>
 }
 
-export type PostCreateManyCourseInputEnvelope = {
-  data: Prisma.PostCreateManyCourseInput | Prisma.PostCreateManyCourseInput[]
-  skipDuplicates?: boolean
-}
-
-export type PostUpsertWithWhereUniqueWithoutCourseInput = {
-  where: Prisma.PostWhereUniqueInput
-  update: Prisma.XOR<Prisma.PostUpdateWithoutCourseInput, Prisma.PostUncheckedUpdateWithoutCourseInput>
-  create: Prisma.XOR<Prisma.PostCreateWithoutCourseInput, Prisma.PostUncheckedCreateWithoutCourseInput>
-}
-
-export type PostUpdateWithWhereUniqueWithoutCourseInput = {
-  where: Prisma.PostWhereUniqueInput
-  data: Prisma.XOR<Prisma.PostUpdateWithoutCourseInput, Prisma.PostUncheckedUpdateWithoutCourseInput>
-}
-
-export type PostUpdateManyWithWhereWithoutCourseInput = {
-  where: Prisma.PostScalarWhereInput
-  data: Prisma.XOR<Prisma.PostUpdateManyMutationInput, Prisma.PostUncheckedUpdateManyWithoutCourseInput>
-}
-
-export type PostCreateWithoutAnswersInput = {
-  id?: bigint | number
-  title?: string | null
-  body?: string | null
-  academicYear?: number | null
-  semester?: number | null
-  viewCount?: number
-  answerCount?: number
-  score?: number
-  isClosed?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutPostsInput
-  course?: Prisma.CourseCreateNestedOneWithoutPostsInput
-  tags?: Prisma.QuestionTagCreateNestedManyWithoutQuestionInput
-  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutQuestionInput
-}
-
-export type PostUncheckedCreateWithoutAnswersInput = {
-  id?: bigint | number
-  userId: bigint | number
-  courseId?: bigint | number | null
-  title?: string | null
-  body?: string | null
-  academicYear?: number | null
-  semester?: number | null
-  viewCount?: number
-  answerCount?: number
-  score?: number
-  isClosed?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  tags?: Prisma.QuestionTagUncheckedCreateNestedManyWithoutQuestionInput
-  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutQuestionInput
-}
-
-export type PostCreateOrConnectWithoutAnswersInput = {
-  where: Prisma.PostWhereUniqueInput
-  create: Prisma.XOR<Prisma.PostCreateWithoutAnswersInput, Prisma.PostUncheckedCreateWithoutAnswersInput>
-}
-
-export type PostUpsertWithoutAnswersInput = {
-  update: Prisma.XOR<Prisma.PostUpdateWithoutAnswersInput, Prisma.PostUncheckedUpdateWithoutAnswersInput>
-  create: Prisma.XOR<Prisma.PostCreateWithoutAnswersInput, Prisma.PostUncheckedCreateWithoutAnswersInput>
+export type PostUpsertWithoutImagesInput = {
+  update: Prisma.XOR<Prisma.PostUpdateWithoutImagesInput, Prisma.PostUncheckedUpdateWithoutImagesInput>
+  create: Prisma.XOR<Prisma.PostCreateWithoutImagesInput, Prisma.PostUncheckedCreateWithoutImagesInput>
   where?: Prisma.PostWhereInput
 }
 
-export type PostUpdateToOneWithWhereWithoutAnswersInput = {
+export type PostUpdateToOneWithWhereWithoutImagesInput = {
   where?: Prisma.PostWhereInput
-  data: Prisma.XOR<Prisma.PostUpdateWithoutAnswersInput, Prisma.PostUncheckedUpdateWithoutAnswersInput>
+  data: Prisma.XOR<Prisma.PostUpdateWithoutImagesInput, Prisma.PostUncheckedUpdateWithoutImagesInput>
 }
 
-export type PostUpdateWithoutAnswersInput = {
+export type PostUpdateWithoutImagesInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  academicYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  semester?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
-  answerCount?: Prisma.IntFieldUpdateOperationsInput | number
-  score?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
-  course?: Prisma.CourseUpdateOneWithoutPostsNestedInput
-  tags?: Prisma.QuestionTagUpdateManyWithoutQuestionNestedInput
-  bookmarks?: Prisma.BookmarkUpdateManyWithoutQuestionNestedInput
+  tags?: Prisma.PostTagUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutPostNestedInput
+  likes?: Prisma.LikeUpdateManyWithoutPostNestedInput
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutPostNestedInput
 }
 
-export type PostUncheckedUpdateWithoutAnswersInput = {
+export type PostUncheckedUpdateWithoutImagesInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  courseId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  academicYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  semester?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
-  answerCount?: Prisma.IntFieldUpdateOperationsInput | number
-  score?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tags?: Prisma.QuestionTagUncheckedUpdateManyWithoutQuestionNestedInput
-  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutQuestionNestedInput
+  tags?: Prisma.PostTagUncheckedUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutPostNestedInput
+  likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutPostNestedInput
 }
 
 export type PostCreateWithoutTagsInput = {
   id?: bigint | number
-  title?: string | null
-  body?: string | null
-  academicYear?: number | null
-  semester?: number | null
-  viewCount?: number
-  answerCount?: number
-  score?: number
+  title: string
+  description: string
   isClosed?: boolean
+  likeCount?: number
+  commentCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPostsInput
-  course?: Prisma.CourseCreateNestedOneWithoutPostsInput
-  answers?: Prisma.AnswerCreateNestedManyWithoutQuestionInput
-  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutQuestionInput
+  images?: Prisma.PostImageCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentCreateNestedManyWithoutPostInput
+  likes?: Prisma.LikeCreateNestedManyWithoutPostInput
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutPostInput
 }
 
 export type PostUncheckedCreateWithoutTagsInput = {
   id?: bigint | number
   userId: bigint | number
-  courseId?: bigint | number | null
-  title?: string | null
-  body?: string | null
-  academicYear?: number | null
-  semester?: number | null
-  viewCount?: number
-  answerCount?: number
-  score?: number
+  title: string
+  description: string
   isClosed?: boolean
+  likeCount?: number
+  commentCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  answers?: Prisma.AnswerUncheckedCreateNestedManyWithoutQuestionInput
-  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutQuestionInput
+  images?: Prisma.PostImageUncheckedCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutPostInput
+  likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutPostInput
 }
 
 export type PostCreateOrConnectWithoutTagsInput = {
@@ -1030,74 +834,226 @@ export type PostUpdateToOneWithWhereWithoutTagsInput = {
 
 export type PostUpdateWithoutTagsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  academicYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  semester?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
-  answerCount?: Prisma.IntFieldUpdateOperationsInput | number
-  score?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
-  course?: Prisma.CourseUpdateOneWithoutPostsNestedInput
-  answers?: Prisma.AnswerUpdateManyWithoutQuestionNestedInput
-  bookmarks?: Prisma.BookmarkUpdateManyWithoutQuestionNestedInput
+  images?: Prisma.PostImageUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutPostNestedInput
+  likes?: Prisma.LikeUpdateManyWithoutPostNestedInput
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateWithoutTagsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  courseId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  academicYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  semester?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
-  answerCount?: Prisma.IntFieldUpdateOperationsInput | number
-  score?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  answers?: Prisma.AnswerUncheckedUpdateManyWithoutQuestionNestedInput
-  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutQuestionNestedInput
+  images?: Prisma.PostImageUncheckedUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutPostNestedInput
+  likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutPostNestedInput
+}
+
+export type PostCreateWithoutCommentsInput = {
+  id?: bigint | number
+  title: string
+  description: string
+  isClosed?: boolean
+  likeCount?: number
+  commentCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutPostsInput
+  tags?: Prisma.PostTagCreateNestedManyWithoutPostInput
+  images?: Prisma.PostImageCreateNestedManyWithoutPostInput
+  likes?: Prisma.LikeCreateNestedManyWithoutPostInput
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutPostInput
+}
+
+export type PostUncheckedCreateWithoutCommentsInput = {
+  id?: bigint | number
+  userId: bigint | number
+  title: string
+  description: string
+  isClosed?: boolean
+  likeCount?: number
+  commentCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tags?: Prisma.PostTagUncheckedCreateNestedManyWithoutPostInput
+  images?: Prisma.PostImageUncheckedCreateNestedManyWithoutPostInput
+  likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutPostInput
+}
+
+export type PostCreateOrConnectWithoutCommentsInput = {
+  where: Prisma.PostWhereUniqueInput
+  create: Prisma.XOR<Prisma.PostCreateWithoutCommentsInput, Prisma.PostUncheckedCreateWithoutCommentsInput>
+}
+
+export type PostUpsertWithoutCommentsInput = {
+  update: Prisma.XOR<Prisma.PostUpdateWithoutCommentsInput, Prisma.PostUncheckedUpdateWithoutCommentsInput>
+  create: Prisma.XOR<Prisma.PostCreateWithoutCommentsInput, Prisma.PostUncheckedCreateWithoutCommentsInput>
+  where?: Prisma.PostWhereInput
+}
+
+export type PostUpdateToOneWithWhereWithoutCommentsInput = {
+  where?: Prisma.PostWhereInput
+  data: Prisma.XOR<Prisma.PostUpdateWithoutCommentsInput, Prisma.PostUncheckedUpdateWithoutCommentsInput>
+}
+
+export type PostUpdateWithoutCommentsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
+  tags?: Prisma.PostTagUpdateManyWithoutPostNestedInput
+  images?: Prisma.PostImageUpdateManyWithoutPostNestedInput
+  likes?: Prisma.LikeUpdateManyWithoutPostNestedInput
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutPostNestedInput
+}
+
+export type PostUncheckedUpdateWithoutCommentsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tags?: Prisma.PostTagUncheckedUpdateManyWithoutPostNestedInput
+  images?: Prisma.PostImageUncheckedUpdateManyWithoutPostNestedInput
+  likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutPostNestedInput
+}
+
+export type PostCreateWithoutLikesInput = {
+  id?: bigint | number
+  title: string
+  description: string
+  isClosed?: boolean
+  likeCount?: number
+  commentCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutPostsInput
+  tags?: Prisma.PostTagCreateNestedManyWithoutPostInput
+  images?: Prisma.PostImageCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentCreateNestedManyWithoutPostInput
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutPostInput
+}
+
+export type PostUncheckedCreateWithoutLikesInput = {
+  id?: bigint | number
+  userId: bigint | number
+  title: string
+  description: string
+  isClosed?: boolean
+  likeCount?: number
+  commentCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tags?: Prisma.PostTagUncheckedCreateNestedManyWithoutPostInput
+  images?: Prisma.PostImageUncheckedCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutPostInput
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutPostInput
+}
+
+export type PostCreateOrConnectWithoutLikesInput = {
+  where: Prisma.PostWhereUniqueInput
+  create: Prisma.XOR<Prisma.PostCreateWithoutLikesInput, Prisma.PostUncheckedCreateWithoutLikesInput>
+}
+
+export type PostUpsertWithoutLikesInput = {
+  update: Prisma.XOR<Prisma.PostUpdateWithoutLikesInput, Prisma.PostUncheckedUpdateWithoutLikesInput>
+  create: Prisma.XOR<Prisma.PostCreateWithoutLikesInput, Prisma.PostUncheckedCreateWithoutLikesInput>
+  where?: Prisma.PostWhereInput
+}
+
+export type PostUpdateToOneWithWhereWithoutLikesInput = {
+  where?: Prisma.PostWhereInput
+  data: Prisma.XOR<Prisma.PostUpdateWithoutLikesInput, Prisma.PostUncheckedUpdateWithoutLikesInput>
+}
+
+export type PostUpdateWithoutLikesInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
+  tags?: Prisma.PostTagUpdateManyWithoutPostNestedInput
+  images?: Prisma.PostImageUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutPostNestedInput
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutPostNestedInput
+}
+
+export type PostUncheckedUpdateWithoutLikesInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tags?: Prisma.PostTagUncheckedUpdateManyWithoutPostNestedInput
+  images?: Prisma.PostImageUncheckedUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutPostNestedInput
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutPostNestedInput
 }
 
 export type PostCreateWithoutBookmarksInput = {
   id?: bigint | number
-  title?: string | null
-  body?: string | null
-  academicYear?: number | null
-  semester?: number | null
-  viewCount?: number
-  answerCount?: number
-  score?: number
+  title: string
+  description: string
   isClosed?: boolean
+  likeCount?: number
+  commentCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPostsInput
-  course?: Prisma.CourseCreateNestedOneWithoutPostsInput
-  answers?: Prisma.AnswerCreateNestedManyWithoutQuestionInput
-  tags?: Prisma.QuestionTagCreateNestedManyWithoutQuestionInput
+  tags?: Prisma.PostTagCreateNestedManyWithoutPostInput
+  images?: Prisma.PostImageCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentCreateNestedManyWithoutPostInput
+  likes?: Prisma.LikeCreateNestedManyWithoutPostInput
 }
 
 export type PostUncheckedCreateWithoutBookmarksInput = {
   id?: bigint | number
   userId: bigint | number
-  courseId?: bigint | number | null
-  title?: string | null
-  body?: string | null
-  academicYear?: number | null
-  semester?: number | null
-  viewCount?: number
-  answerCount?: number
-  score?: number
+  title: string
+  description: string
   isClosed?: boolean
+  likeCount?: number
+  commentCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  answers?: Prisma.AnswerUncheckedCreateNestedManyWithoutQuestionInput
-  tags?: Prisma.QuestionTagUncheckedCreateNestedManyWithoutQuestionInput
+  tags?: Prisma.PostTagUncheckedCreateNestedManyWithoutPostInput
+  images?: Prisma.PostImageUncheckedCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutPostInput
+  likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
 }
 
 export type PostCreateOrConnectWithoutBookmarksInput = {
@@ -1118,168 +1074,86 @@ export type PostUpdateToOneWithWhereWithoutBookmarksInput = {
 
 export type PostUpdateWithoutBookmarksInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  academicYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  semester?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
-  answerCount?: Prisma.IntFieldUpdateOperationsInput | number
-  score?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
-  course?: Prisma.CourseUpdateOneWithoutPostsNestedInput
-  answers?: Prisma.AnswerUpdateManyWithoutQuestionNestedInput
-  tags?: Prisma.QuestionTagUpdateManyWithoutQuestionNestedInput
+  tags?: Prisma.PostTagUpdateManyWithoutPostNestedInput
+  images?: Prisma.PostImageUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutPostNestedInput
+  likes?: Prisma.LikeUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateWithoutBookmarksInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  courseId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  academicYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  semester?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
-  answerCount?: Prisma.IntFieldUpdateOperationsInput | number
-  score?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  answers?: Prisma.AnswerUncheckedUpdateManyWithoutQuestionNestedInput
-  tags?: Prisma.QuestionTagUncheckedUpdateManyWithoutQuestionNestedInput
+  tags?: Prisma.PostTagUncheckedUpdateManyWithoutPostNestedInput
+  images?: Prisma.PostImageUncheckedUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutPostNestedInput
+  likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
 }
 
 export type PostCreateManyUserInput = {
   id?: bigint | number
-  courseId?: bigint | number | null
-  title?: string | null
-  body?: string | null
-  academicYear?: number | null
-  semester?: number | null
-  viewCount?: number
-  answerCount?: number
-  score?: number
+  title: string
+  description: string
   isClosed?: boolean
+  likeCount?: number
+  commentCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type PostUpdateWithoutUserInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  academicYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  semester?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
-  answerCount?: Prisma.IntFieldUpdateOperationsInput | number
-  score?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  course?: Prisma.CourseUpdateOneWithoutPostsNestedInput
-  answers?: Prisma.AnswerUpdateManyWithoutQuestionNestedInput
-  tags?: Prisma.QuestionTagUpdateManyWithoutQuestionNestedInput
-  bookmarks?: Prisma.BookmarkUpdateManyWithoutQuestionNestedInput
+  tags?: Prisma.PostTagUpdateManyWithoutPostNestedInput
+  images?: Prisma.PostImageUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutPostNestedInput
+  likes?: Prisma.LikeUpdateManyWithoutPostNestedInput
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateWithoutUserInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  courseId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  academicYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  semester?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
-  answerCount?: Prisma.IntFieldUpdateOperationsInput | number
-  score?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  answers?: Prisma.AnswerUncheckedUpdateManyWithoutQuestionNestedInput
-  tags?: Prisma.QuestionTagUncheckedUpdateManyWithoutQuestionNestedInput
-  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutQuestionNestedInput
+  tags?: Prisma.PostTagUncheckedUpdateManyWithoutPostNestedInput
+  images?: Prisma.PostImageUncheckedUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutPostNestedInput
+  likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  courseId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  academicYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  semester?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
-  answerCount?: Prisma.IntFieldUpdateOperationsInput | number
-  score?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
   isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type PostCreateManyCourseInput = {
-  id?: bigint | number
-  userId: bigint | number
-  title?: string | null
-  body?: string | null
-  academicYear?: number | null
-  semester?: number | null
-  viewCount?: number
-  answerCount?: number
-  score?: number
-  isClosed?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type PostUpdateWithoutCourseInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  academicYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  semester?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
-  answerCount?: Prisma.IntFieldUpdateOperationsInput | number
-  score?: Prisma.IntFieldUpdateOperationsInput | number
-  isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
-  answers?: Prisma.AnswerUpdateManyWithoutQuestionNestedInput
-  tags?: Prisma.QuestionTagUpdateManyWithoutQuestionNestedInput
-  bookmarks?: Prisma.BookmarkUpdateManyWithoutQuestionNestedInput
-}
-
-export type PostUncheckedUpdateWithoutCourseInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  academicYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  semester?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
-  answerCount?: Prisma.IntFieldUpdateOperationsInput | number
-  score?: Prisma.IntFieldUpdateOperationsInput | number
-  isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  answers?: Prisma.AnswerUncheckedUpdateManyWithoutQuestionNestedInput
-  tags?: Prisma.QuestionTagUncheckedUpdateManyWithoutQuestionNestedInput
-  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutQuestionNestedInput
-}
-
-export type PostUncheckedUpdateManyWithoutCourseInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  academicYear?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  semester?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
-  answerCount?: Prisma.IntFieldUpdateOperationsInput | number
-  score?: Prisma.IntFieldUpdateOperationsInput | number
-  isClosed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  commentCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1290,14 +1164,18 @@ export type PostUncheckedUpdateManyWithoutCourseInput = {
  */
 
 export type PostCountOutputType = {
-  answers: number
   tags: number
+  images: number
+  comments: number
+  likes: number
   bookmarks: number
 }
 
 export type PostCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  answers?: boolean | PostCountOutputTypeCountAnswersArgs
   tags?: boolean | PostCountOutputTypeCountTagsArgs
+  images?: boolean | PostCountOutputTypeCountImagesArgs
+  comments?: boolean | PostCountOutputTypeCountCommentsArgs
+  likes?: boolean | PostCountOutputTypeCountLikesArgs
   bookmarks?: boolean | PostCountOutputTypeCountBookmarksArgs
 }
 
@@ -1314,15 +1192,29 @@ export type PostCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * PostCountOutputType without action
  */
-export type PostCountOutputTypeCountAnswersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.AnswerWhereInput
+export type PostCountOutputTypeCountTagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PostTagWhereInput
 }
 
 /**
  * PostCountOutputType without action
  */
-export type PostCountOutputTypeCountTagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.QuestionTagWhereInput
+export type PostCountOutputTypeCountImagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PostImageWhereInput
+}
+
+/**
+ * PostCountOutputType without action
+ */
+export type PostCountOutputTypeCountCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CommentWhereInput
+}
+
+/**
+ * PostCountOutputType without action
+ */
+export type PostCountOutputTypeCountLikesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LikeWhereInput
 }
 
 /**
@@ -1336,21 +1228,18 @@ export type PostCountOutputTypeCountBookmarksArgs<ExtArgs extends runtime.Types.
 export type PostSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  courseId?: boolean
   title?: boolean
-  body?: boolean
-  academicYear?: boolean
-  semester?: boolean
-  viewCount?: boolean
-  answerCount?: boolean
-  score?: boolean
+  description?: boolean
   isClosed?: boolean
+  likeCount?: boolean
+  commentCount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  course?: boolean | Prisma.Post$courseArgs<ExtArgs>
-  answers?: boolean | Prisma.Post$answersArgs<ExtArgs>
   tags?: boolean | Prisma.Post$tagsArgs<ExtArgs>
+  images?: boolean | Prisma.Post$imagesArgs<ExtArgs>
+  comments?: boolean | Prisma.Post$commentsArgs<ExtArgs>
+  likes?: boolean | Prisma.Post$likesArgs<ExtArgs>
   bookmarks?: boolean | Prisma.Post$bookmarksArgs<ExtArgs>
   _count?: boolean | Prisma.PostCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["post"]>
@@ -1358,94 +1247,76 @@ export type PostSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 export type PostSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  courseId?: boolean
   title?: boolean
-  body?: boolean
-  academicYear?: boolean
-  semester?: boolean
-  viewCount?: boolean
-  answerCount?: boolean
-  score?: boolean
+  description?: boolean
   isClosed?: boolean
+  likeCount?: boolean
+  commentCount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  course?: boolean | Prisma.Post$courseArgs<ExtArgs>
 }, ExtArgs["result"]["post"]>
 
 export type PostSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  courseId?: boolean
   title?: boolean
-  body?: boolean
-  academicYear?: boolean
-  semester?: boolean
-  viewCount?: boolean
-  answerCount?: boolean
-  score?: boolean
+  description?: boolean
   isClosed?: boolean
+  likeCount?: boolean
+  commentCount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  course?: boolean | Prisma.Post$courseArgs<ExtArgs>
 }, ExtArgs["result"]["post"]>
 
 export type PostSelectScalar = {
   id?: boolean
   userId?: boolean
-  courseId?: boolean
   title?: boolean
-  body?: boolean
-  academicYear?: boolean
-  semester?: boolean
-  viewCount?: boolean
-  answerCount?: boolean
-  score?: boolean
+  description?: boolean
   isClosed?: boolean
+  likeCount?: boolean
+  commentCount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "courseId" | "title" | "body" | "academicYear" | "semester" | "viewCount" | "answerCount" | "score" | "isClosed" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
+export type PostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "title" | "description" | "isClosed" | "likeCount" | "commentCount" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
 export type PostInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  course?: boolean | Prisma.Post$courseArgs<ExtArgs>
-  answers?: boolean | Prisma.Post$answersArgs<ExtArgs>
   tags?: boolean | Prisma.Post$tagsArgs<ExtArgs>
+  images?: boolean | Prisma.Post$imagesArgs<ExtArgs>
+  comments?: boolean | Prisma.Post$commentsArgs<ExtArgs>
+  likes?: boolean | Prisma.Post$likesArgs<ExtArgs>
   bookmarks?: boolean | Prisma.Post$bookmarksArgs<ExtArgs>
   _count?: boolean | Prisma.PostCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PostIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  course?: boolean | Prisma.Post$courseArgs<ExtArgs>
 }
 export type PostIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  course?: boolean | Prisma.Post$courseArgs<ExtArgs>
 }
 
 export type $PostPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Post"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
-    course: Prisma.$CoursePayload<ExtArgs> | null
-    answers: Prisma.$AnswerPayload<ExtArgs>[]
-    tags: Prisma.$QuestionTagPayload<ExtArgs>[]
+    tags: Prisma.$PostTagPayload<ExtArgs>[]
+    images: Prisma.$PostImagePayload<ExtArgs>[]
+    comments: Prisma.$CommentPayload<ExtArgs>[]
+    likes: Prisma.$LikePayload<ExtArgs>[]
     bookmarks: Prisma.$BookmarkPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: bigint
     userId: bigint
-    courseId: bigint | null
-    title: string | null
-    body: string | null
-    academicYear: number | null
-    semester: number | null
-    viewCount: number
-    answerCount: number
-    score: number
+    title: string
+    description: string
     isClosed: boolean
+    likeCount: number
+    commentCount: number
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["post"]>
@@ -1843,9 +1714,10 @@ readonly fields: PostFieldRefs;
 export interface Prisma__PostClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  course<T extends Prisma.Post$courseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$courseArgs<ExtArgs>>): Prisma.Prisma__CourseClient<runtime.Types.Result.GetResult<Prisma.$CoursePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  answers<T extends Prisma.Post$answersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$answersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnswerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  tags<T extends Prisma.Post$tagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$tagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuestionTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tags<T extends Prisma.Post$tagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$tagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  images<T extends Prisma.Post$imagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$imagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  comments<T extends Prisma.Post$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  likes<T extends Prisma.Post$likesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$likesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   bookmarks<T extends Prisma.Post$bookmarksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$bookmarksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BookmarkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1878,15 +1750,11 @@ export interface Prisma__PostClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface PostFieldRefs {
   readonly id: Prisma.FieldRef<"Post", 'BigInt'>
   readonly userId: Prisma.FieldRef<"Post", 'BigInt'>
-  readonly courseId: Prisma.FieldRef<"Post", 'BigInt'>
   readonly title: Prisma.FieldRef<"Post", 'String'>
-  readonly body: Prisma.FieldRef<"Post", 'String'>
-  readonly academicYear: Prisma.FieldRef<"Post", 'Int'>
-  readonly semester: Prisma.FieldRef<"Post", 'Int'>
-  readonly viewCount: Prisma.FieldRef<"Post", 'Int'>
-  readonly answerCount: Prisma.FieldRef<"Post", 'Int'>
-  readonly score: Prisma.FieldRef<"Post", 'Int'>
+  readonly description: Prisma.FieldRef<"Post", 'String'>
   readonly isClosed: Prisma.FieldRef<"Post", 'Boolean'>
+  readonly likeCount: Prisma.FieldRef<"Post", 'Int'>
+  readonly commentCount: Prisma.FieldRef<"Post", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Post", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Post", 'DateTime'>
 }
@@ -2285,70 +2153,99 @@ export type PostDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * Post.course
- */
-export type Post$courseArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Course
-   */
-  select?: Prisma.CourseSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Course
-   */
-  omit?: Prisma.CourseOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.CourseInclude<ExtArgs> | null
-  where?: Prisma.CourseWhereInput
-}
-
-/**
- * Post.answers
- */
-export type Post$answersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Answer
-   */
-  select?: Prisma.AnswerSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Answer
-   */
-  omit?: Prisma.AnswerOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.AnswerInclude<ExtArgs> | null
-  where?: Prisma.AnswerWhereInput
-  orderBy?: Prisma.AnswerOrderByWithRelationInput | Prisma.AnswerOrderByWithRelationInput[]
-  cursor?: Prisma.AnswerWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.AnswerScalarFieldEnum | Prisma.AnswerScalarFieldEnum[]
-}
-
-/**
  * Post.tags
  */
 export type Post$tagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the QuestionTag
+   * Select specific fields to fetch from the PostTag
    */
-  select?: Prisma.QuestionTagSelect<ExtArgs> | null
+  select?: Prisma.PostTagSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the QuestionTag
+   * Omit specific fields from the PostTag
    */
-  omit?: Prisma.QuestionTagOmit<ExtArgs> | null
+  omit?: Prisma.PostTagOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.QuestionTagInclude<ExtArgs> | null
-  where?: Prisma.QuestionTagWhereInput
-  orderBy?: Prisma.QuestionTagOrderByWithRelationInput | Prisma.QuestionTagOrderByWithRelationInput[]
-  cursor?: Prisma.QuestionTagWhereUniqueInput
+  include?: Prisma.PostTagInclude<ExtArgs> | null
+  where?: Prisma.PostTagWhereInput
+  orderBy?: Prisma.PostTagOrderByWithRelationInput | Prisma.PostTagOrderByWithRelationInput[]
+  cursor?: Prisma.PostTagWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.QuestionTagScalarFieldEnum | Prisma.QuestionTagScalarFieldEnum[]
+  distinct?: Prisma.PostTagScalarFieldEnum | Prisma.PostTagScalarFieldEnum[]
+}
+
+/**
+ * Post.images
+ */
+export type Post$imagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PostImage
+   */
+  select?: Prisma.PostImageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PostImage
+   */
+  omit?: Prisma.PostImageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PostImageInclude<ExtArgs> | null
+  where?: Prisma.PostImageWhereInput
+  orderBy?: Prisma.PostImageOrderByWithRelationInput | Prisma.PostImageOrderByWithRelationInput[]
+  cursor?: Prisma.PostImageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PostImageScalarFieldEnum | Prisma.PostImageScalarFieldEnum[]
+}
+
+/**
+ * Post.comments
+ */
+export type Post$commentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Comment
+   */
+  select?: Prisma.CommentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Comment
+   */
+  omit?: Prisma.CommentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CommentInclude<ExtArgs> | null
+  where?: Prisma.CommentWhereInput
+  orderBy?: Prisma.CommentOrderByWithRelationInput | Prisma.CommentOrderByWithRelationInput[]
+  cursor?: Prisma.CommentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CommentScalarFieldEnum | Prisma.CommentScalarFieldEnum[]
+}
+
+/**
+ * Post.likes
+ */
+export type Post$likesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Like
+   */
+  select?: Prisma.LikeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Like
+   */
+  omit?: Prisma.LikeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LikeInclude<ExtArgs> | null
+  where?: Prisma.LikeWhereInput
+  orderBy?: Prisma.LikeOrderByWithRelationInput | Prisma.LikeOrderByWithRelationInput[]
+  cursor?: Prisma.LikeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LikeScalarFieldEnum | Prisma.LikeScalarFieldEnum[]
 }
 
 /**

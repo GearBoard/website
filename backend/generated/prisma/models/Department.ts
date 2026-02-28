@@ -28,29 +28,24 @@ export type AggregateDepartment = {
 
 export type DepartmentAvgAggregateOutputType = {
   id: number | null
-  facultyId: number | null
 }
 
 export type DepartmentSumAggregateOutputType = {
   id: bigint | null
-  facultyId: bigint | null
 }
 
 export type DepartmentMinAggregateOutputType = {
   id: bigint | null
-  facultyId: bigint | null
   name: string | null
 }
 
 export type DepartmentMaxAggregateOutputType = {
   id: bigint | null
-  facultyId: bigint | null
   name: string | null
 }
 
 export type DepartmentCountAggregateOutputType = {
   id: number
-  facultyId: number
   name: number
   _all: number
 }
@@ -58,29 +53,24 @@ export type DepartmentCountAggregateOutputType = {
 
 export type DepartmentAvgAggregateInputType = {
   id?: true
-  facultyId?: true
 }
 
 export type DepartmentSumAggregateInputType = {
   id?: true
-  facultyId?: true
 }
 
 export type DepartmentMinAggregateInputType = {
   id?: true
-  facultyId?: true
   name?: true
 }
 
 export type DepartmentMaxAggregateInputType = {
   id?: true
-  facultyId?: true
   name?: true
 }
 
 export type DepartmentCountAggregateInputType = {
   id?: true
-  facultyId?: true
   name?: true
   _all?: true
 }
@@ -173,7 +163,6 @@ export type DepartmentGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inter
 
 export type DepartmentGroupByOutputType = {
   id: bigint
-  facultyId: bigint
   name: string
   _count: DepartmentCountAggregateOutputType | null
   _avg: DepartmentAvgAggregateOutputType | null
@@ -202,18 +191,14 @@ export type DepartmentWhereInput = {
   OR?: Prisma.DepartmentWhereInput[]
   NOT?: Prisma.DepartmentWhereInput | Prisma.DepartmentWhereInput[]
   id?: Prisma.BigIntFilter<"Department"> | bigint | number
-  facultyId?: Prisma.BigIntFilter<"Department"> | bigint | number
   name?: Prisma.StringFilter<"Department"> | string
   users?: Prisma.UserListRelationFilter
-  courses?: Prisma.CourseListRelationFilter
 }
 
 export type DepartmentOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  facultyId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   users?: Prisma.UserOrderByRelationAggregateInput
-  courses?: Prisma.CourseOrderByRelationAggregateInput
 }
 
 export type DepartmentWhereUniqueInput = Prisma.AtLeast<{
@@ -221,15 +206,12 @@ export type DepartmentWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.DepartmentWhereInput | Prisma.DepartmentWhereInput[]
   OR?: Prisma.DepartmentWhereInput[]
   NOT?: Prisma.DepartmentWhereInput | Prisma.DepartmentWhereInput[]
-  facultyId?: Prisma.BigIntFilter<"Department"> | bigint | number
   name?: Prisma.StringFilter<"Department"> | string
   users?: Prisma.UserListRelationFilter
-  courses?: Prisma.CourseListRelationFilter
 }, "id">
 
 export type DepartmentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  facultyId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   _count?: Prisma.DepartmentCountOrderByAggregateInput
   _avg?: Prisma.DepartmentAvgOrderByAggregateInput
@@ -243,57 +225,45 @@ export type DepartmentScalarWhereWithAggregatesInput = {
   OR?: Prisma.DepartmentScalarWhereWithAggregatesInput[]
   NOT?: Prisma.DepartmentScalarWhereWithAggregatesInput | Prisma.DepartmentScalarWhereWithAggregatesInput[]
   id?: Prisma.BigIntWithAggregatesFilter<"Department"> | bigint | number
-  facultyId?: Prisma.BigIntWithAggregatesFilter<"Department"> | bigint | number
   name?: Prisma.StringWithAggregatesFilter<"Department"> | string
 }
 
 export type DepartmentCreateInput = {
   id?: bigint | number
-  facultyId: bigint | number
   name: string
   users?: Prisma.UserCreateNestedManyWithoutDepartmentInput
-  courses?: Prisma.CourseCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentUncheckedCreateInput = {
   id?: bigint | number
-  facultyId: bigint | number
   name: string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutDepartmentInput
-  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  facultyId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   users?: Prisma.UserUpdateManyWithoutDepartmentNestedInput
-  courses?: Prisma.CourseUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentUncheckedUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  facultyId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   users?: Prisma.UserUncheckedUpdateManyWithoutDepartmentNestedInput
-  courses?: Prisma.CourseUncheckedUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentCreateManyInput = {
   id?: bigint | number
-  facultyId: bigint | number
   name: string
 }
 
 export type DepartmentUpdateManyMutationInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  facultyId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type DepartmentUncheckedUpdateManyInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  facultyId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -304,35 +274,25 @@ export type DepartmentNullableScalarRelationFilter = {
 
 export type DepartmentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  facultyId?: Prisma.SortOrder
   name?: Prisma.SortOrder
 }
 
 export type DepartmentAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  facultyId?: Prisma.SortOrder
 }
 
 export type DepartmentMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  facultyId?: Prisma.SortOrder
   name?: Prisma.SortOrder
 }
 
 export type DepartmentMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  facultyId?: Prisma.SortOrder
   name?: Prisma.SortOrder
 }
 
 export type DepartmentSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  facultyId?: Prisma.SortOrder
-}
-
-export type DepartmentScalarRelationFilter = {
-  is?: Prisma.DepartmentWhereInput
-  isNot?: Prisma.DepartmentWhereInput
 }
 
 export type DepartmentCreateNestedOneWithoutUsersInput = {
@@ -351,32 +311,14 @@ export type DepartmentUpdateOneWithoutUsersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.DepartmentUpdateToOneWithWhereWithoutUsersInput, Prisma.DepartmentUpdateWithoutUsersInput>, Prisma.DepartmentUncheckedUpdateWithoutUsersInput>
 }
 
-export type DepartmentCreateNestedOneWithoutCoursesInput = {
-  create?: Prisma.XOR<Prisma.DepartmentCreateWithoutCoursesInput, Prisma.DepartmentUncheckedCreateWithoutCoursesInput>
-  connectOrCreate?: Prisma.DepartmentCreateOrConnectWithoutCoursesInput
-  connect?: Prisma.DepartmentWhereUniqueInput
-}
-
-export type DepartmentUpdateOneRequiredWithoutCoursesNestedInput = {
-  create?: Prisma.XOR<Prisma.DepartmentCreateWithoutCoursesInput, Prisma.DepartmentUncheckedCreateWithoutCoursesInput>
-  connectOrCreate?: Prisma.DepartmentCreateOrConnectWithoutCoursesInput
-  upsert?: Prisma.DepartmentUpsertWithoutCoursesInput
-  connect?: Prisma.DepartmentWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.DepartmentUpdateToOneWithWhereWithoutCoursesInput, Prisma.DepartmentUpdateWithoutCoursesInput>, Prisma.DepartmentUncheckedUpdateWithoutCoursesInput>
-}
-
 export type DepartmentCreateWithoutUsersInput = {
   id?: bigint | number
-  facultyId: bigint | number
   name: string
-  courses?: Prisma.CourseCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentUncheckedCreateWithoutUsersInput = {
   id?: bigint | number
-  facultyId: bigint | number
   name: string
-  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentCreateOrConnectWithoutUsersInput = {
@@ -397,60 +339,12 @@ export type DepartmentUpdateToOneWithWhereWithoutUsersInput = {
 
 export type DepartmentUpdateWithoutUsersInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  facultyId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  courses?: Prisma.CourseUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentUncheckedUpdateWithoutUsersInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  facultyId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  courses?: Prisma.CourseUncheckedUpdateManyWithoutDepartmentNestedInput
-}
-
-export type DepartmentCreateWithoutCoursesInput = {
-  id?: bigint | number
-  facultyId: bigint | number
-  name: string
-  users?: Prisma.UserCreateNestedManyWithoutDepartmentInput
-}
-
-export type DepartmentUncheckedCreateWithoutCoursesInput = {
-  id?: bigint | number
-  facultyId: bigint | number
-  name: string
-  users?: Prisma.UserUncheckedCreateNestedManyWithoutDepartmentInput
-}
-
-export type DepartmentCreateOrConnectWithoutCoursesInput = {
-  where: Prisma.DepartmentWhereUniqueInput
-  create: Prisma.XOR<Prisma.DepartmentCreateWithoutCoursesInput, Prisma.DepartmentUncheckedCreateWithoutCoursesInput>
-}
-
-export type DepartmentUpsertWithoutCoursesInput = {
-  update: Prisma.XOR<Prisma.DepartmentUpdateWithoutCoursesInput, Prisma.DepartmentUncheckedUpdateWithoutCoursesInput>
-  create: Prisma.XOR<Prisma.DepartmentCreateWithoutCoursesInput, Prisma.DepartmentUncheckedCreateWithoutCoursesInput>
-  where?: Prisma.DepartmentWhereInput
-}
-
-export type DepartmentUpdateToOneWithWhereWithoutCoursesInput = {
-  where?: Prisma.DepartmentWhereInput
-  data: Prisma.XOR<Prisma.DepartmentUpdateWithoutCoursesInput, Prisma.DepartmentUncheckedUpdateWithoutCoursesInput>
-}
-
-export type DepartmentUpdateWithoutCoursesInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  facultyId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  users?: Prisma.UserUpdateManyWithoutDepartmentNestedInput
-}
-
-export type DepartmentUncheckedUpdateWithoutCoursesInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  facultyId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  users?: Prisma.UserUncheckedUpdateManyWithoutDepartmentNestedInput
 }
 
 
@@ -460,12 +354,10 @@ export type DepartmentUncheckedUpdateWithoutCoursesInput = {
 
 export type DepartmentCountOutputType = {
   users: number
-  courses: number
 }
 
 export type DepartmentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | DepartmentCountOutputTypeCountUsersArgs
-  courses?: boolean | DepartmentCountOutputTypeCountCoursesArgs
 }
 
 /**
@@ -485,45 +377,32 @@ export type DepartmentCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Type
   where?: Prisma.UserWhereInput
 }
 
-/**
- * DepartmentCountOutputType without action
- */
-export type DepartmentCountOutputTypeCountCoursesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.CourseWhereInput
-}
-
 
 export type DepartmentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  facultyId?: boolean
   name?: boolean
   users?: boolean | Prisma.Department$usersArgs<ExtArgs>
-  courses?: boolean | Prisma.Department$coursesArgs<ExtArgs>
   _count?: boolean | Prisma.DepartmentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["department"]>
 
 export type DepartmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  facultyId?: boolean
   name?: boolean
 }, ExtArgs["result"]["department"]>
 
 export type DepartmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  facultyId?: boolean
   name?: boolean
 }, ExtArgs["result"]["department"]>
 
 export type DepartmentSelectScalar = {
   id?: boolean
-  facultyId?: boolean
   name?: boolean
 }
 
-export type DepartmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "facultyId" | "name", ExtArgs["result"]["department"]>
+export type DepartmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name", ExtArgs["result"]["department"]>
 export type DepartmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.Department$usersArgs<ExtArgs>
-  courses?: boolean | Prisma.Department$coursesArgs<ExtArgs>
   _count?: boolean | Prisma.DepartmentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type DepartmentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -533,11 +412,9 @@ export type $DepartmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
   name: "Department"
   objects: {
     users: Prisma.$UserPayload<ExtArgs>[]
-    courses: Prisma.$CoursePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: bigint
-    facultyId: bigint
     name: string
   }, ExtArgs["result"]["department"]>
   composites: {}
@@ -934,7 +811,6 @@ readonly fields: DepartmentFieldRefs;
 export interface Prisma__DepartmentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   users<T extends Prisma.Department$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Department$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  courses<T extends Prisma.Department$coursesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Department$coursesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CoursePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -965,7 +841,6 @@ export interface Prisma__DepartmentClient<T, Null = never, ExtArgs extends runti
  */
 export interface DepartmentFieldRefs {
   readonly id: Prisma.FieldRef<"Department", 'BigInt'>
-  readonly facultyId: Prisma.FieldRef<"Department", 'BigInt'>
   readonly name: Prisma.FieldRef<"Department", 'String'>
 }
     
@@ -1376,30 +1251,6 @@ export type Department$usersArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
-}
-
-/**
- * Department.courses
- */
-export type Department$coursesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Course
-   */
-  select?: Prisma.CourseSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Course
-   */
-  omit?: Prisma.CourseOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.CourseInclude<ExtArgs> | null
-  where?: Prisma.CourseWhereInput
-  orderBy?: Prisma.CourseOrderByWithRelationInput | Prisma.CourseOrderByWithRelationInput[]
-  cursor?: Prisma.CourseWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.CourseScalarFieldEnum | Prisma.CourseScalarFieldEnum[]
 }
 
 /**
