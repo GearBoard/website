@@ -1,9 +1,5 @@
 # GearBoard Backend
 
-Express + TypeScript + Prisma API. Response shape: `{ success, data?, message }`.
-
----
-
 ## Project structure
 
 ```
