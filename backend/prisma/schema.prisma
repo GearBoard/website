@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
@@ -27,6 +27,7 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   posts      Post[]
   comments   Comment[]
@@ -70,6 +71,7 @@ model Post {
   commentCount Int     @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
 
   user      User        @relation(fields: [userId], references: [id])
   tags      PostTag[]
@@ -124,6 +126,7 @@ model Comment {
   content   String   @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   post   Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
   user   User    @relation(fields: [userId], references: [id])
