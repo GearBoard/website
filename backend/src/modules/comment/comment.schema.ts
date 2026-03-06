@@ -1,24 +1,36 @@
 import { z } from "zod";
 
-export const GetCommentByPostIDSchema = z.object({
-  id: z
+export const postIdValidateSchema = z.object({
+  postId: z
     .string()
     .min(1)
     .transform((s) => BigInt(s))
     .refine((n) => n >= 1n, {
-      message: "Invalid user id",
+      message: "Invalid post id",
+    }),
+});
+
+export const commentIdValidateSchema = z.object({
+  commentId: z
+    .string()
+    .min(1)
+    .transform((s) => BigInt(s))
+    .refine((n) => n >= 1n, {
+      message: "Invalid comment id",
     }),
 });
 
 export const createCommentSchema = z.object({
-  id: z
+  content: z.string().min(1, "Content of comment is require"),
+  images: z
     .string()
-    .min(1)
-    .transform((s) => BigInt(s))
-    .refine((n) => n >= 1n, {
-      message: "Invalid user id",
-    }),
+    .url()
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => (v ? v : null)),
+});
 
+export const createReplySchema = z.object({
   content: z.string().min(1, "Content of comment is require"),
   images: z
     .string()

@@ -1,24 +1,37 @@
 import { Router } from "express";
 import { validateBody, validateParams } from "../../common/middleware/validate.middleware.js";
 import { commentController } from "./comment.controller.js";
-import { GetCommentByPostIDSchema, createCommentSchema } from "./comment.schema.js";
+import {
+  postIdValidateSchema,
+  commentIdValidateSchema,
+  createCommentSchema,
+  createReplySchema,
+} from "./comment.schema.js";
 
 export const commentRoute = Router({ mergeParams: true });
 
 commentRoute.get(
   "/",
-  validateParams(GetCommentByPostIDSchema),
+  validateParams(postIdValidateSchema),
   commentController.GetCommentByPostId.bind(commentController)
 );
 
 commentRoute.post(
   "/",
+  validateParams(postIdValidateSchema),
   validateBody(createCommentSchema),
   commentController.createComment.bind(commentController)
 );
 
 commentRoute.post(
   "/:commentId/replies",
-  validateBody(createCommentSchema),
+  validateParams(commentIdValidateSchema),
+  validateBody(createReplySchema),
   commentController.createReply.bind(commentController)
+);
+
+commentRoute.delete(
+  "/:commentId",
+  validateParams(commentIdValidateSchema),
+  commentController.deleteComment.bind(commentController)
 );
