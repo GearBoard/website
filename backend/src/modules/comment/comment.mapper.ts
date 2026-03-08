@@ -2,9 +2,9 @@ import { Comment, CommentImage, User } from "../../../generated/prisma/client.js
 import type { CommentResponseDto, CommentImageDto, CommentAuthorDto } from "./comment.dto.js";
 
 export type CommentWithRelations = Comment & {
-  images?: CommentImage[];
-  user?: User;
-  replies?: CommentWithRelations[];
+  images: CommentImage[];
+  user: User;
+  replies: CommentWithRelations[];
 };
 
 export function toDto(comment: CommentWithRelations): CommentResponseDto {
@@ -18,7 +18,6 @@ export function toDto(comment: CommentWithRelations): CommentResponseDto {
     author: comment.user ? toAuthorDto(comment.user) : undefined,
     replies: comment.replies?.map(toDto),
     createdAt: comment.createdAt.toISOString(),
-    updatedAt: comment.updatedAt.toISOString(),
   };
 }
 

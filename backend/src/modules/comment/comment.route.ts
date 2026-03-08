@@ -1,27 +1,9 @@
 import { Router } from "express";
 import { validateBody, validateParams } from "../../common/middleware/validate.middleware.js";
 import { commentController } from "./comment.controller.js";
-import {
-  postIdValidateSchema,
-  commentIdValidateSchema,
-  createCommentSchema,
-  createReplySchema,
-} from "./comment.schema.js";
+import { commentIdValidateSchema, createReplySchema } from "./comment.schema.js";
 
 export const commentRoute = Router({ mergeParams: true });
-
-commentRoute.get(
-  "/",
-  validateParams(postIdValidateSchema),
-  commentController.GetCommentByPostId.bind(commentController)
-);
-
-commentRoute.post(
-  "/",
-  validateParams(postIdValidateSchema),
-  validateBody(createCommentSchema),
-  commentController.createComment.bind(commentController)
-);
 
 commentRoute.post(
   "/:commentId/replies",

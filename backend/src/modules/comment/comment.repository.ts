@@ -62,8 +62,9 @@ export const commentRepository = {
   },
 
   async deleteComment(id: bigint) {
-    return prisma.comment.delete({
-      where: { id },
-    });
+    return prisma.$transaction([
+      prisma.comment.update({ where: { id }, data: { deletedAt: new Date() } }),
+      prisma.comment.updateMany({ where: { parentId: id }, data: { deletedAt: new Date() } }),
+    ]);
   },
 };

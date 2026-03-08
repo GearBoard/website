@@ -6,7 +6,7 @@ export const commentService = {
   async getById(id: bigint) {
     const comment = await commentRepository.getById(id);
     if (!comment) return null;
-    return toDto(comment as unknown as CommentWithRelations);
+    return toDto(comment as CommentWithRelations);
   },
 
   async getByPostId(postId: bigint) {
@@ -16,12 +16,12 @@ export const commentService = {
 
   async createComment(userId: bigint, postId: bigint, data: CreateCommentRequestDto) {
     const comment = await commentRepository.createComment(userId, postId, data);
-    return toDto(comment as unknown as CommentWithRelations);
+    return toDto(comment as CommentWithRelations);
   },
 
   async createReply(userId: bigint, postId: bigint, parentId: bigint, data: CreateReplyRequestDto) {
     const comment = await commentRepository.createReply(userId, postId, parentId, data);
-    return toDto(comment as unknown as CommentWithRelations);
+    return toDto(comment as CommentWithRelations);
   },
 
   async deleteComment(id: bigint) {

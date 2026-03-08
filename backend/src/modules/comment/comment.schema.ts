@@ -1,15 +1,5 @@
 import { z } from "zod";
 
-export const postIdValidateSchema = z.object({
-  postId: z
-    .string()
-    .min(1)
-    .transform((s) => BigInt(s))
-    .refine((n) => n >= 1n, {
-      message: "Invalid post id",
-    }),
-});
-
 export const commentIdValidateSchema = z.object({
   commentId: z
     .string()

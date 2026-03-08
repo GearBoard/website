@@ -25,5 +25,4 @@ export interface CommentResponseDto {
   author?: CommentAuthorDto;
   replies?: CommentResponseDto[];
   createdAt: string;
-  updatedAt: string;
 }
