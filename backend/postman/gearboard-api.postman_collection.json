@@ -8,6 +8,36 @@
     {
       "key": "baseUrl",
       "value": "http://localhost:4000"
+    },
+    {
+      "key": "userId",
+      "value": "1",
+      "description": "Current user ID for authentication"
+    },
+    {
+      "key": "postId",
+      "value": "1",
+      "description": "Test post ID"
+    },
+    {
+      "key": "mockPostTitle",
+      "value": "How to fix laptop keyboard",
+      "description": "Mock post title"
+    },
+    {
+      "key": "mockPostDescription",
+      "value": "My laptop keyboard stopped working. Does anyone have suggestions on how to fix it or should I replace it?",
+      "description": "Mock post description"
+    },
+    {
+      "key": "mockTags",
+      "value": "[\"laptop\", \"keyboard\", \"repair\"]",
+      "description": "Mock tags array as JSON string"
+    },
+    {
+      "key": "mockImages",
+      "value": "[\"https://example.com/keyboard.png\", \"https://example.com/keyboard2.png\"]",
+      "description": "Mock images array as JSON string"
     }
   ],
   "item": [
@@ -69,6 +99,190 @@
               "path": ["api", "users"]
             },
             "description": "Create user with only required fields (username, email). password, role, image, description, departmentId, provider are optional (role defaults to USER)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Get All Posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/posts?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": false
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "tag",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "userId",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all posts with pagination and optional filters. Query params: page (default 1), limit (default 10, max 100), search (optional), tag (optional), userId (optional)."
+          }
+        },
+        {
+          "name": "Get Post by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/posts/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts", "{{postId}}"]
+            },
+            "description": "Get a post by id. Uses postId variable (default 1)."
+          }
+        },
+        {
+          "name": "Create Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-user-id",
+                "value": "{{userId}}",
+                "description": "User ID of the post creator (required)"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{mockPostTitle}}\",\n  \"description\": \"{{mockPostDescription}}\",\n  \"tags\": {{mockTags}},\n  \"images\": {{mockImages}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts"]
+            },
+            "description": "Create a new post. Required: title, description. Optional: tags (array of strings), images (array of URLs). x-user-id header is required."
+          }
+        },
+        {
+          "name": "Create Post (minimal)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-user-id",
+                "value": "{{userId}}",
+                "description": "User ID of the post creator (required)"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Need help with printer\",\n  \"description\": \"My printer is not printing. Any solutions?\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts"]
+            },
+            "description": "Create post with only required fields (title, description). tags and images are optional."
+          }
+        },
+        {
+          "name": "Update Post",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-user-id",
+                "value": "{{userId}}",
+                "description": "User ID (must be post owner or admin)"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{mockPostTitle}} - SOLVED\",\n  \"description\": \"Updated solution: You can order a replacement keyboard online.\",\n  \"tags\": [\"laptop\", \"keyboard\", \"solved\"],\n  \"isClosed\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/posts/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts", "{{postId}}"]
+            },
+            "description": "Update a post. All fields are optional: title, description, tags, isClosed. Only post owner or admin can update. x-user-id header is required."
+          }
+        },
+        {
+          "name": "Update Post (partial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-user-id",
+                "value": "{{userId}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isClosed\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/posts/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts", "{{postId}}"]
+            },
+            "description": "Update only specific fields. In this example, marking the post as closed."
+          }
+        },
+        {
+          "name": "Delete Post",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{userId}}",
+                "description": "User ID (must be post owner or admin)"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/posts/{{postId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts", "{{postId}}"]
+            },
+            "description": "Delete a post. Only post owner or admin can delete. x-user-id header is required."
           }
         }
       ]
