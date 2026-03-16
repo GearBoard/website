@@ -3,7 +3,7 @@ import { createUserSchema } from "./user.schema.js";
 
 export interface UserResponseDto {
   id: string;
-  username: string;
+  username: string | null;
   email: string;
   image: string | null;
   description: string | null;
