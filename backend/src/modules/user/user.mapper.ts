@@ -3,9 +3,11 @@ import type { UserResponseDto } from "./user.dto.js";
 
 export function toDto(user: User): UserResponseDto {
   return {
-    id: user.id.toString(),
+    id: user.id,
+    name: user.name,
     username: user.username,
     email: user.email,
+    emailVerified: user.emailVerified,
     image: user.image,
     description: user.description,
     role: user.role,
