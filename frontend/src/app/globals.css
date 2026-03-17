@@ -9,12 +9,15 @@
      ---------------------------------------------------------- */
   --color-primary-red: var(--primary-red);
   --color-dark-red: var(--dark-red);
+  --color-darker-red: var(--darker-red);
 
   --color-primary-navy: var(--primary-navy);
   --color-dark-navy: var(--dark-navy);
+  --color-darker-navy: var(--darker-navy);
 
   --color-primary-yellow: var(--primary-yellow);
   --color-dark-yellow: var(--dark-yellow);
+  --color-darker-yellow: var(--darker-yellow);
 
   --color-bg-white: var(--bg-white);
 
@@ -86,8 +89,6 @@
      SHADOW SYSTEM
      ---------------------------------------------------------- */
   --shadow-black: var(--shadow-black);
-  --shadow-black-sm: var(--shadow-black-sm);
-  --shadow-none: none;
 }
 
 /* ============================================================
@@ -96,12 +97,15 @@
 :root {
   --primary-red: #8b0020;
   --dark-red: #6d0019;
+  --darker-red: #4f0012;
 
   --primary-navy: #333e55;
   --dark-navy: #1a2232;
+  --darker-navy: #121823;
 
   --primary-yellow: #f8d21d;
   --dark-yellow: #edba00;
+  --darker-yellow: #dbac00;
 
   --bg-white: #f3eff5;
 
@@ -114,16 +118,8 @@
    BASE LAYER — minimal resets, all values via tokens
    ============================================================ */
 @layer base {
-  * {
-    @apply;
-  }
-
   body {
     @apply bg-bg-white;
     font-family: "Satoshi", var(--font-noto-thai), sans-serif;
-  }
-
-  html {
-    @apply;
   }
 }
