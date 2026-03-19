@@ -6,24 +6,24 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-[8] border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 cursor-pointer active:cursor-default",
   {
     variants: {
-      variant: {
+      color: {
         red: "bg-primary-red text-white hover:bg-dark-red active:bg-darker-red focus-visible:ring-primary-red",
         navy: "bg-primary-navy text-white hover:bg-dark-navy active:bg-darker-navy focus-visible:ring-primary-navy",
         yellow:
           "bg-primary-yellow text-primary-navy hover:bg-dark-yellow active:bg-darker-yellow focus-visible:ring-primary-yellow",
       },
       size: {
-        default: "w-[147px] h-[48px] text-lg gap-2",
-        md: "w-[132px] h-[38px] text-base gap-1.5",
-        sm: "w-[122px] h-[31px] text-sm gap-1.5",
-        xs: "w-[95px] h-[24px] text-xs gap-1 [&_svg:not([class*='size-'])]:size-3",
+        default: "px-[20] py-[12] text-lg gap-8",
+        md: "px-[16] py-[8] text-base gap-8",
+        sm: "px-[16] py-[6] text-sm gap-8",
+        xs: "px-[8] py-[4] text-xs gap-8 [&_svg:not([class*='size-'])]:size-3",
       },
     },
     defaultVariants: {
-      variant: "red",
+      color: "red",
       size: "default",
     },
   }
@@ -37,7 +37,7 @@ type ButtonProps = React.ComponentProps<"button"> &
 
 function Button({
   className,
-  variant = "navy",
+  color = "red",
   size = "default",
   asChild = false,
   loading = false,
@@ -51,11 +51,11 @@ function Button({
   return (
     <Comp
       data-slot="button"
-      data-variant={variant}
+      data-variant={color}
       data-size={size}
       disabled={isDisabled}
       aria-busy={loading}
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ color, size, className }))}
       {...props}
     >
       {loading ? (
