@@ -64,6 +64,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         aria-busy={loading}
         className={cn(buttonVariants({ color, size, className }))}
         ref={ref}
+        {...props}
         onClick={(e) => {
           if (isDisabled) {
             e.preventDefault();
@@ -71,7 +72,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           }
           props.onClick?.(e);
         }}
-        {...props}
       >
         {loading && (
           <>
