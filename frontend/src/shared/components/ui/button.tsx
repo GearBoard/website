@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
@@ -6,7 +8,7 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-[8] border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 cursor-pointer active:cursor-default",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 cursor-pointer active:cursor-default",
   {
     variants: {
       color: {
@@ -35,40 +37,54 @@ type ButtonProps = React.ComponentProps<"button"> &
     loading?: boolean;
   };
 
-function Button({
-  className,
-  color = "red",
-  size = "default",
-  asChild = false,
-  loading = false,
-  disabled,
-  children,
-  ...props
-}: ButtonProps) {
-  const Comp = asChild ? Slot.Root : "button";
-  const isDisabled = disabled || loading;
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      className,
+      color = "red",
+      size = "default",
+      asChild = false,
+      loading = false,
+      disabled,
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    const Comp = asChild ? Slot.Root : "button";
+    const isDisabled = disabled || loading;
 
-  return (
-    <Comp
-      data-slot="button"
-      data-variant={color}
-      data-size={size}
-      disabled={isDisabled}
-      aria-busy={loading}
-      className={cn(buttonVariants({ color, size, className }))}
-      {...props}
-    >
-      {loading ? (
-        <>
-          <Loader2 className="animate-spin" />
-          <span className="sr-only">Loading…</span>
-        </>
-      ) : (
-        children
-      )}
-    </Comp>
-  );
-}
+    return (
+      <Comp
+        data-slot="button"
+        data-variant={color}
+        data-size={size}
+        disabled={isDisabled}
+        aria-disabled={isDisabled}
+        aria-busy={loading}
+        className={cn(buttonVariants({ color, size, className }))}
+        ref={ref}
+        onClick={(e) => {
+          if (isDisabled) {
+            e.preventDefault();
+            return;
+          }
+          props.onClick?.(e);
+        }}
+        {...props}
+      >
+        {loading && (
+          <>
+            <Loader2 className="animate-spin" />
+            <span className="sr-only">Loading…</span>
+          </>
+        )}
+        <Slot.Slottable>{children}</Slot.Slottable>
+      </Comp>
+    );
+  }
+);
+Button.displayName = "Button";
 
 export { Button, buttonVariants };
 export type { ButtonProps };

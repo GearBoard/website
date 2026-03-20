@@ -40,11 +40,11 @@
   /* ----------------------------------------------------------
      FONT SIZE SCALE
      ---------------------------------------------------------- */
-  --text-h1: 56px; /*3.5 rem*/
-  --text-h2: 36px; /*2.25 rem*/
-  --text-h3: 28px; /*1.75 rem*/
-  --text-body: 16px; /*1 rem*/
-  --text-caption: 12px; /*0.75 rem*/
+  --text-h1: 56px; /* 3.5 rem */
+  --text-h2: 36px; /* 2.25 rem */
+  --text-h3: 28px; /* 1.75 rem */
+  --text-body: 16px; /* 1 rem */
+  --text-caption: 12px; /* 0.75 rem */
 
   --text-2xs: 0.625rem;
   /* 10px */
@@ -72,23 +72,9 @@
   /* 72px */
 
   /* ----------------------------------------------------------
-     BORDER RADIUS SCALE
-     ---------------------------------------------------------- */
-  --radius-none: 0;
-  --radius-xs: calc(var(--radius) * 0.4);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
-  --radius-full: 9999px;
-
-  /* ----------------------------------------------------------
      SHADOW SYSTEM
      ---------------------------------------------------------- */
-  --shadow-black: var(--shadow-black);
+  --shadow-black: var(--shadow-black-val);
 }
 
 /* ============================================================
@@ -111,7 +97,7 @@
 
   --gray: #d9d9d9;
 
-  --shadow-black: 0 0 30px 0 rgba(0, 0, 0, 0.1);
+  --shadow-black-val: 0 0 30px 0 rgba(0, 0, 0, 0.1);
 }
 
 /* ============================================================
