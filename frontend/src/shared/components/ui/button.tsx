@@ -16,10 +16,10 @@ const buttonVariants = cva(
           "bg-primary-yellow text-primary-navy hover:bg-dark-yellow active:bg-darker-yellow focus-visible:ring-primary-yellow",
       },
       size: {
-        default: "px-[20] py-[12] text-lg gap-8",
-        md: "px-[16] py-[8] text-base gap-8",
-        sm: "px-[16] py-[6] text-sm gap-8",
-        xs: "px-[8] py-[4] text-xs gap-8 [&_svg:not([class*='size-'])]:size-3",
+        default: "px-5 py-3 text-lg gap-2",
+        md: "px-4 py-2 text-base gap-2",
+        sm: "px-4 py-1.5 text-sm gap-2",
+        xs: "px-2 py-1 text-xs gap-2 [&_svg:not([class*='size-'])]:size-3",
       },
     },
     defaultVariants: {
