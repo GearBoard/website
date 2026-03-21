@@ -35,6 +35,8 @@ type ButtonProps = React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
     loading?: boolean;
+    iconLeft?: React.ReactNode;
+    iconRight?: React.ReactNode;
   };
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -46,6 +48,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       asChild = false,
       loading = false,
       disabled,
+      iconLeft,
+      iconRight,
       children,
       ...props
     },
@@ -73,13 +77,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           props.onClick?.(e);
         }}
       >
-        {loading && (
+        {loading ? (
           <>
             <Loader2 className="animate-spin" />
             <span className="sr-only">Loading…</span>
           </>
+        ) : (
+          iconLeft
         )}
         <Slot.Slottable>{children}</Slot.Slottable>
+        {iconRight}
       </Comp>
     );
   }
