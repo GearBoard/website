@@ -125,7 +125,7 @@ export const postRepository = {
   },
 
   async update(id: bigint, data: UpdatePostRequestDto): Promise<PostWithRelations | null> {
-    return prisma.$transaction(async (tx: typeof prisma) => {
+    return prisma.$transaction(async (tx) => {
       const post = await tx.post.findUnique({
         where: { id, deletedAt: null },
       });

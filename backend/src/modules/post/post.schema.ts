@@ -4,11 +4,8 @@ import { z } from "zod";
 export const getPostByIdSchema = z.object({
   id: z
     .string()
-    .min(1)
-    .transform((s) => BigInt(s))
-    .refine((n) => n >= 1n, {
-      message: "Invalid post id",
-    }),
+    .regex(/^[1-9]\d*$/, { message: "Invalid post id" })
+    .transform((s) => BigInt(s)),
 });
 
 // GET /posts - Query schemas
@@ -16,11 +13,17 @@ export const getAllPostsQuerySchema = z.object({
   page: z
     .string()
     .optional()
+    .refine((v) => v === undefined || /^[1-9]\d*$/.test(v), {
+      message: "Page must be a positive integer",
+    })
     .transform((v) => (v ? parseInt(v, 10) : 1))
     .refine((n) => n >= 1, { message: "Page must be >= 1" }),
   limit: z
     .string()
     .optional()
+    .refine((v) => v === undefined || /^[1-9]\d*$/.test(v), {
+      message: "Limit must be a positive integer",
+    })
     .transform((v) => (v ? parseInt(v, 10) : 10))
     .refine((n) => n >= 1 && n <= 100, { message: "Limit must be between 1 and 100" }),
   search: z.string().optional(),
@@ -28,15 +31,12 @@ export const getAllPostsQuerySchema = z.object({
   userId: z
     .string()
     .optional()
+    .refine((v) => v === undefined || /^[1-9]\d*$/.test(v), {
+      message: "userId must be a valid positive bigint",
+    })
     .transform((v) => {
       if (!v) return undefined;
-      try {
-        const n = BigInt(v);
-        if (n < 1n) throw new Error();
-        return n;
-      } catch {
-        throw new Error("userId must be a valid positive bigint");
-      }
+      return BigInt(v);
     }),
 });
 

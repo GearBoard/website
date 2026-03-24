@@ -3,6 +3,16 @@ import { successResponse, errorResponse } from "../../common/utils/response.js";
 import { postService } from "./post.service.js";
 import { GetPostByIdParams, GetAllPostsQuery } from "./post.schema.js";
 
+const parseUserId = (userId: unknown): bigint | null => {
+  if (!userId || Array.isArray(userId)) return null;
+  if (typeof userId !== "string") return null;
+  if (!/^[1-9]\d*$/.test(userId)) return null;
+
+  const parsed = BigInt(userId);
+  if (parsed <= 0n) return null;
+  return parsed;
+};
+
 export const postController = {
   async getById(req: Request, res: Response) {
     try {
@@ -43,21 +53,13 @@ export const postController = {
 
   async create(req: Request, res: Response) {
     try {
-      const userId = req.headers["x-user-id"];
+      const userId = parseUserId(req.headers["x-user-id"]);
       if (!userId) {
-        res.status(401).json(errorResponse("Unauthorized"));
-        return;
-      }
-      if (Array.isArray(userId)) {
-        res.status(400).json(errorResponse("Invalid user ID format"));
-        return;
-      }
-      if (!/^\d+$/.test(userId)) {
-        res.status(400).json(errorResponse("Invalid user ID format"));
+        res.status(401).json(errorResponse("Unauthorized or invalid user ID"));
         return;
       }
 
-      const post = await postService.create(req.body, BigInt(userId));
+      const post = await postService.create(req.body, userId);
       res.status(201).json(successResponse(post));
     } catch (error) {
       console.error("Error in create:", error);
@@ -73,23 +75,13 @@ export const postController = {
         }
       ).validatedParams;
 
-      const userId = req.headers["x-user-id"];
+      const userId = parseUserId(req.headers["x-user-id"]);
       if (!userId) {
-        res.status(401).json(errorResponse("Unauthorized"));
+        res.status(401).json(errorResponse("Unauthorized or invalid user ID"));
         return;
       }
 
-      if (Array.isArray(userId)) {
-        res.status(400).json(errorResponse("Invalid user ID format"));
-        return;
-      }
-
-      if (!/^\d+$/.test(userId)) {
-        res.status(400).json(errorResponse("Invalid user ID format"));
-        return;
-      }
-
-      const result = await postService.update(id, req.body, BigInt(userId as string));
+      const result = await postService.update(id, req.body, userId);
       switch (result.status) {
         case "not_found":
           res.status(404).json(errorResponse("Post not found"));
@@ -115,23 +107,13 @@ export const postController = {
         }
       ).validatedParams;
 
-      const userId = req.headers["x-user-id"];
+      const userId = parseUserId(req.headers["x-user-id"]);
       if (!userId) {
-        res.status(401).json(errorResponse("Unauthorized"));
+        res.status(401).json(errorResponse("Unauthorized or invalid user ID"));
         return;
       }
 
-      if (Array.isArray(userId)) {
-        res.status(400).json(errorResponse("Invalid user ID format"));
-        return;
-      }
-
-      if (!/^\d+$/.test(userId)) {
-        res.status(400).json(errorResponse("Invalid user ID format"));
-        return;
-      }
-
-      const result = await postService.delete(id, BigInt(userId as string));
+      const result = await postService.delete(id, userId);
       if (result === null) {
         res.status(404).json(errorResponse("Post not found"));
         return;
