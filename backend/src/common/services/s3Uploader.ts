@@ -45,7 +45,7 @@ export async function uploadToS3(input: S3UploadInput): Promise<S3UploadSuccess>
   const { file, filename, mimeType, size } = input;
 
   // Validation
-  if (!file || size === 0) {
+  if (!file || size <= 0) {
     throw new Error("File must not be empty");
   }
 
@@ -61,7 +61,9 @@ export async function uploadToS3(input: S3UploadInput): Promise<S3UploadSuccess>
   }
 
   if (!ALLOWED_MIME_TYPES.includes(finalMimeType)) {
-    throw new Error(finalMimeType);
+    throw new Error(
+      `Unsupported MIME type: ${finalMimeType}. Allowed: ${ALLOWED_MIME_TYPES.join(", ")}`
+    );
   }
 
   // Configuration
