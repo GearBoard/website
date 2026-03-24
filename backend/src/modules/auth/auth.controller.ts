@@ -32,12 +32,7 @@ export async function logout(req: Request, res: Response) {
     returnHeaders: true,
   });
 
-  const setCookie: string[] = [];
-  headers.forEach((value, key) => {
-    if (key.toLowerCase() === "set-cookie") {
-      setCookie.push(value);
-    }
-  });
+  const setCookie = headers.getSetCookie();
 
   if (setCookie.length > 0) {
     res.setHeader("set-cookie", setCookie);

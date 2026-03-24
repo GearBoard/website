@@ -25,6 +25,6 @@ export const env = {
     "BETTER_AUTH_TRUSTED_ORIGIN",
     getEnv("BETTER_AUTH_URL")
   ),
-  GOOGLE_CLIENT_ID: getEnv("GOOGLE_CLIENT_ID"),
-  GOOGLE_CLIENT_SECRET: getEnv("GOOGLE_CLIENT_SECRET"),
+  GOOGLE_CLIENT_ID: getEnvOptional("GOOGLE_CLIENT_ID", ""),
+  GOOGLE_CLIENT_SECRET: getEnvOptional("GOOGLE_CLIENT_SECRET", ""),
 } as const;
