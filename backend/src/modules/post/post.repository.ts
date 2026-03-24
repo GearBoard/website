@@ -179,7 +179,7 @@ export const postRepository = {
 
   async delete(id: bigint): Promise<void | null> {
     const post = await prisma.post.findUnique({
-      where: { id },
+      where: { id, deletedAt: null },
       select: { id: true },
     });
 

@@ -8,9 +8,7 @@ const parseUserId = (userId: unknown): bigint | null => {
   if (typeof userId !== "string") return null;
   if (!/^[1-9]\d*$/.test(userId)) return null;
 
-  const parsed = BigInt(userId);
-  if (parsed <= 0n) return null;
-  return parsed;
+  return BigInt(userId);
 };
 
 export const postController = {
