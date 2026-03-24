@@ -40,8 +40,7 @@ export default function AuthTestDashboard() {
               <strong>Email:</strong> {session.user.email}
             </p>
             <p>
-              <strong>Username:</strong>{" "}
-              {(session.user as typeof session.user & { username?: string }).username}
+              <strong>Username:</strong> {session.user.username}
             </p>
           </div>
           <button

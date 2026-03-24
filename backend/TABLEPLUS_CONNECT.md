@@ -8,9 +8,9 @@ To connect to your Dockerized PostgreSQL database using TablePlus:
     - **Name**: `Gearboard` (or any name you like)
     - **Host**: `localhost` (or `127.0.0.1`)
     - **Port**: `5432`
-    - **User**: `postgres`
-    - **Password**: `password`
-    - **Database**: `testdb`
+    - **User**: `<YOUR_DB_USER>` (see .env)
+    - **Password**: `<YOUR_DB_PASSWORD>` (see .env)
+    - **Database**: `<YOUR_DB_NAME>` (see .env)
     - **SSL**: `Prefer` or `Disable`
 4.  Click **Test** to verify, then **Connect**.
 

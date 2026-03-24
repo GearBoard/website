@@ -16,9 +16,7 @@ export default function RegisterTestPage() {
     e.preventDefault();
     setError("");
     await authClient.signUp.email(
-      { email, password, name, username } as unknown as Parameters<
-        typeof authClient.signUp.email
-      >[0],
+      { email, password, name, username },
       {
         onSuccess: () => {
           router.push("/auth-test/login");

@@ -27,21 +27,21 @@ export async function getMe(req: Request, res: Response) {
 }
 
 export async function logout(req: Request, res: Response) {
-  const { headers } = await auth.api.signOut({
-    headers: fromNodeHeaders(req.headers),
-    returnHeaders: true,
-  });
+  try {
+    const { headers } = await auth.api.signOut({
+      headers: fromNodeHeaders(req.headers),
+      returnHeaders: true,
+    });
 
-  const setCookie: string[] = [];
-  headers.forEach((value, key) => {
-    if (key.toLowerCase() === "set-cookie") {
-      setCookie.push(value);
+    const setCookie = headers.getSetCookie();
+
+    if (setCookie.length > 0) {
+      res.setHeader("set-cookie", setCookie);
     }
-  });
 
-  if (setCookie.length > 0) {
-    res.setHeader("set-cookie", setCookie);
+    return res.status(204).end();
+  } catch (error) {
+    console.error("Logout error:", error);
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
   }
-
-  return res.status(204).end();
 }

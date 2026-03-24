@@ -60,6 +60,10 @@ export const userController = {
         res.status(404).json(errorResponse("User not found"));
         return;
       }
+      if (err.code === "P2003") {
+        res.status(400).json(errorResponse("Invalid departmentId"));
+        return;
+      }
       throw e;
     }
   },

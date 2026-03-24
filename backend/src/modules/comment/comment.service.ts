@@ -3,28 +3,28 @@ import { toDto, type CommentWithRelations } from "./comment.mapper.js";
 import type { CreateCommentRequestDto, CreateReplyRequestDto } from "./comment.dto.js";
 
 export const commentService = {
-  async getById(id: bigint) {
+  async getById(id: string) {
     const comment = await commentRepository.getById(id);
     if (!comment) return null;
     return toDto(comment as CommentWithRelations);
   },
 
-  async getByPostId(postId: bigint) {
+  async getByPostId(postId: string) {
     const comments = await commentRepository.getByPostId(postId);
-    return comments.map((c: unknown) => toDto(c as CommentWithRelations));
+    return comments.map((c) => toDto(c));
   },
 
-  async createComment(userId: bigint, postId: bigint, data: CreateCommentRequestDto) {
+  async createComment(userId: string, postId: string, data: CreateCommentRequestDto) {
     const comment = await commentRepository.createComment(userId, postId, data);
     return toDto(comment as CommentWithRelations);
   },
 
-  async createReply(userId: bigint, postId: bigint, parentId: bigint, data: CreateReplyRequestDto) {
+  async createReply(userId: string, postId: string, parentId: string, data: CreateReplyRequestDto) {
     const comment = await commentRepository.createReply(userId, postId, parentId, data);
     return toDto(comment as CommentWithRelations);
   },
 
-  async deleteComment(id: bigint) {
+  async deleteComment(id: string) {
     await commentRepository.deleteComment(id);
   },
 };

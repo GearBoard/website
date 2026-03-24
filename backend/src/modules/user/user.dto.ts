@@ -11,7 +11,6 @@ export interface UserResponseDto {
   description: string | null;
   role: string;
   departmentId: string | null;
-  provider: string;
   createdAt: string;
   updatedAt: string;
 }

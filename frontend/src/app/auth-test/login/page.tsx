@@ -8,18 +8,22 @@ export default function LoginTestPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
     await authClient.signIn.email(
       { email, password },
       {
         onSuccess: () => {
+          setIsLoading(false);
           router.push("/auth-test");
         },
         onError: (ctx: { error: { message: string } }) => {
+          setIsLoading(false);
           setError(ctx.error.message);
         },
       }
@@ -62,16 +66,17 @@ export default function LoginTestPage() {
         </div>
         <button
           type="submit"
+          disabled={isLoading}
           style={{
             padding: "10px 15px",
-            backgroundColor: "#333",
+            backgroundColor: isLoading ? "#666" : "#333",
             color: "white",
             border: "none",
             borderRadius: 4,
-            cursor: "pointer",
+            cursor: isLoading ? "not-allowed" : "pointer",
           }}
         >
-          Login
+          {isLoading ? "Logging in..." : "Login"}
         </button>
       </form>
       <p style={{ marginTop: 15 }}>
