@@ -178,18 +178,22 @@ export const postRepository = {
   },
 
   async delete(id: bigint): Promise<void | null> {
-    const post = await prisma.post.findUnique({
-      where: { id, deletedAt: null },
-      select: { id: true },
-    });
+    return prisma.$transaction(async (tx) => {
+      const post = await tx.post.findUnique({
+        where: { id, deletedAt: null },
+        select: { id: true },
+      });
 
-    if (!post) {
+      if (!post) {
+        return null;
+      }
+
+      await tx.post.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
+
       return null;
-    }
-
-    await prisma.post.update({
-      where: { id },
-      data: { deletedAt: new Date() },
     });
   },
 };
