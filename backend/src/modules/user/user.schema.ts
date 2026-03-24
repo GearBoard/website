@@ -10,17 +10,11 @@ export const getUserByIdSchema = z.object({
     }),
 });
 
-const authProviderSchema = z.enum(["LOCAL", "GOOGLE"]);
 const userRoleSchema = z.enum(["USER", "ADMIN"]);
 
 export const createUserSchema = z.object({
   username: z.string().min(1, "Username is required").trim(),
   email: z.string().email("Invalid email").trim(),
-  password: z
-    .string()
-    .optional()
-    .nullable()
-    .transform((v) => v ?? null),
   role: userRoleSchema.optional().default("USER"),
   image: z
     .string()
@@ -44,5 +38,4 @@ export const createUserSchema = z.object({
         throw new Error("departmentId must be a valid positive bigint");
       }
     }),
-  provider: authProviderSchema.optional().default("LOCAL"),
 });
