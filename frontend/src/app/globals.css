@@ -1,26 +1,113 @@
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@1,2&display=swap");
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* ----------------------------------------------------------
+     COLOR SYSTEM
+     ---------------------------------------------------------- */
+  --color-primary-red: var(--primary-red);
+  --color-dark-red: var(--dark-red);
+  --color-darker-red: var(--darker-red);
+
+  --color-primary-navy: var(--primary-navy);
+  --color-dark-navy: var(--dark-navy);
+  --color-darker-navy: var(--darker-navy);
+
+  --color-primary-yellow: var(--primary-yellow);
+  --color-dark-yellow: var(--dark-yellow);
+  --color-darker-yellow: var(--darker-yellow);
+
+  --color-bg-white: var(--bg-white);
+
+  --color-gray: var(--gray);
+  --color-light-gray: var(--light-gray);
+
+  /* ----------------------------------------------------------
+     TYPOGRAPHY — font families
+     ---------------------------------------------------------- */
+  --font-satoshi: "Satoshi", sans-serif;
+  --font-noto: var(--font-noto-thai), sans-serif;
+
+  /* Font weights */
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* ----------------------------------------------------------
+     FONT SIZE SCALE
+     ---------------------------------------------------------- */
+  --text-h1: 56px; /* 3.5 rem */
+  --text-h2: 36px; /* 2.25 rem */
+  --text-h3: 28px; /* 1.75 rem */
+  --text-body: 16px; /* 1 rem */
+  --text-caption: 12px; /* 0.75 rem */
+
+  --text-2xs: 0.625rem;
+  /* 10px */
+  --text-xs: 0.75rem;
+  /* 12px */
+  --text-sm: 0.875rem;
+  /* 14px */
+  --text-base: 1rem;
+  /* 16px */
+  --text-lg: 1.125rem;
+  /* 18px */
+  --text-xl: 1.25rem;
+  /* 20px */
+  --text-2xl: 1.5rem;
+  /* 24px */
+  --text-3xl: 1.875rem;
+  /* 30px */
+  --text-4xl: 2.25rem;
+  /* 36px */
+  --text-5xl: 3rem;
+  /* 48px */
+  --text-6xl: 3.75rem;
+  /* 60px */
+  --text-7xl: 4.5rem;
+  /* 72px */
+
+  /* ----------------------------------------------------------
+     SHADOW SYSTEM
+     ---------------------------------------------------------- */
+  --shadow-black: var(--shadow-black-val);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ============================================================
+   CSS CUSTOM PROPERTIES  (light mode defaults)
+   ============================================================ */
+:root {
+  --primary-red: #8b0020;
+  --dark-red: #6d0019;
+  --darker-red: #4f0012;
+
+  --primary-navy: #333e55;
+  --dark-navy: #1a2232;
+  --darker-navy: #121823;
+
+  --primary-yellow: #f8d21d;
+  --dark-yellow: #edba00;
+  --darker-yellow: #dbac00;
+
+  --bg-white: #f3eff5;
+
+  --gray: #d9d9d9;
+  --light-gray: #eaeaea;
+
+  --shadow-black-val: 0 0 30px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================================
+   BASE LAYER — minimal resets, all values via tokens
+   ============================================================ */
+@layer base {
+  body {
+    @apply bg-bg-white;
+    font-family: "Satoshi", var(--font-noto-thai), sans-serif;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }

@@ -13,7 +13,6 @@ export const postController = {
       ).validatedParams;
 
       const post = await postService.getById(id);
-
       if (!post) {
         res.status(404).json(errorResponse("Post not found"));
         return;
@@ -44,19 +43,13 @@ export const postController = {
 
   async create(req: Request, res: Response) {
     try {
-      // Get userId from session/auth context
-      // For now, we'll mock it - in production, this should come from Better Auth
       const userId = req.headers["x-user-id"];
-
       if (!userId) {
-        res.status(401).json(errorResponse("Unauthorized: User not authenticated"));
+        res.status(401).json(errorResponse("Unauthorized"));
         return;
       }
 
-      const userIdBigInt = BigInt(userId as string);
-      const data = req.body;
-
-      const post = await postService.create(data, userIdBigInt);
+      const post = await postService.create(req.body, BigInt(userId as string));
       res.status(201).json(successResponse(post));
     } catch (error) {
       console.error("Error in create:", error);
@@ -73,26 +66,14 @@ export const postController = {
       ).validatedParams;
 
       const userId = req.headers["x-user-id"];
-
       if (!userId) {
-        res.status(401).json(errorResponse("Unauthorized: User not authenticated"));
+        res.status(401).json(errorResponse("Unauthorized"));
         return;
       }
 
-      const userIdBigInt = BigInt(userId as string);
-      const data = req.body;
-
-      // Check if post exists first
-      const existingPost = await postService.getById(id);
-      if (!existingPost) {
-        res.status(404).json(errorResponse("Post not found"));
-        return;
-      }
-
-      const updatedPost = await postService.update(id, data, userIdBigInt);
-
+      const updatedPost = await postService.update(id, req.body, BigInt(userId as string));
       if (!updatedPost) {
-        res.status(403).json(errorResponse("Forbidden: Only post owner or admin can update"));
+        res.status(403).json(errorResponse("Forbidden"));
         return;
       }
 
@@ -112,25 +93,18 @@ export const postController = {
       ).validatedParams;
 
       const userId = req.headers["x-user-id"];
-
       if (!userId) {
-        res.status(401).json(errorResponse("Unauthorized: User not authenticated"));
+        res.status(401).json(errorResponse("Unauthorized"));
         return;
       }
 
-      const userIdBigInt = BigInt(userId as string);
-
-      // Check if post exists first
-      const existingPost = await postService.getById(id);
-      if (!existingPost) {
+      const result = await postService.delete(id, BigInt(userId as string));
+      if (result === null) {
         res.status(404).json(errorResponse("Post not found"));
         return;
       }
-
-      const deleted = await postService.delete(id, userIdBigInt);
-
-      if (!deleted) {
-        res.status(403).json(errorResponse("Forbidden: Only post owner or admin can delete"));
+      if (!result) {
+        res.status(403).json(errorResponse("Forbidden"));
         return;
       }
 

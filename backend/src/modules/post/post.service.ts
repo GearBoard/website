@@ -11,8 +11,13 @@ import { getSkipTake } from "../../common/utils/pagination.js";
 
 export const postService = {
   async getById(id: bigint): Promise<PostResponseDto | null> {
+    // Check if post exists
     const post = await postRepository.findById(id);
-    return post ? toPostDto(post) : null;
+    if (!post) {
+      return null; // Post not found - will be handled as 404 in controller
+    }
+
+    return toPostDto(post);
   },
 
   async getAll(query: GetAllPostsQuery): Promise<PostPaginatedDto> {
@@ -45,25 +50,31 @@ export const postService = {
     data: UpdatePostRequestDto,
     userId: bigint
   ): Promise<PostResponseDto | null> {
-    // Check if user is owner or admin
-    const isOwner = await postRepository.checkOwnership(id, userId);
-    const isAdmin = await postRepository.checkIsAdmin(userId);
-
-    if (!isOwner && !isAdmin) {
-      return null; // Will be handled as unauthorized in controller
+    // Check if post exists and get ownership info
+    const post = await postRepository.findById(id);
+    if (!post) {
+      return null; // Post not found
     }
 
-    const post = await postRepository.update(id, data);
-    return post ? toPostDto(post) : null;
+    // Check if user is owner
+    if (post.userId !== userId) {
+      return null; // Not owner
+    }
+
+    const updatedPost = await postRepository.update(id, data);
+    return updatedPost ? toPostDto(updatedPost) : null;
   },
 
-  async delete(id: bigint, userId: bigint): Promise<boolean> {
-    // Check if user is owner or admin
-    const isOwner = await postRepository.checkOwnership(id, userId);
-    const isAdmin = await postRepository.checkIsAdmin(userId);
+  async delete(id: bigint, userId: bigint): Promise<boolean | null> {
+    // Check if post exists and get ownership info
+    const post = await postRepository.findById(id);
+    if (!post) {
+      return null; // Post not found
+    }
 
-    if (!isOwner && !isAdmin) {
-      return false; // Will be handled as unauthorized in controller
+    // Check if user is owner
+    if (post.userId !== userId) {
+      return false; // Not owner
     }
 
     await postRepository.delete(id);

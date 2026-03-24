@@ -1,37 +1,7 @@
 import { Prisma } from "../../../generated/prisma/client.js";
 import { prisma } from "../../config/prisma.js";
 import { CreatePostRequestDto, UpdatePostRequestDto } from "./post.dto.js";
-
-interface PostWithRelations {
-  id: bigint;
-  userId: bigint;
-  title: string;
-  description: string;
-  isClosed: boolean;
-  likeCount: number;
-  commentCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
-  user: {
-    id: bigint;
-    username: string;
-    image: string | null;
-  };
-  tags: Array<{
-    postId: bigint;
-    tagId: bigint;
-    tag: {
-      id: bigint;
-      name: string;
-    };
-  }>;
-  images: Array<{
-    id: bigint;
-    postId: bigint;
-    url: string;
-  }>;
-}
+import { PostWithRelations } from "./post.mapper.js";
 
 const postInclude = {
   user: {
@@ -48,6 +18,8 @@ const postInclude = {
   },
   images: true,
 };
+
+export { postInclude };
 
 export const postRepository = {
   async findById(id: bigint): Promise<PostWithRelations | null> {
@@ -204,27 +176,5 @@ export const postRepository = {
       where: { id },
       data: { deletedAt: new Date() },
     });
-  },
-
-  async hardDelete(id: bigint): Promise<void> {
-    await prisma.post.delete({
-      where: { id },
-    });
-  },
-
-  async checkOwnership(postId: bigint, userId: bigint): Promise<boolean> {
-    const post = await prisma.post.findUnique({
-      where: { id: postId },
-      select: { userId: true },
-    });
-    return post?.userId === userId;
-  },
-
-  async checkIsAdmin(userId: bigint): Promise<boolean> {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { role: true },
-    });
-    return user?.role === "ADMIN";
   },
 };

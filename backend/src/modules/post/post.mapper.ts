@@ -1,35 +1,8 @@
 import { PostResponseDto, AuthorInfoDto } from "./post.dto.js";
+import { Prisma } from "../../../generated/prisma/client.js";
+import { postInclude } from "./post.repository.js";
 
-interface PostWithRelations {
-  id: bigint;
-  userId: bigint;
-  title: string;
-  description: string;
-  isClosed: boolean;
-  likeCount: number;
-  commentCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
-  user: {
-    id: bigint;
-    username: string;
-    image: string | null;
-  };
-  tags: Array<{
-    postId: bigint;
-    tagId: bigint;
-    tag: {
-      id: bigint;
-      name: string;
-    };
-  }>;
-  images: Array<{
-    id: bigint;
-    postId: bigint;
-    url: string;
-  }>;
-}
+export type PostWithRelations = Prisma.PostGetPayload<{ include: typeof postInclude }>;
 
 export function toPostDto(post: PostWithRelations): PostResponseDto {
   return {
