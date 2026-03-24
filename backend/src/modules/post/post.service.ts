@@ -9,6 +9,11 @@ import {
 import { GetAllPostsQuery } from "./post.schema.js";
 import { getSkipTake } from "../../common/utils/pagination.js";
 
+type UpdateResult =
+  | { status: "not_found" }
+  | { status: "forbidden" }
+  | { status: "success"; data: PostResponseDto };
+
 export const postService = {
   async getById(id: bigint): Promise<PostResponseDto | null> {
     // Check if post exists
@@ -45,24 +50,24 @@ export const postService = {
     return toPostDto(post);
   },
 
-  async update(
-    id: bigint,
-    data: UpdatePostRequestDto,
-    userId: bigint
-  ): Promise<PostResponseDto | null> {
+  async update(id: bigint, data: UpdatePostRequestDto, userId: bigint): Promise<UpdateResult> {
     // Check if post exists and get ownership info
     const post = await postRepository.findById(id);
     if (!post) {
-      return null; // Post not found
+      return { status: "not_found" };
     }
 
     // Check if user is owner
     if (post.userId !== userId) {
-      return null; // Not owner
+      return { status: "forbidden" };
     }
 
     const updatedPost = await postRepository.update(id, data);
-    return updatedPost ? toPostDto(updatedPost) : null;
+    if (!updatedPost) {
+      return { status: "not_found" }; // Though unlikely since we checked
+    }
+
+    return { status: "success", data: toPostDto(updatedPost) };
   },
 
   async delete(id: bigint, userId: bigint): Promise<boolean | null> {

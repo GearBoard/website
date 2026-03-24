@@ -48,8 +48,16 @@ export const postController = {
         res.status(401).json(errorResponse("Unauthorized"));
         return;
       }
+      if (Array.isArray(userId)) {
+        res.status(400).json(errorResponse("Invalid user ID format"));
+        return;
+      }
+      if (!/^\d+$/.test(userId)) {
+        res.status(400).json(errorResponse("Invalid user ID format"));
+        return;
+      }
 
-      const post = await postService.create(req.body, BigInt(userId as string));
+      const post = await postService.create(req.body, BigInt(userId));
       res.status(201).json(successResponse(post));
     } catch (error) {
       console.error("Error in create:", error);
@@ -71,13 +79,28 @@ export const postController = {
         return;
       }
 
-      const updatedPost = await postService.update(id, req.body, BigInt(userId as string));
-      if (!updatedPost) {
-        res.status(403).json(errorResponse("Forbidden"));
+      if (Array.isArray(userId)) {
+        res.status(400).json(errorResponse("Invalid user ID format"));
         return;
       }
 
-      res.status(200).json(successResponse(updatedPost));
+      if (!/^\d+$/.test(userId)) {
+        res.status(400).json(errorResponse("Invalid user ID format"));
+        return;
+      }
+
+      const result = await postService.update(id, req.body, BigInt(userId as string));
+      switch (result.status) {
+        case "not_found":
+          res.status(404).json(errorResponse("Post not found"));
+          return;
+        case "forbidden":
+          res.status(403).json(errorResponse("Forbidden"));
+          return;
+        case "success":
+          res.status(200).json(successResponse(result.data));
+          return;
+      }
     } catch (error) {
       console.error("Error in update:", error);
       res.status(500).json(errorResponse("Internal server error"));
@@ -95,6 +118,16 @@ export const postController = {
       const userId = req.headers["x-user-id"];
       if (!userId) {
         res.status(401).json(errorResponse("Unauthorized"));
+        return;
+      }
+
+      if (Array.isArray(userId)) {
+        res.status(400).json(errorResponse("Invalid user ID format"));
+        return;
+      }
+
+      if (!/^\d+$/.test(userId)) {
+        res.status(400).json(errorResponse("Invalid user ID format"));
         return;
       }
 

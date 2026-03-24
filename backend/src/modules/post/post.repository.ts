@@ -125,53 +125,68 @@ export const postRepository = {
   },
 
   async update(id: bigint, data: UpdatePostRequestDto): Promise<PostWithRelations | null> {
+    return prisma.$transaction(async (tx: typeof prisma) => {
+      const post = await tx.post.findUnique({
+        where: { id, deletedAt: null },
+      });
+
+      if (!post) {
+        return null;
+      }
+
+      // Handle tags update
+      if (data.tags !== undefined) {
+        // Delete existing tags
+        await tx.postTag.deleteMany({
+          where: { postId: id },
+        });
+
+        // Create new tags
+        if (data.tags.length > 0) {
+          await Promise.all(
+            data.tags.map(async (tagName) => {
+              await tx.postTag.create({
+                data: {
+                  postId: id,
+                  tag: {
+                    connectOrCreate: {
+                      where: { name: tagName },
+                      create: { name: tagName },
+                    },
+                  },
+                },
+              });
+            })
+          );
+        }
+      }
+
+      // Update post fields
+      const updateData: Prisma.PostUpdateInput = {};
+      if (data.title !== undefined) updateData.title = data.title;
+      if (data.description !== undefined) updateData.description = data.description;
+      if (data.isClosed !== undefined) updateData.isClosed = data.isClosed;
+
+      const updatedPost = await tx.post.update({
+        where: { id },
+        data: updateData,
+        include: postInclude,
+      });
+
+      return updatedPost as PostWithRelations;
+    });
+  },
+
+  async delete(id: bigint): Promise<void | null> {
     const post = await prisma.post.findUnique({
-      where: { id, deletedAt: null },
+      where: { id },
+      select: { id: true },
     });
 
     if (!post) {
       return null;
     }
 
-    // Handle tags update
-    if (data.tags !== undefined) {
-      // Delete existing tags
-      await prisma.postTag.deleteMany({
-        where: { postId: id },
-      });
-
-      // Create new tags
-      if (data.tags.length > 0) {
-        await prisma.postTag.createMany({
-          data: await Promise.all(
-            data.tags.map(async (tagName) => {
-              const tag = await prisma.tag.findUnique({ where: { name: tagName } });
-              return {
-                postId: id,
-                tagId: tag ? tag.id : (await prisma.tag.create({ data: { name: tagName } })).id,
-              };
-            })
-          ),
-        });
-      }
-    }
-
-    // Update post fields
-    const updateData: Prisma.PostUpdateInput = {};
-    if (data.title !== undefined) updateData.title = data.title;
-    if (data.description !== undefined) updateData.description = data.description;
-    if (data.isClosed !== undefined) updateData.isClosed = data.isClosed;
-
-    const updatedPost = await prisma.post.update({
-      where: { id },
-      data: updateData,
-      include: postInclude,
-    });
-
-    return updatedPost as PostWithRelations;
-  },
-
-  async delete(id: bigint): Promise<void> {
     await prisma.post.update({
       where: { id },
       data: { deletedAt: new Date() },

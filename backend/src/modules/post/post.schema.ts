@@ -42,8 +42,8 @@ export const getAllPostsQuerySchema = z.object({
 
 // POST - Create schema
 export const createPostSchema = z.object({
-  title: z.string().min(1, "Title is required").max(255, "Title too long").trim(),
-  description: z.string().min(1, "Description is required").trim(),
+  title: z.string().trim().min(1, "Title is required").max(255, "Title too long"),
+  description: z.string().trim().min(1, "Description is required"),
   tags: z
     .array(z.string().trim())
     .optional()
@@ -54,8 +54,8 @@ export const createPostSchema = z.object({
 
 // PATCH - Update schema
 export const updatePostSchema = z.object({
-  title: z.string().min(1, "Title is required").max(255, "Title too long").trim().optional(),
-  description: z.string().min(1, "Description is required").trim().optional(),
+  title: z.string().trim().min(1, "Title is required").max(255, "Title too long").optional(),
+  description: z.string().trim().min(1, "Description is required").optional(),
   tags: z
     .array(z.string().trim())
     .optional()
