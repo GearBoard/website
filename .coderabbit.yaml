@@ -1,0 +1,33 @@
+language: "th"
+
+reviews:
+  profile: "chill"
+  high_level_summary: true
+  poem: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches: ["main", "develop"]
+  path_filters:
+    - "!**/*.lock"
+    - "!**/dist/**"
+    - "!**/node_modules/**"
+  # path_instructions:
+  #   - path: "src/api/**"
+  #     instructions: "Focus on security, input validation และ error handling"
+  #   - path: "**/*.test.ts"
+  #     instructions: "ตรวจ edge cases และ mock completeness"
+
+knowledge_base:
+  web_search:
+    enabled: true
+  # code_guidelines:
+  #   enabled: true
+  #   filePatterns:
+  #     - "docs/coding-standards.md"
+
+tools:
+  eslint:
+    enabled: true
+  gitleaks:
+    enabled: true
