@@ -10,6 +10,9 @@ generated/
 .env.*
 !.env.example
 
+# GCS Configuration
+key.json
+
 # Misc
 .DS_Store
 *.pem
