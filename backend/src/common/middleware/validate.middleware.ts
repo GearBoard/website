@@ -29,3 +29,19 @@ export function validateParams<T extends z.ZodType>(schema: T) {
     res.status(400).json(errorResponse(message));
   };
 }
+
+export function validateQuery<T extends z.ZodType>(schema: T) {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const result = schema.safeParse(req.query);
+    if (result.success) {
+      (req as Request & { validatedQuery: z.infer<T> }).validatedQuery = result.data;
+      next();
+      return;
+    }
+    const first = result.error.issues[0];
+    const message = first
+      ? `${first.path.join(".")}: ${first.message}`
+      : "Invalid query parameters";
+    res.status(400).json(errorResponse(message));
+  };
+}

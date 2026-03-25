@@ -1,0 +1,130 @@
+import type { Request, Response } from "express";
+import { successResponse, errorResponse } from "../../common/utils/response.js";
+import { postService } from "./post.service.js";
+import { GetPostByIdParams, GetAllPostsQuery } from "./post.schema.js";
+
+const parseUserId = (userId: unknown): bigint | null => {
+  if (!userId || Array.isArray(userId)) return null;
+  if (typeof userId !== "string") return null;
+  if (!/^[1-9]\d*$/.test(userId)) return null;
+
+  return BigInt(userId);
+};
+
+export const postController = {
+  async getById(req: Request, res: Response) {
+    try {
+      const { id } = (
+        req as Request & {
+          validatedParams: GetPostByIdParams;
+        }
+      ).validatedParams;
+
+      const post = await postService.getById(id);
+      if (!post) {
+        res.status(404).json(errorResponse("Post not found"));
+        return;
+      }
+
+      res.status(200).json(successResponse(post));
+    } catch (error) {
+      console.error("Error in getById:", error);
+      res.status(500).json(errorResponse("Internal server error"));
+    }
+  },
+
+  async getAll(req: Request, res: Response) {
+    try {
+      const query = (
+        req as Request & {
+          validatedQuery: GetAllPostsQuery;
+        }
+      ).validatedQuery;
+
+      const result = await postService.getAll(query);
+      res.status(200).json(successResponse(result));
+    } catch (error) {
+      console.error("Error in getAll:", error);
+      res.status(500).json(errorResponse("Internal server error"));
+    }
+  },
+
+  async create(req: Request, res: Response) {
+    try {
+      const userId = parseUserId(req.headers["x-user-id"]);
+      if (!userId) {
+        res.status(401).json(errorResponse("Unauthorized or invalid user ID"));
+        return;
+      }
+
+      const post = await postService.create(req.body, userId);
+      res.status(201).json(successResponse(post));
+    } catch (error) {
+      console.error("Error in create:", error);
+      res.status(500).json(errorResponse("Internal server error"));
+    }
+  },
+
+  async update(req: Request, res: Response) {
+    try {
+      const { id } = (
+        req as Request & {
+          validatedParams: GetPostByIdParams;
+        }
+      ).validatedParams;
+
+      const userId = parseUserId(req.headers["x-user-id"]);
+      if (!userId) {
+        res.status(401).json(errorResponse("Unauthorized or invalid user ID"));
+        return;
+      }
+
+      const result = await postService.update(id, req.body, userId);
+      switch (result.status) {
+        case "not_found":
+          res.status(404).json(errorResponse("Post not found"));
+          return;
+        case "forbidden":
+          res.status(403).json(errorResponse("Forbidden"));
+          return;
+        case "success":
+          res.status(200).json(successResponse(result.data));
+          return;
+      }
+    } catch (error) {
+      console.error("Error in update:", error);
+      res.status(500).json(errorResponse("Internal server error"));
+    }
+  },
+
+  async delete(req: Request, res: Response) {
+    try {
+      const { id } = (
+        req as Request & {
+          validatedParams: GetPostByIdParams;
+        }
+      ).validatedParams;
+
+      const userId = parseUserId(req.headers["x-user-id"]);
+      if (!userId) {
+        res.status(401).json(errorResponse("Unauthorized or invalid user ID"));
+        return;
+      }
+
+      const result = await postService.delete(id, userId);
+      if (result === null) {
+        res.status(404).json(errorResponse("Post not found"));
+        return;
+      }
+      if (!result) {
+        res.status(403).json(errorResponse("Forbidden"));
+        return;
+      }
+
+      res.status(200).json(successResponse({ message: "Post deleted successfully" }));
+    } catch (error) {
+      console.error("Error in delete:", error);
+      res.status(500).json(errorResponse("Internal server error"));
+    }
+  },
+};
