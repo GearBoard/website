@@ -1,6 +1,7 @@
 import { Storage } from "@google-cloud/storage";
 import { v4 as uuidv4 } from "uuid";
 import type { Readable } from "stream";
+import { pipeline } from "stream/promises";
 import path from "path";
 
 import { env } from "../../config/env.js";
@@ -76,14 +77,25 @@ export async function uploadToGCS(input: GCSUploadInput): Promise<GCSUploadSucce
   const bucket = getGCSBucket();
 
   try {
-    await bucket.file(key).save(file as Buffer, {
-      contentType: finalMimeType,
-      resumable: false,
-      validation: false,
-      metadata: {
+    const gcsFile = bucket.file(key);
+    const metadata = { contentType: finalMimeType };
+
+    if (Buffer.isBuffer(file)) {
+      await gcsFile.save(file, {
         contentType: finalMimeType,
-      },
-    });
+        resumable: false,
+        metadata,
+      });
+    } else {
+      await pipeline(
+        file as NodeJS.ReadableStream,
+        gcsFile.createWriteStream({
+          contentType: finalMimeType,
+          resumable: false,
+          metadata,
+        })
+      );
+    }
 
     const url = `https://storage.googleapis.com/${env.GCS_BUCKET_NAME}/${key}`;
     return { url };
