@@ -85,6 +85,7 @@ export async function uploadToGCS(input: GCSUploadInput): Promise<GCSUploadSucce
         contentType: finalMimeType,
         resumable: false,
         metadata,
+        predefinedAcl: "publicRead",
       });
     } else {
       await pipeline(
@@ -93,6 +94,7 @@ export async function uploadToGCS(input: GCSUploadInput): Promise<GCSUploadSucce
           contentType: finalMimeType,
           resumable: false,
           metadata,
+          predefinedAcl: "publicRead",
         })
       );
     }
