@@ -11,24 +11,30 @@ datasource db {
 }
 
 //////////////////////////
-// USER
+// BETTER AUTH MODELS
 //////////////////////////
 
 model User {
-  id          BigInt     @id @default(autoincrement())
-  username    String     @unique
-  email       String     @unique
-  password    String?    // null if login via Google
-  image       String?    // profile picture
-  description String?
-  role        UserRole   @default(USER)
-  departmentId BigInt?
-  provider    AuthProvider @default(LOCAL)
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
+  // Custom Gearboard fields
+  username        String?   @unique
+  displayUsername String?
+  description     String?
+  role            UserRole  @default(USER)
+  departmentId    String?
+  deletedAt       DateTime?
 
+  sessions Session[]
+  accounts Account[]
+
+  // Relations
   posts      Post[]
   comments   Comment[]
   likes      Like[]
@@ -36,42 +42,77 @@ model User {
   department Department? @relation(fields: [departmentId], references: [id])
 }
 
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+//////////////////////////
+// DOMAIN MODELS
+//////////////////////////
+
 enum UserRole {
   USER
   ADMIN
 }
 
-enum AuthProvider {
-  LOCAL
-  GOOGLE
-}
-
-//////////////////////////
-// DEPARTMENT
-//////////////////////////
-
 model Department {
-  id   BigInt @id @default(autoincrement())
+  id   String @id @default(cuid())
   name String
 
   users User[]
 }
 
-//////////////////////////
-// POST (QUESTION)
-//////////////////////////
-
 model Post {
-  id          BigInt   @id @default(autoincrement())
-  userId      BigInt
-  title       String
-  description String   @db.Text
-  isClosed    Boolean  @default(false)
-  likeCount   Int      @default(0)
-  commentCount Int     @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt   DateTime?
+  id           String    @id @default(cuid())
+  userId       String
+  title        String
+  description  String    @db.Text
+  isClosed     Boolean   @default(false)
+  likeCount    Int       @default(0)
+  commentCount Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
 
   user      User        @relation(fields: [userId], references: [id])
   tags      PostTag[]
@@ -81,32 +122,24 @@ model Post {
   bookmarks Bookmark[]
 }
 
-//////////////////////////
-// POST IMAGES
-//////////////////////////
-
 model PostImage {
-  id      BigInt @id @default(autoincrement())
-  postId  BigInt
-  url     String
+  id     String @id @default(cuid())
+  postId String
+  url    String
 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
-//////////////////////////
-// TAG
-//////////////////////////
-
 model Tag {
-  id    BigInt @id @default(autoincrement())
-  name  String @unique
+  id   String @id @default(cuid())
+  name String @unique
 
   posts PostTag[]
 }
 
 model PostTag {
-  postId BigInt
-  tagId  BigInt
+  postId String
+  tagId  String
 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   tag  Tag  @relation(fields: [tagId], references: [id])
@@ -114,47 +147,35 @@ model PostTag {
   @@id([postId, tagId])
 }
 
-//////////////////////////
-// COMMENT (supports reply)
-//////////////////////////
-
 model Comment {
-  id        BigInt   @id @default(autoincrement())
-  postId    BigInt
-  userId    BigInt
-  parentId  BigInt?  // for reply(can be null)
-  content   String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String    @id @default(cuid())
+  postId    String
+  userId    String
+  parentId  String? // for reply(can be null)
+  content   String    @db.Text
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  post   Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user   User    @relation(fields: [userId], references: [id])
-  parent Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  post    Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user    User      @relation(fields: [userId], references: [id])
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
   replies Comment[] @relation("CommentReplies")
 
   images CommentImage[]
 }
 
-//////////////////////////
-// COMMENT IMAGE
-//////////////////////////
-
 model CommentImage {
-  id        BigInt @id @default(autoincrement())
-  commentId BigInt
+  id        String @id @default(cuid())
+  commentId String
   url       String
 
   comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
 }
 
-//////////////////////////
-// LIKE
-//////////////////////////
-
 model Like {
-  userId BigInt
-  postId BigInt
+  userId    String
+  postId    String
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
@@ -163,13 +184,9 @@ model Like {
   @@id([userId, postId])
 }
 
-//////////////////////////
-// BOOKMARK
-//////////////////////////
-
 model Bookmark {
-  userId BigInt
-  postId BigInt
+  userId    String
+  postId    String
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])

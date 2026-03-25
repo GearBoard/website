@@ -10,7 +10,6 @@ export function toDto(user: User): UserResponseDto {
     description: user.description,
     role: user.role,
     departmentId: user.departmentId === null ? null : user.departmentId.toString(),
-    provider: user.provider,
     createdAt: user.createdAt.toISOString(),
     updatedAt: user.updatedAt.toISOString(),
   };

@@ -11,7 +11,7 @@ export interface CommentImageDto {
 
 export interface CommentAuthorDto {
   id: string;
-  username: string;
+  username: string | null;
   image: string | null;
 }
 
