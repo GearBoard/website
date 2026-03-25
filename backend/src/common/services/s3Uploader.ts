@@ -3,6 +3,8 @@ import { v4 as uuidv4 } from "uuid";
 import type { Readable } from "stream";
 import path from "path";
 
+import { env } from "../../config/env.js";
+
 export interface S3UploadInput {
   file: Buffer | Readable | NodeJS.ReadableStream;
   filename: string;
@@ -22,9 +24,9 @@ let s3Client: S3Client | null = null;
 function getS3Client() {
   if (s3Client) return s3Client;
 
-  const s3Region = process.env.S3_REGION;
-  const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+  const s3Region = env.S3_REGION;
+  const accessKeyId = env.AWS_ACCESS_KEY_ID;
+  const secretAccessKey = env.AWS_SECRET_ACCESS_KEY;
 
   if (!s3Region || !accessKeyId || !secretAccessKey) {
     throw new Error("Missing S3 credentials in environment variables");
@@ -66,14 +68,10 @@ export async function uploadToS3(input: S3UploadInput): Promise<S3UploadSuccess>
     );
   }
 
-  // Configuration
-  const s3BucketName = process.env.S3_BUCKET_NAME;
-  const s3Region = process.env.S3_REGION;
-  const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
-
-  if (!s3BucketName || !s3Region || !accessKeyId || !secretAccessKey) {
-    throw new Error("Missing S3 credentials in environment variables");
+  const s3BucketName = env.S3_BUCKET_NAME;
+  const s3Region = env.S3_REGION;
+  if (!s3BucketName) {
+    throw new Error("Missing S3_BUCKET_NAME in environment variables");
   }
 
   const client = getS3Client();
