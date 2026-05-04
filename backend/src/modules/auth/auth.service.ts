@@ -30,13 +30,4 @@ export const authService = {
       username: (session.user as { username?: string | null }).username ?? null,
     };
   },
-
-  async signOut(headers: IncomingHttpHeaders): Promise<string[]> {
-    const response = await auth.api.signOut({
-      headers: fromNodeHeaders(headers),
-      returnHeaders: true,
-    });
-
-    return response.headers.getSetCookie();
-  },
 };
