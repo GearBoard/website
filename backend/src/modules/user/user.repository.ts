@@ -17,7 +17,7 @@ export const userRepository = {
         name: data.username,
         username: data.username,
         email: data.email,
-        role: data.role,
+        role: "USER",
         image: data.image,
         description: data.description,
         departmentId: data.departmentId,
