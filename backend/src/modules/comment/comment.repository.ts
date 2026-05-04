@@ -13,14 +13,14 @@ const commentInclude = {
 };
 
 export const commentRepository = {
-  async getById(id: bigint) {
+  async getById(id: string) {
     return prisma.comment.findUnique({
       where: { id },
       include: commentInclude,
     });
   },
 
-  async getByPostId(postId: bigint) {
+  async getByPostId(postId: string) {
     return prisma.comment.findMany({
       where: { postId, parentId: null },
       include: commentInclude,
@@ -28,7 +28,7 @@ export const commentRepository = {
     });
   },
 
-  async createComment(userId: bigint, postId: bigint, data: CreateCommentRequestDto) {
+  async createComment(userId: string, postId: string, data: CreateCommentRequestDto) {
     return prisma.comment.create({
       data: {
         userId,
@@ -44,7 +44,7 @@ export const commentRepository = {
     });
   },
 
-  async createReply(userId: bigint, postId: bigint, parentId: bigint, data: CreateReplyRequestDto) {
+  async createReply(userId: string, postId: string, parentId: string, data: CreateReplyRequestDto) {
     return prisma.comment.create({
       data: {
         userId,
@@ -61,7 +61,7 @@ export const commentRepository = {
     });
   },
 
-  async deleteComment(id: bigint) {
+  async deleteComment(id: string) {
     return prisma.$transaction([
       prisma.comment.update({ where: { id }, data: { deletedAt: new Date() } }),
       prisma.comment.updateMany({ where: { parentId: id }, data: { deletedAt: new Date() } }),

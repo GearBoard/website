@@ -4,7 +4,7 @@ import { userService } from "./user.service.js";
 
 export const userController = {
   async getById(req: Request, res: Response) {
-    const { id } = (req as Request & { validatedParams: { id: bigint } }).validatedParams;
+    const { id } = (req as Request & { validatedParams: { id: string } }).validatedParams;
 
     const data = await userService.getById(id);
     if (!data) {

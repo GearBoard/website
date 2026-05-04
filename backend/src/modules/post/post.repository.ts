@@ -22,7 +22,7 @@ const postInclude = {
 export { postInclude };
 
 export const postRepository = {
-  async findById(id: bigint): Promise<PostWithRelations | null> {
+  async findById(id: string): Promise<PostWithRelations | null> {
     const post = await prisma.post.findUnique({
       where: { id, deletedAt: null },
       include: postInclude,
@@ -35,7 +35,7 @@ export const postRepository = {
     take: number;
     search?: string;
     tagName?: string;
-    userId?: bigint;
+    userId?: string;
   }) {
     const { skip, take, search, tagName, userId } = options;
 
@@ -96,7 +96,7 @@ export const postRepository = {
     };
   },
 
-  async create(data: CreatePostRequestDto, userId: bigint): Promise<PostWithRelations> {
+  async create(data: CreatePostRequestDto, userId: string): Promise<PostWithRelations> {
     const post = await prisma.post.create({
       data: {
         userId,
@@ -124,8 +124,8 @@ export const postRepository = {
     return post as PostWithRelations;
   },
 
-  async update(id: bigint, data: UpdatePostRequestDto): Promise<PostWithRelations | null> {
-    return prisma.$transaction(async (tx) => {
+  async update(id: string, data: UpdatePostRequestDto): Promise<PostWithRelations | null> {
+    return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const post = await tx.post.findUnique({
         where: { id, deletedAt: null },
       });
@@ -147,7 +147,9 @@ export const postRepository = {
             data.tags.map(async (tagName) => {
               await tx.postTag.create({
                 data: {
-                  postId: id,
+                  post: {
+                    connect: { id },
+                  },
                   tag: {
                     connectOrCreate: {
                       where: { name: tagName },
@@ -177,8 +179,8 @@ export const postRepository = {
     });
   },
 
-  async delete(id: bigint): Promise<boolean> {
-    return prisma.$transaction(async (tx) => {
+  async delete(id: string): Promise<boolean> {
+    return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const post = await tx.post.findUnique({
         where: { id, deletedAt: null },
         select: { id: true },

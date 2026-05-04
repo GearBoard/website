@@ -2,10 +2,7 @@ import { z } from "zod";
 
 // GET - Param schemas
 export const getPostByIdSchema = z.object({
-  id: z
-    .string()
-    .regex(/^[1-9]\d*$/, { message: "Invalid post id" })
-    .transform((s) => BigInt(s)),
+  id: z.string().trim().min(1, { message: "Invalid post id" }),
 });
 
 // GET /posts - Query schemas
@@ -28,16 +25,7 @@ export const getAllPostsQuerySchema = z.object({
     .refine((n) => n >= 1 && n <= 100, { message: "Limit must be between 1 and 100" }),
   search: z.string().optional(),
   tag: z.string().optional(),
-  userId: z
-    .string()
-    .optional()
-    .refine((v) => v === undefined || /^[1-9]\d*$/.test(v), {
-      message: "userId must be a valid positive bigint",
-    })
-    .transform((v) => {
-      if (!v) return undefined;
-      return BigInt(v);
-    }),
+  userId: z.string().trim().min(1, { message: "userId must not be empty" }).optional(),
 });
 
 // POST - Create schema

@@ -3,7 +3,7 @@ import { createPostSchema, updatePostSchema } from "./post.schema.js";
 
 export interface AuthorInfoDto {
   id: string;
-  username: string;
+  username: string | null;
   image: string | null;
 }
 

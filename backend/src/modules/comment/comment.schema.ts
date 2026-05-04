@@ -1,13 +1,7 @@
 import { z } from "zod";
 
 export const commentIdValidateSchema = z.object({
-  commentId: z
-    .string()
-    .min(1)
-    .transform((s) => BigInt(s))
-    .refine((n) => n >= 1n, {
-      message: "Invalid comment id",
-    }),
+  commentId: z.string().trim().min(1, { message: "Invalid comment id" }),
 });
 
 export const createCommentSchema = z.object({

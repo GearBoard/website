@@ -3,7 +3,7 @@ import { prisma } from "../../config/prisma.js";
 import { CreateUserRequestDto } from "./user.dto.js";
 
 export const userRepository = {
-  async findById(id: bigint): Promise<User | null> {
+  async findById(id: string): Promise<User | null> {
     const user = await prisma.user.findUnique({
       where: { id },
     });
@@ -13,7 +13,15 @@ export const userRepository = {
 
   async create(data: CreateUserRequestDto): Promise<User> {
     const user = await prisma.user.create({
-      data,
+      data: {
+        name: data.username,
+        username: data.username,
+        email: data.email,
+        role: data.role,
+        image: data.image,
+        description: data.description,
+        departmentId: data.departmentId,
+      },
     });
 
     return user;

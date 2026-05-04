@@ -15,7 +15,7 @@ type UpdateResult =
   | { status: "success"; data: PostResponseDto };
 
 export const postService = {
-  async getById(id: bigint): Promise<PostResponseDto | null> {
+  async getById(id: string): Promise<PostResponseDto | null> {
     // Check if post exists
     const post = await postRepository.findById(id);
     if (!post) {
@@ -45,12 +45,12 @@ export const postService = {
     };
   },
 
-  async create(data: CreatePostRequestDto, userId: bigint): Promise<PostResponseDto> {
+  async create(data: CreatePostRequestDto, userId: string): Promise<PostResponseDto> {
     const post = await postRepository.create(data, userId);
     return toPostDto(post);
   },
 
-  async update(id: bigint, data: UpdatePostRequestDto, userId: bigint): Promise<UpdateResult> {
+  async update(id: string, data: UpdatePostRequestDto, userId: string): Promise<UpdateResult> {
     // Check if post exists and get ownership info
     const post = await postRepository.findById(id);
     if (!post) {
@@ -70,7 +70,7 @@ export const postService = {
     return { status: "success", data: toPostDto(updatedPost) };
   },
 
-  async delete(id: bigint, userId: bigint): Promise<boolean | null> {
+  async delete(id: string, userId: string): Promise<boolean | null> {
     // Check if post exists and get ownership info
     const post = await postRepository.findById(id);
     if (!post) {
