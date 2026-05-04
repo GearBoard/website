@@ -30,7 +30,7 @@ export const commentController = {
     ).validatedParams;
 
     try {
-      await commentService.deleteComment(commentId);
+      await commentService.deleteComment(commentId, authReq.user.id);
       res.status(200).json(successResponse({ message: "Comment deleted successfully" }));
     } catch (error) {
       handleHttpError(res, error);

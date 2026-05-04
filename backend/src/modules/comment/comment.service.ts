@@ -1,4 +1,4 @@
-import { NotFoundError } from "../../common/errors/app-error.js";
+import { ForbiddenError, NotFoundError } from "../../common/errors/app-error.js";
 import { commentRepository } from "./comment.repository.js";
 import { toDto, type CommentWithRelations } from "./comment.mapper.js";
 import type {
@@ -51,10 +51,14 @@ export const commentService = {
     return toDto(comment as CommentWithRelations);
   },
 
-  async deleteComment(id: string): Promise<void> {
+  async deleteComment(id: string, userId: string): Promise<void> {
     const comment = await commentRepository.getById(id);
     if (!comment) {
       throw new NotFoundError("Comment not found");
+    }
+
+    if (comment.userId !== userId) {
+      throw new ForbiddenError("Forbidden");
     }
 
     await commentRepository.deleteComment(id);
