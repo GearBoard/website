@@ -4,7 +4,7 @@ info:
   description: API Specification for GearBoard application (Q&A Platform)
   version: 1.0.0
 servers:
-  - url: http://localhost:4000
+  - url: http://localhost:4000/api
     description: Local Development Server
 
 components:
@@ -65,32 +65,50 @@ components:
           format: int64
 
     # --- User Schemas ---
-    User:
+    CurrentUserProfile:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
-        student_id:
           type: string
-        username:
+        name:
           type: string
         email:
           type: string
           format: email
+        image:
+          type: string
+          nullable: true
+        username:
+          type: string
+          nullable: true
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+          nullable: true
+        email:
+          type: string
+          format: email
+        image:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
         role:
           type: string
-          enum: [student, moderator, admin]
-        reputation:
-          type: integer
-        faculty:
-          $ref: "#/components/schemas/Faculty"
-        department:
-          $ref: "#/components/schemas/Department"
-        created_at:
+          enum: [USER, ADMIN]
+        departmentId:
+          type: string
+          nullable: true
+        createdAt:
           type: string
           format: date-time
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
 
@@ -98,19 +116,16 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
         username:
           type: string
+          nullable: true
+        image:
+          type: string
+          nullable: true
         role:
           type: string
-        reputation:
-          type: integer
-        faculty:
-          $ref: "#/components/schemas/Faculty"
-        department:
-          $ref: "#/components/schemas/Department"
-        # Public profile might limit personal info like student_id/email
+          enum: [USER, ADMIN]
 
     # --- Post/Question Schemas ---
     Post:
@@ -184,52 +199,6 @@ security:
   - BearerAuth: []
 
 paths:
-  # --- Authentication ---
-  /auth/login:
-    post:
-      tags: [Auth]
-      summary: Login with external token
-      security: [] # Public endpoint
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [token]
-              properties:
-                token:
-                  type: string
-                  description: Google/Firebase token
-      responses:
-        "200":
-          description: Login successful
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  accessToken:
-                    type: string
-                  isNewUser:
-                    type: boolean
-        "400":
-          description: Invalid Request
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
-
-  /auth/logout:
-    post:
-      tags: [Auth]
-      summary: Logout
-      responses:
-        "204":
-          description: Logout successful (No Content)
-        "401":
-          description: Unauthorized
-
   # --- Users ---
   /users/me:
     get:
@@ -241,57 +210,67 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/CurrentUserProfile"
         "401":
           description: Unauthorized
-    patch:
+
+  /users/{id}:
+    get:
       tags: [Users]
-      summary: Update current user profile
+      summary: Get user by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+
+  /users:
+    post:
+      tags: [Users]
+      summary: Create user
+      security: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [username, email]
               properties:
-                student_id:
-                  type: string
-                department_id:
-                  type: integer
                 username:
                   type: string
+                email:
+                  type: string
+                  format: email
+                image:
+                  type: string
+                  format: uri
+                  nullable: true
+                description:
+                  type: string
+                  nullable: true
+                departmentId:
+                  type: string
+                  nullable: true
       responses:
-        "200":
-          description: Updated successfully
+        "201":
+          description: User created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
-        "400":
-          description: Invalid Input
-        "401":
-          description: Unauthorized
-
-  /users/{id}/profile:
-    get:
-      tags: [Users]
-      summary: Get public profile of a user
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: Public profile
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserProfile"
-        "404":
-          description: User not found
+        "409":
+          description: Email or username already exists
 
   # --- Master Data ---
   /faculties:
