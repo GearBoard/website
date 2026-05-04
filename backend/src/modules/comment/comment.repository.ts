@@ -5,9 +5,15 @@ const commentInclude = {
   images: true,
   user: true,
   replies: {
+    where: {
+      deletedAt: null,
+    },
     include: {
       images: true,
       user: true,
+    },
+    orderBy: {
+      createdAt: "asc",
     },
   },
 };
@@ -15,14 +21,14 @@ const commentInclude = {
 export const commentRepository = {
   async getById(id: string) {
     return prisma.comment.findUnique({
-      where: { id },
+      where: { id, deletedAt: null },
       include: commentInclude,
     });
   },
 
   async getByPostId(postId: string) {
     return prisma.comment.findMany({
-      where: { postId, parentId: null },
+      where: { postId, parentId: null, deletedAt: null },
       include: commentInclude,
       orderBy: { createdAt: "desc" },
     });

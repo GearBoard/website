@@ -18,8 +18,10 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
 
     (req as AuthenticatedRequest).user = {
       id: session.user.id,
+      name: session.user.name,
+      image: session.user.image ?? null,
       email: session.user.email,
-      username: (session.user as { username?: string | null }).username ?? undefined,
+      username: (session.user as { username?: string | null }).username ?? null,
     };
 
     next();

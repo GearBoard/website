@@ -4,9 +4,11 @@ import type { Request } from "express";
 
 export interface AuthenticatedUser {
   id: string;
+  name: string;
+  image: string | null;
   role?: string;
-  email?: string;
-  username?: string;
+  email: string;
+  username: string | null;
 }
 
 declare module "express-serve-static-core" {
