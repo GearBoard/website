@@ -13,10 +13,4 @@ userRoute.get(
   validateParams(getUserByIdSchema),
   userController.getById.bind(userController)
 );
-
-userRoute.get(
-  "/:id",
-  validateParams(getUserByIdSchema),
-  userController.getById.bind(userController)
-);
 userRoute.post("/", validateBody(createUserSchema), userController.create.bind(userController));
