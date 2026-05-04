@@ -1,17 +1,8 @@
 import type { Request, Response } from "express";
-import { fromNodeHeaders } from "better-auth/node";
 import { successResponse, errorResponse } from "../../common/utils/response.js";
-import { auth } from "../../config/auth.js";
+import type { AuthenticatedRequest } from "../../common/types/index.js";
 import { postService } from "./post.service.js";
 import { GetPostByIdParams, GetAllPostsQuery } from "./post.schema.js";
-
-async function getSessionUserId(req: Request): Promise<string | null> {
-  const session = await auth.api.getSession({
-    headers: fromNodeHeaders(req.headers),
-  });
-
-  return session?.user?.id ?? null;
-}
 
 export const postController = {
   async getById(req: Request, res: Response) {
@@ -53,13 +44,8 @@ export const postController = {
 
   async create(req: Request, res: Response) {
     try {
-      const userId = await getSessionUserId(req);
-      if (!userId) {
-        res.status(401).json(errorResponse("Unauthorized"));
-        return;
-      }
-
-      const post = await postService.create(req.body, userId);
+      const authReq = req as AuthenticatedRequest;
+      const post = await postService.create(req.body, authReq.user.id);
       res.status(201).json(successResponse(post));
     } catch (error) {
       console.error("Error in create:", error);
@@ -69,19 +55,14 @@ export const postController = {
 
   async update(req: Request, res: Response) {
     try {
+      const authReq = req as AuthenticatedRequest;
       const { id } = (
-        req as Request & {
+        authReq as AuthenticatedRequest & {
           validatedParams: GetPostByIdParams;
         }
       ).validatedParams;
 
-      const userId = await getSessionUserId(req);
-      if (!userId) {
-        res.status(401).json(errorResponse("Unauthorized"));
-        return;
-      }
-
-      const result = await postService.update(id, req.body, userId);
+      const result = await postService.update(id, req.body, authReq.user.id);
       switch (result.status) {
         case "not_found":
           res.status(404).json(errorResponse("Post not found"));
@@ -101,19 +82,14 @@ export const postController = {
 
   async delete(req: Request, res: Response) {
     try {
+      const authReq = req as AuthenticatedRequest;
       const { id } = (
-        req as Request & {
+        authReq as AuthenticatedRequest & {
           validatedParams: GetPostByIdParams;
         }
       ).validatedParams;
 
-      const userId = await getSessionUserId(req);
-      if (!userId) {
-        res.status(401).json(errorResponse("Unauthorized"));
-        return;
-      }
-
-      const result = await postService.delete(id, userId);
+      const result = await postService.delete(id, authReq.user.id);
       if (result === null) {
         res.status(404).json(errorResponse("Post not found"));
         return;

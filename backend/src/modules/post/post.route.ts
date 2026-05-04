@@ -4,6 +4,7 @@ import {
   validateParams,
   validateQuery,
 } from "../../common/middleware/validate.middleware.js";
+import { requireAuth } from "../../common/middleware/auth.middleware.js";
 import { postController } from "./post.controller.js";
 import {
   createPostSchema,
@@ -29,11 +30,17 @@ postRoute.get(
 );
 
 // POST /posts - Create a new post
-postRoute.post("/", validateBody(createPostSchema), postController.create.bind(postController));
+postRoute.post(
+  "/",
+  requireAuth,
+  validateBody(createPostSchema),
+  postController.create.bind(postController)
+);
 
 // PATCH /posts/:id - Update a post
 postRoute.patch(
   "/:id",
+  requireAuth,
   validateParams(getPostByIdSchema),
   validateBody(updatePostSchema),
   postController.update.bind(postController)
@@ -42,6 +49,7 @@ postRoute.patch(
 // DELETE /posts/:id - Delete a post
 postRoute.delete(
   "/:id",
+  requireAuth,
   validateParams(getPostByIdSchema),
   postController.delete.bind(postController)
 );
