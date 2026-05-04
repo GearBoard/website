@@ -1,15 +1,17 @@
 import type { Request, Response } from "express";
+import { fromNodeHeaders } from "better-auth/node";
 import { successResponse, errorResponse } from "../../common/utils/response.js";
+import { auth } from "../../config/auth.js";
 import { postService } from "./post.service.js";
 import { GetPostByIdParams, GetAllPostsQuery } from "./post.schema.js";
 
-const parseUserId = (userId: unknown): bigint | null => {
-  if (!userId || Array.isArray(userId)) return null;
-  if (typeof userId !== "string") return null;
-  if (!/^[1-9]\d*$/.test(userId)) return null;
+async function getSessionUserId(req: Request): Promise<string | null> {
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers),
+  });
 
-  return BigInt(userId);
-};
+  return session?.user?.id ?? null;
+}
 
 export const postController = {
   async getById(req: Request, res: Response) {
@@ -51,9 +53,9 @@ export const postController = {
 
   async create(req: Request, res: Response) {
     try {
-      const userId = parseUserId(req.headers["x-user-id"]);
+      const userId = await getSessionUserId(req);
       if (!userId) {
-        res.status(401).json(errorResponse("Unauthorized or invalid user ID"));
+        res.status(401).json(errorResponse("Unauthorized"));
         return;
       }
 
@@ -73,9 +75,9 @@ export const postController = {
         }
       ).validatedParams;
 
-      const userId = parseUserId(req.headers["x-user-id"]);
+      const userId = await getSessionUserId(req);
       if (!userId) {
-        res.status(401).json(errorResponse("Unauthorized or invalid user ID"));
+        res.status(401).json(errorResponse("Unauthorized"));
         return;
       }
 
@@ -105,9 +107,9 @@ export const postController = {
         }
       ).validatedParams;
 
-      const userId = parseUserId(req.headers["x-user-id"]);
+      const userId = await getSessionUserId(req);
       if (!userId) {
-        res.status(401).json(errorResponse("Unauthorized or invalid user ID"));
+        res.status(401).json(errorResponse("Unauthorized"));
         return;
       }
 
