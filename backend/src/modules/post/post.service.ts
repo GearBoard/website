@@ -1,3 +1,4 @@
+import { ForbiddenError, NotFoundError } from "../../common/errors/app-error.js";
 import { toPostDto } from "./post.mapper.js";
 import { postRepository } from "./post.repository.js";
 import {
@@ -9,17 +10,11 @@ import {
 import { GetAllPostsQuery } from "./post.schema.js";
 import { getSkipTake } from "../../common/utils/pagination.js";
 
-type UpdateResult =
-  | { status: "not_found" }
-  | { status: "forbidden" }
-  | { status: "success"; data: PostResponseDto };
-
 export const postService = {
-  async getById(id: string): Promise<PostResponseDto | null> {
-    // Check if post exists
+  async getById(id: string): Promise<PostResponseDto> {
     const post = await postRepository.findById(id);
     if (!post) {
-      return null; // Post not found - will be handled as 404 in controller
+      throw new NotFoundError("Post not found");
     }
 
     return toPostDto(post);
@@ -50,39 +45,34 @@ export const postService = {
     return toPostDto(post);
   },
 
-  async update(id: string, data: UpdatePostRequestDto, userId: string): Promise<UpdateResult> {
-    // Check if post exists and get ownership info
+  async update(id: string, data: UpdatePostRequestDto, userId: string): Promise<PostResponseDto> {
     const post = await postRepository.findById(id);
     if (!post) {
-      return { status: "not_found" };
+      throw new NotFoundError("Post not found");
     }
 
-    // Check if user is owner
     if (post.userId !== userId) {
-      return { status: "forbidden" };
+      throw new ForbiddenError("Forbidden");
     }
 
     const updatedPost = await postRepository.update(id, data);
     if (!updatedPost) {
-      return { status: "not_found" }; // Though unlikely since we checked
+      throw new NotFoundError("Post not found");
     }
 
-    return { status: "success", data: toPostDto(updatedPost) };
+    return toPostDto(updatedPost);
   },
 
-  async delete(id: string, userId: string): Promise<boolean | null> {
-    // Check if post exists and get ownership info
+  async delete(id: string, userId: string): Promise<void> {
     const post = await postRepository.findById(id);
     if (!post) {
-      return null; // Post not found
+      throw new NotFoundError("Post not found");
     }
 
-    // Check if user is owner
     if (post.userId !== userId) {
-      return false; // Not owner
+      throw new ForbiddenError("Forbidden");
     }
 
     await postRepository.delete(id);
-    return true;
   },
 };

@@ -1,11 +1,19 @@
+import { NotFoundError } from "../../common/errors/app-error.js";
 import { commentRepository } from "./comment.repository.js";
 import { toDto, type CommentWithRelations } from "./comment.mapper.js";
-import type { CreateCommentRequestDto, CreateReplyRequestDto } from "./comment.dto.js";
+import type {
+  CommentResponseDto,
+  CreateCommentRequestDto,
+  CreateReplyRequestDto,
+} from "./comment.dto.js";
 
 export const commentService = {
-  async getById(id: string) {
+  async getById(id: string): Promise<CommentResponseDto> {
     const comment = await commentRepository.getById(id);
-    if (!comment) return null;
+    if (!comment) {
+      throw new NotFoundError("Comment not found");
+    }
+
     return toDto(comment as CommentWithRelations);
   },
 
@@ -24,7 +32,31 @@ export const commentService = {
     return toDto(comment as CommentWithRelations);
   },
 
-  async deleteComment(id: string) {
+  async createReplyFromParent(
+    parentId: string,
+    userId: string,
+    data: CreateReplyRequestDto
+  ): Promise<CommentResponseDto> {
+    const parentComment = await commentRepository.getById(parentId);
+    if (!parentComment) {
+      throw new NotFoundError("Comment doesn't exist");
+    }
+
+    const comment = await commentRepository.createReply(
+      userId,
+      parentComment.postId,
+      parentId,
+      data
+    );
+    return toDto(comment as CommentWithRelations);
+  },
+
+  async deleteComment(id: string): Promise<void> {
+    const comment = await commentRepository.getById(id);
+    if (!comment) {
+      throw new NotFoundError("Comment not found");
+    }
+
     await commentRepository.deleteComment(id);
   },
 };

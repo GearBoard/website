@@ -1,42 +1,25 @@
 import { Request, Response } from "express";
-import { fromNodeHeaders } from "better-auth/node";
-import { auth } from "../../config/auth.js";
+import { successResponse } from "../../common/utils/response.js";
+import { handleHttpError } from "../../common/utils/http-error.js";
+import { authService } from "./auth.service.js";
 
 export async function getMe(req: Request, res: Response) {
-  const session = await auth.api.getSession({
-    headers: fromNodeHeaders(req.headers),
-  });
-
-  if (!session?.user) {
-    return res.status(401).json({
-      success: false,
-      message: "Unauthorized",
-    });
+  try {
+    const user = await authService.getCurrentUser(req.headers);
+    return res.status(200).json(successResponse(user));
+  } catch (error) {
+    handleHttpError(res, error);
   }
-
-  return res.status(200).json({
-    success: true,
-    data: {
-      id: session.user.id,
-      name: session.user.name,
-      email: session.user.email,
-      image: session.user.image ?? null,
-      username: (session.user as { username?: string | null }).username ?? null,
-    },
-  });
 }
 
 export async function logout(req: Request, res: Response) {
-  const { headers } = await auth.api.signOut({
-    headers: fromNodeHeaders(req.headers),
-    returnHeaders: true,
-  });
-
-  const setCookie = headers.getSetCookie();
-
-  if (setCookie.length > 0) {
-    res.setHeader("set-cookie", setCookie);
+  try {
+    const setCookie = await authService.signOut(req.headers);
+    if (setCookie.length > 0) {
+      res.setHeader("set-cookie", setCookie);
+    }
+    return res.status(204).end();
+  } catch (error) {
+    handleHttpError(res, error);
   }
-
-  return res.status(204).end();
 }

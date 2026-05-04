@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import type { AuthenticatedRequest } from "../../common/types/index.js";
-import { successResponse, errorResponse } from "../../common/utils/response.js";
+import { successResponse } from "../../common/utils/response.js";
+import { handleHttpError } from "../../common/utils/http-error.js";
 import { commentService } from "./comment.service.js";
 
 export const commentController = {
@@ -13,28 +14,10 @@ export const commentController = {
     ).validatedParams;
 
     try {
-      // For createReply, we need the postId which is likely attached to the parent comment.
-      // We should first fetch the parent comment to get the postId.
-      const parentComment = await commentService.getById(commentId);
-      if (!parentComment) {
-        res.status(404).json(errorResponse("Comment doesn't exist"));
-        return;
-      }
-
-      const data = await commentService.createReply(
-        authReq.user.id,
-        parentComment.postId,
-        commentId,
-        req.body
-      );
+      const data = await commentService.createReplyFromParent(commentId, authReq.user.id, req.body);
       res.status(201).json(successResponse(data));
-    } catch (e: unknown) {
-      const err = e as { code?: string };
-      if (err.code === "P2003") {
-        res.status(400).json(errorResponse("Parent comment or User doesn't exist"));
-        return;
-      }
-      throw e;
+    } catch (error) {
+      handleHttpError(res, error);
     }
   },
 
@@ -47,16 +30,10 @@ export const commentController = {
     ).validatedParams;
 
     try {
-      const parentComment = await commentService.getById(commentId);
-      if (!parentComment) {
-        res.status(404).json(errorResponse("Comment not found"));
-        return;
-      }
-
-      const data = await commentService.deleteComment(commentId);
-      res.status(200).json(successResponse(data));
-    } catch {
-      res.status(500).json(errorResponse("Failed to delete comment"));
+      await commentService.deleteComment(commentId);
+      res.status(200).json(successResponse({ message: "Comment deleted successfully" }));
+    } catch (error) {
+      handleHttpError(res, error);
     }
   },
 };
