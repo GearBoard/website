@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { DEPARTMENTS } from "../constants/departments";
 import type { ProfileFormData, RegistrationFormProps } from "../types/types";
+import Image from "next/image";
 
 export default function RegistrationForm({ onSwitchToLogin }: RegistrationFormProps) {
   const [formData, setFormData] = useState<ProfileFormData>({
@@ -109,7 +110,9 @@ export default function RegistrationForm({ onSwitchToLogin }: RegistrationFormPr
                 className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 border-4 border-white shadow-sm flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-all"
               >
                 {formData.profileImage ? (
-                  <img
+                  <Image
+                    width={96}
+                    height={96}
                     src={formData.profileImage}
                     alt="Profile preview"
                     className="w-full h-full object-cover"

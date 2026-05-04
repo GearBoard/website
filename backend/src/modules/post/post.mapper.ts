@@ -1,4 +1,4 @@
-import { PostResponseDto, AuthorInfoDto } from "./post.dto.js";
+import { PostResponseDto } from "./post.dto.js";
 import { Prisma } from "../../../generated/prisma/client.js";
 import { postInclude } from "./post.repository.js";
 

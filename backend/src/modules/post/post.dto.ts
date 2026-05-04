@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { createPostSchema, updatePostSchema } from "./post.schema.js";
-import { PaginatedResult } from "../../common/utils/pagination.js";
 
 export interface AuthorInfoDto {
   id: string;
