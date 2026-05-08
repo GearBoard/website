@@ -13,13 +13,13 @@ import { getSkipTake } from "../../common/utils/pagination.js";
 
 export const userService = {
   async getById(id: string, requesterId: string, requesterRole: string): Promise<UserResponseDto> {
+    if (requesterId !== id && requesterRole !== "ADMIN") {
+      throw new ForbiddenError("Forbidden");
+    }
+
     const user = await userRepository.findById(id);
     if (!user) {
       throw new NotFoundError("User not found");
-    }
-
-    if (requesterId !== id && requesterRole !== "ADMIN") {
-      throw new ForbiddenError("Forbidden");
     }
 
     return toDto(user);
@@ -64,13 +64,13 @@ export const userService = {
     requesterId: string,
     requesterRole: string
   ): Promise<UserResponseDto> {
+    if (requesterId !== id && requesterRole !== "ADMIN") {
+      throw new ForbiddenError("Forbidden");
+    }
+
     const user = await userRepository.findById(id);
     if (!user) {
       throw new NotFoundError("User not found");
-    }
-
-    if (requesterId !== id && requesterRole !== "ADMIN") {
-      throw new ForbiddenError("Forbidden");
     }
 
     try {
@@ -88,15 +88,13 @@ export const userService = {
   },
 
   async delete(id: string, requesterId: string, requesterRole: string): Promise<void> {
-    const user = await userRepository.findById(id);
-    if (!user) {
-      throw new NotFoundError("User not found");
-    }
-
     if (requesterId !== id && requesterRole !== "ADMIN") {
       throw new ForbiddenError("Forbidden");
     }
 
-    await userRepository.softDelete(id);
+    const deleted = await userRepository.softDelete(id);
+    if (!deleted) {
+      throw new NotFoundError("User not found");
+    }
   },
 };

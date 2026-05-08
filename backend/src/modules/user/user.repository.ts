@@ -68,14 +68,6 @@ export const userRepository = {
   },
 
   async update(id: string, data: UpdateUserRequestDto): Promise<User | null> {
-    const existing = await prisma.user.findUnique({
-      where: { id, deletedAt: null },
-    });
-
-    if (!existing) {
-      return null;
-    }
-
     const updateData: Prisma.UserUpdateInput = {};
     if (data.username !== undefined) updateData.username = data.username;
     if (data.name !== undefined) updateData.name = data.name;
@@ -86,29 +78,31 @@ export const userRepository = {
         data.departmentId !== null ? { connect: { id: data.departmentId } } : { disconnect: true };
     }
 
-    const updated = await prisma.user.update({
-      where: { id },
-      data: updateData,
-    });
-
-    return updated;
+    try {
+      return await prisma.user.update({
+        where: { id, deletedAt: null },
+        data: updateData,
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
+        return null;
+      }
+      throw error;
+    }
   },
 
   async softDelete(id: string): Promise<boolean> {
-    const existing = await prisma.user.findUnique({
-      where: { id, deletedAt: null },
-      select: { id: true },
-    });
-
-    if (!existing) {
-      return false;
+    try {
+      await prisma.user.update({
+        where: { id, deletedAt: null },
+        data: { deletedAt: new Date() },
+      });
+      return true;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
+        return false;
+      }
+      throw error;
     }
-
-    await prisma.user.update({
-      where: { id },
-      data: { deletedAt: new Date() },
-    });
-
-    return true;
   },
 };

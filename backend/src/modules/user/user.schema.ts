@@ -58,7 +58,7 @@ export const updateUserSchema = z.object({
     .or(z.literal(""))
     .transform((v) => (v !== undefined ? (v === "" ? null : v) : undefined)),
   description: z.string().optional().nullable(),
-  departmentId: z.string().nullable().optional(),
+  departmentId: z.union([z.string().trim().min(1), z.null()]).optional(),
 });
 
 export type GetUserByIdParams = z.infer<typeof getUserByIdSchema>;
