@@ -6,12 +6,7 @@ import {
   validateQuery,
 } from "../../common/middleware/validate.middleware.js";
 import { userController } from "./user.controller.js";
-import {
-  createUserSchema,
-  getAllUsersQuerySchema,
-  getUserByIdSchema,
-  updateUserSchema,
-} from "./user.schema.js";
+import { getAllUsersQuerySchema, getUserByIdSchema, updateUserSchema } from "./user.schema.js";
 
 export const userRoute = Router();
 
@@ -33,15 +28,6 @@ userRoute.get(
   requireAuth,
   validateParams(getUserByIdSchema),
   userController.getById.bind(userController)
-);
-
-// POST /users — admin only
-userRoute.post(
-  "/",
-  requireAuth,
-  requireAdmin,
-  validateBody(createUserSchema),
-  userController.create.bind(userController)
 );
 
 // PATCH /users/:id — owner or admin

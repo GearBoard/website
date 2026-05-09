@@ -1,7 +1,7 @@
 import { Prisma } from "../../../generated/prisma/client.js";
 import type { User } from "../../../generated/prisma/client.js";
 import { prisma } from "../../config/prisma.js";
-import type { CreateUserRequestDto, UpdateUserRequestDto } from "./user.dto.js";
+import type { UpdateUserRequestDto } from "./user.dto.js";
 
 export const userRepository = {
   async findById(id: string): Promise<User | null> {
@@ -51,22 +51,6 @@ export const userRepository = {
     return { users, total };
   },
 
-  async create(data: CreateUserRequestDto): Promise<User> {
-    const user = await prisma.user.create({
-      data: {
-        name: data.username,
-        username: data.username,
-        email: data.email,
-        role: "USER",
-        image: data.image,
-        description: data.description,
-        departmentId: data.departmentId,
-      },
-    });
-
-    return user;
-  },
-
   async update(id: string, data: UpdateUserRequestDto): Promise<User | null> {
     const updateData: Prisma.UserUpdateInput = {};
     if (data.username !== undefined) updateData.username = data.username;
@@ -91,16 +75,17 @@ export const userRepository = {
     }
   },
 
-  async softDelete(id: string): Promise<boolean> {
+  async softDelete(id: string): Promise<{ id: string } | null> {
     try {
-      await prisma.user.update({
+      const user = await prisma.user.update({
         where: { id, deletedAt: null },
         data: { deletedAt: new Date() },
+        select: { id: true },
       });
-      return true;
+      return user;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
-        return false;
+        return null;
       }
       throw error;
     }

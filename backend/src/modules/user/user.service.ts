@@ -1,7 +1,7 @@
 import { Prisma } from "../../../generated/prisma/client.js";
 import { ConflictError, ForbiddenError, NotFoundError } from "../../common/errors/app-error.js";
+import { UserRole } from "../../common/types/index.js";
 import type {
-  CreateUserRequestDto,
   GetAllUsersQuery,
   UpdateUserRequestDto,
   UserPaginatedDto,
@@ -12,8 +12,12 @@ import { userRepository } from "./user.repository.js";
 import { getSkipTake } from "../../common/utils/pagination.js";
 
 export const userService = {
-  async getById(id: string, requesterId: string, requesterRole: string): Promise<UserResponseDto> {
-    if (requesterId !== id && requesterRole !== "ADMIN") {
+  async getById(
+    id: string,
+    requesterId: string,
+    requesterRole: UserRole
+  ): Promise<UserResponseDto> {
+    if (requesterId !== id && requesterRole !== UserRole.ADMIN) {
       throw new ForbiddenError("Forbidden");
     }
 
@@ -45,26 +49,13 @@ export const userService = {
     };
   },
 
-  async create(data: CreateUserRequestDto): Promise<UserResponseDto> {
-    try {
-      const user = await userRepository.create(data);
-      return toDto(user);
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-        throw new ConflictError("User with this email or username already exists");
-      }
-
-      throw error;
-    }
-  },
-
   async update(
     id: string,
     data: UpdateUserRequestDto,
     requesterId: string,
-    requesterRole: string
+    requesterRole: UserRole
   ): Promise<UserResponseDto> {
-    if (requesterId !== id && requesterRole !== "ADMIN") {
+    if (requesterId !== id && requesterRole !== UserRole.ADMIN) {
       throw new ForbiddenError("Forbidden");
     }
 
@@ -87,8 +78,8 @@ export const userService = {
     }
   },
 
-  async delete(id: string, requesterId: string, requesterRole: string): Promise<void> {
-    if (requesterId !== id && requesterRole !== "ADMIN") {
+  async delete(id: string, requesterId: string, requesterRole: UserRole): Promise<void> {
+    if (requesterId !== id && requesterRole !== UserRole.ADMIN) {
       throw new ForbiddenError("Forbidden");
     }
 

@@ -1,7 +1,8 @@
 // Shared types for auth and request
 
 import type { Request } from "express";
-import type { UserRole } from "../../../generated/prisma/index.js";
+import { UserRole } from "../../../generated/prisma/index.js";
+export { UserRole };
 
 export interface AuthenticatedUser {
   id: string;

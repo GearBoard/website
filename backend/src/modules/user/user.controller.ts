@@ -9,7 +9,8 @@ export const userController = {
   async getMe(req: Request, res: Response) {
     try {
       const authReq = req as AuthenticatedRequest;
-      res.status(200).json(successResponse(authReq.user));
+      const data = await userService.getById(authReq.user.id, authReq.user.id, authReq.user.role);
+      res.status(200).json(successResponse(data));
     } catch (error) {
       handleHttpError(res, error);
     }
@@ -31,15 +32,6 @@ export const userController = {
       const query = (req as Request & { validatedQuery: GetAllUsersQuery }).validatedQuery;
       const result = await userService.getAll(query);
       res.status(200).json(successResponse(result));
-    } catch (error) {
-      handleHttpError(res, error);
-    }
-  },
-
-  async create(req: Request, res: Response) {
-    try {
-      const data = await userService.create(req.body);
-      res.status(201).json(successResponse(data));
     } catch (error) {
       handleHttpError(res, error);
     }
