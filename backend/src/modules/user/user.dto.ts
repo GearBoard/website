@@ -1,5 +1,7 @@
 import z from "zod";
-import { createUserSchema } from "./user.schema.js";
+import { getAllUsersQuerySchema, updateUserSchema } from "./user.schema.js";
+import type { PaginatedResult } from "../../common/utils/pagination.js";
+import { UserRole } from "../../common/types/index.js";
 
 export interface UserResponseDto {
   id: string;
@@ -7,10 +9,13 @@ export interface UserResponseDto {
   email: string;
   image: string | null;
   description: string | null;
-  role: string;
+  role: UserRole;
   departmentId: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
-export type CreateUserRequestDto = z.infer<typeof createUserSchema>;
+export type UserPaginatedDto = PaginatedResult<UserResponseDto>;
+
+export type UpdateUserRequestDto = z.infer<typeof updateUserSchema>;
+export type GetAllUsersQuery = z.infer<typeof getAllUsersQuerySchema>;
