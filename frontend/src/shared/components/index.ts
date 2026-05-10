@@ -21,3 +21,6 @@ export {
 
 export { UserDropdown } from "./ui/user-dropdown";
 export type { UserDropdownProps, UserDropdownUser } from "./ui/user-dropdown";
+
+export { Dropdown } from "./ui/dropdown";
+export type { DropdownProps, DropdownOption } from "./ui/dropdown";
