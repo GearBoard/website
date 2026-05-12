@@ -2,8 +2,16 @@
 
 import * as React from "react";
 import { Popover } from "radix-ui";
-import { Check, ChevronDown } from "lucide-react";
+import { Check } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
+
+function TriangleIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 10 6" className={className} fill="currentColor" aria-hidden>
+      <polygon points="0,0 10,0 5,6" />
+    </svg>
+  );
+}
 
 export interface DropdownOption {
   value: string;
@@ -73,14 +81,14 @@ export function Dropdown(props: DropdownProps) {
             "flex w-full items-center justify-between rounded border border-gray px-3 py-2 text-sm outline-none transition-colors",
             "hover:border-primary-red focus-visible:border-primary-red",
             open && "border-primary-red",
-            hasSelection ? "text-primary-navy" : "text-gray",
+            hasSelection ? "text-darker-navy" : "text-dark-navy",
             className
           )}
         >
           <span>{triggerLabel}</span>
-          <ChevronDown
+          <TriangleIcon
             className={cn(
-              "size-4 shrink-0 text-gray transition-transform duration-200",
+              "w-[8px] h-[5px] shrink-0 text-primary-red transition-transform duration-200",
               open && "rotate-180"
             )}
           />
@@ -107,12 +115,12 @@ export function Dropdown(props: DropdownProps) {
                 <button
                   key={option.value}
                   onClick={() => handleMultiToggle(option.value)}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-primary-navy transition-colors hover:bg-light-gray"
+                  className="flex mx-1 w-[calc(100%-0.5rem)] items-center gap-2 rounded px-3 py-2 text-sm text-darker-navy transition-colors hover:bg-light-gray"
                 >
                   <span
                     className={cn(
-                      "flex size-4 shrink-0 items-center justify-center rounded-sm border transition-colors",
-                      isChecked ? "border-primary-red bg-primary-red" : "border-gray"
+                      "flex size-4 shrink-0 items-center justify-center rounded-none border transition-colors",
+                      isChecked ? "border-primary-red bg-primary-red" : "border-primary-red"
                     )}
                   >
                     {isChecked && <Check className="size-3 text-white" strokeWidth={3} />}
@@ -128,8 +136,8 @@ export function Dropdown(props: DropdownProps) {
                 key={option.value}
                 onClick={() => handleSingleSelect(option.value)}
                 className={cn(
-                  "w-full px-3 py-2 text-left text-sm transition-colors",
-                  isSelected ? "bg-primary-red text-white" : "text-primary-navy hover:bg-light-gray"
+                  "block mx-1 w-[calc(100%-0.5rem)] rounded px-3 py-2 text-left text-sm transition-colors",
+                  isSelected ? "bg-primary-red text-white" : "text-darker-navy hover:bg-light-gray"
                 )}
               >
                 {option.label}
