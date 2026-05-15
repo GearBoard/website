@@ -20,7 +20,7 @@ export const Navbar = () => {
               className="font-bold tracking-tight text-primary-red flex flex-row items-center gap-2 text-base sm:text-3xl"
             >
               <Image
-                src="logo.svg"
+                src="/logo.svg"
                 width={82}
                 height={80}
                 alt="GearBoard Logo"
@@ -36,6 +36,7 @@ export const Navbar = () => {
             <input
               type="text"
               placeholder="ค้นหาวิชา, อาจารย์ หรือข้อสอบ"
+              aria-label="ค้นหา"
               className="bg-transparent outline-none w-full font-satoshi text-sm text-primary-navy placeholder:text-gray/60"
             />
           </div>
@@ -55,13 +56,17 @@ export const Navbar = () => {
         <div className="md:hidden flex items-center gap-4">
           <button
             type="button"
-            className="p-1 focus:outline-none"
+            className="p-1 focus-visible:ring-2 focus-visible:ring-primary-red focus-visible:ring-offset-2 outline-none rounded-sm"
             aria-label="Search"
             onClick={() => setIsSearchOpen(!isSearchOpen)}
           >
             <Search className="h-6 w-6 text-primary-red" />
           </button>
-          <button type="button" className="p-1 focus:outline-none" aria-label="Menu">
+          <button
+            type="button"
+            className="p-1 focus-visible:ring-2 focus-visible:ring-primary-red focus-visible:ring-offset-2 outline-none rounded-sm"
+            aria-label="Menu"
+          >
             <Menu className="h-6 w-6 text-primary-red" />
           </button>
         </div>
@@ -75,6 +80,7 @@ export const Navbar = () => {
             <input
               type="text"
               placeholder="ค้นหาวิชา, อาจารย์ หรือข้อสอบ"
+              aria-label="ค้นหา"
               className="bg-transparent outline-none w-full font-satoshi text-sm text-primary-navy placeholder:text-gray/60"
               autoFocus
             />
