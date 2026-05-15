@@ -12,9 +12,12 @@ const notoSansThai = Noto_Sans_Thai({
 const preview: Preview = {
   decorators: [
     (Story) => (
-      <div className={notoSansThai.variable}>
-        <Story />
-      </div>
+      <>
+        <style>{`body { font-family: 'Satoshi', sans-serif !important; }`}</style>
+        <div className={notoSansThai.variable} style={{ fontFamily: "'Satoshi', sans-serif" }}>
+          <Story />
+        </div>
+      </>
     ),
   ],
   parameters: {

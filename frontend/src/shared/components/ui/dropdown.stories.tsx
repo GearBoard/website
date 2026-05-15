@@ -51,11 +51,11 @@ function AllVariantsDemo() {
 
   return (
     <div className="flex w-full gap-8 p-6">
-      <div className="flex w-48 flex-col gap-2">
+      <div className="flex w-56 flex-col gap-2">
         <span className="text-xs text-gray-400">Single-Dropdown</span>
         <Dropdown options={OPTIONS} value={single} onChange={setSingle} />
       </div>
-      <div className="flex w-48 flex-col gap-2">
+      <div className="flex w-56 flex-col gap-2">
         <span className="text-xs text-gray-400">Multi-Dropdown</span>
         <Dropdown multiple options={OPTIONS} values={multi} onChange={setMulti} />
       </div>

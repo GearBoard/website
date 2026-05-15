@@ -2,8 +2,21 @@
 
 import * as React from "react";
 import { Popover } from "radix-ui";
-import { Check } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
+
+function CheckIcon() {
+  return (
+    <svg viewBox="-1 -1 14 14" fill="none" className="size-3" aria-hidden>
+      <polyline
+        points="0.75,6 4.25,9.5 11.25,2.5"
+        stroke="white"
+        strokeWidth="2"
+        strokeLinecap="butt"
+        strokeLinejoin="miter"
+      />
+    </svg>
+  );
+}
 
 function TriangleIcon({ className }: { className?: string }) {
   return (
@@ -42,19 +55,21 @@ export function Dropdown(props: DropdownProps) {
   const { options, placeholder = "Dropdown", className } = props;
   const [open, setOpen] = React.useState(false);
 
-  const hasSelection = props.multiple ? (props.values?.length ?? 0) > 0 : !!props.value;
+  const multiple = props.multiple;
+  const multiValues = props.multiple ? props.values : undefined;
+  const singleValue = !props.multiple ? props.value : undefined;
 
   const triggerLabel = React.useMemo(() => {
-    if (props.multiple) {
-      const selected = props.values ?? [];
+    if (multiple) {
+      const selected = multiValues ?? [];
       if (selected.length === 0) return placeholder;
       if (selected.length === 1)
         return options.find((o) => o.value === selected[0])?.label ?? placeholder;
       return `${selected.length} selected`;
     }
-    if (!props.value) return placeholder;
-    return options.find((o) => o.value === props.value)?.label ?? placeholder;
-  }, [props, options, placeholder]);
+    if (!singleValue) return placeholder;
+    return options.find((o) => o.value === singleValue)?.label ?? placeholder;
+  }, [multiple, multiValues, singleValue, options, placeholder]);
 
   function handleSingleSelect(value: string) {
     if (!props.multiple) {
@@ -78,17 +93,17 @@ export function Dropdown(props: DropdownProps) {
       <Popover.Trigger asChild>
         <button
           className={cn(
-            "flex w-full items-center justify-between rounded border border-gray px-3 py-2 text-sm outline-none transition-colors",
+            "flex w-full items-center justify-between rounded-[10px] border-2 border-transparent px-5 py-2.5",
+            "text-lg font-[700] tracking-[-0.02em] text-[#262626] outline-none transition-colors shadow-black",
             "hover:border-primary-red focus-visible:border-primary-red",
             open && "border-primary-red",
-            hasSelection ? "text-darker-navy" : "text-dark-navy",
             className
           )}
         >
-          <span>{triggerLabel}</span>
+          <span className="truncate">{triggerLabel}</span>
           <TriangleIcon
             className={cn(
-              "w-[8px] h-[5px] shrink-0 text-primary-red transition-transform duration-200",
+              "w-[10px] h-[5px] shrink-0 text-primary-red transition-transform duration-200",
               open && "rotate-180"
             )}
           />
@@ -98,10 +113,10 @@ export function Dropdown(props: DropdownProps) {
       <Popover.Portal>
         <Popover.Content
           align="start"
-          sideOffset={4}
+          sideOffset={10}
           style={{ width: "var(--radix-popover-trigger-width)" }}
           className={cn(
-            "z-50 overflow-hidden rounded border border-light-gray bg-white py-1 shadow-black",
+            "z-50 flex flex-col gap-2 overflow-hidden rounded-[15px] bg-white p-[5px] shadow-black",
             "data-[state=open]:animate-in data-[state=closed]:animate-out",
             "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
             "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
@@ -115,15 +130,15 @@ export function Dropdown(props: DropdownProps) {
                 <button
                   key={option.value}
                   onClick={() => handleMultiToggle(option.value)}
-                  className="flex mx-1 w-[calc(100%-0.5rem)] items-center gap-2 rounded px-3 py-2 text-sm text-darker-navy transition-colors hover:bg-light-gray"
+                  className="flex w-full items-center gap-[15px] rounded-[10px] px-5 py-1.5 text-lg font-[700] tracking-[-0.02em] text-[#262626] transition-colors hover:bg-light-gray"
                 >
                   <span
                     className={cn(
-                      "flex size-4 shrink-0 items-center justify-center rounded-none border transition-colors",
+                      "flex size-4 shrink-0 items-center justify-center rounded-[2px] border-2 transition-colors",
                       isChecked ? "border-primary-red bg-primary-red" : "border-primary-red"
                     )}
                   >
-                    {isChecked && <Check className="size-3 text-white" strokeWidth={3} />}
+                    {isChecked && <CheckIcon />}
                   </span>
                   {option.label}
                 </button>
@@ -136,8 +151,8 @@ export function Dropdown(props: DropdownProps) {
                 key={option.value}
                 onClick={() => handleSingleSelect(option.value)}
                 className={cn(
-                  "block mx-1 w-[calc(100%-0.5rem)] rounded px-3 py-2 text-left text-sm transition-colors",
-                  isSelected ? "bg-primary-red text-white" : "text-darker-navy hover:bg-light-gray"
+                  "block w-full rounded-[10px] px-5 py-2 text-left text-lg font-[700] tracking-[-0.02em] transition-colors",
+                  isSelected ? "bg-primary-red text-white" : "text-[#262626] hover:bg-light-gray"
                 )}
               >
                 {option.label}
