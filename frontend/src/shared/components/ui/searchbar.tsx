@@ -11,7 +11,6 @@ const searchbarVariants = cva(
     variants: {
       variant: {
         default: "",
-        hovered: "border-primary-red",
         focus: "border-primary-red",
         disabled: "opacity-50 pointer-events-none",
       },
@@ -25,10 +24,18 @@ const searchbarVariants = cva(
 export interface SearchbarProps
   extends React.InputHTMLAttributes<HTMLInputElement>, VariantProps<typeof searchbarVariants> {
   containerClassName?: string;
+  /**
+   * Whether to hide the placeholder text immediately when the input is focused.
+   * @default true
+   */
+  hidePlaceholderOnFocus?: boolean;
 }
 
 const Searchbar = React.forwardRef<HTMLInputElement, SearchbarProps>(
-  ({ className, variant, containerClassName, disabled, ...props }, ref) => {
+  (
+    { className, variant, containerClassName, disabled, hidePlaceholderOnFocus = true, ...props },
+    ref
+  ) => {
     const [isFocused, setIsFocused] = React.useState(false);
 
     // Automatically switch to focus variant when internal input is focused
@@ -52,7 +59,11 @@ const Searchbar = React.forwardRef<HTMLInputElement, SearchbarProps>(
           {...props}
           ref={ref}
           disabled={disabled}
-          placeholder={isFocused ? "" : (props.placeholder ?? "ค้นหาวิชา, อาจารย์ หรือข้อสอบ")}
+          placeholder={
+            isFocused && hidePlaceholderOnFocus
+              ? ""
+              : (props.placeholder ?? "ค้นหาวิชา, อาจารย์ หรือข้อสอบ")
+          }
           onFocus={(e) => {
             setIsFocused(true);
             props.onFocus?.(e);

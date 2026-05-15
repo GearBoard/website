@@ -8,9 +8,10 @@ const meta: Meta<typeof Searchbar> = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["default", "hovered", "focus", "disabled"],
+      options: ["default", "focus"],
     },
     disabled: { control: "boolean" },
+    hidePlaceholderOnFocus: { control: "boolean" },
   },
 };
 
@@ -23,11 +24,7 @@ export const Default: Story = {
   },
 };
 
-export const Hovered: Story = {
-  args: {
-    variant: "hovered",
-  },
-};
+// Hovered state is now handled by standard CSS hover classes
 
 export const Focused: Story = {
   args: {
@@ -58,8 +55,8 @@ export const AllVariants: Story = {
         <Searchbar />
       </div>
       <div>
-        <p className="text-sm text-gray-500 mb-2">Hovered (Forced)</p>
-        <Searchbar variant="hovered" />
+        <p className="text-sm text-gray-500 mb-2">Hover (CSS only)</p>
+        <Searchbar />
       </div>
       <div>
         <p className="text-sm text-gray-500 mb-2">Focus (Manual)</p>
