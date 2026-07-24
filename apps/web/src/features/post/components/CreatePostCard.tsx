@@ -22,6 +22,7 @@ interface CreatePostCardProps {
     tags?: string[];
     images?: string[];
   }) => Promise<void> | void;
+  onCancel?: () => void;
   loading?: boolean;
 }
 
@@ -42,6 +43,7 @@ export function CreatePostCard({
   initialTags = [],
   className,
   onSubmit,
+  onCancel,
   loading = false,
 }: CreatePostCardProps) {
   const { data: me } = useGetMe();
@@ -286,14 +288,26 @@ export function CreatePostCard({
                 </Popover.Root>
               </div>
 
-              <Button
-                type="submit"
-                iconLeft={<SquarePen className="size-4" />}
-                loading={loading || isUploadingImage}
-                disabled={!title.trim() || !content.trim() || loading || isUploadingImage}
-              >
-                {mode === "edit" ? "แก้ไข" : "โพสต์"}
-              </Button>
+              <div className="flex items-center gap-2">
+                {mode === "edit" && (
+                  <Button
+                    type="button"
+                    color="gray"
+                    onClick={onCancel}
+                    disabled={loading || isUploadingImage}
+                  >
+                    ยกเลิก
+                  </Button>
+                )}
+                <Button
+                  type="submit"
+                  iconLeft={<SquarePen className="size-4" />}
+                  loading={loading || isUploadingImage}
+                  disabled={!title.trim() || !content.trim() || loading || isUploadingImage}
+                >
+                  {mode === "edit" ? "แก้ไข" : "โพสต์"}
+                </Button>
+              </div>
             </div>
           </form>
         )}

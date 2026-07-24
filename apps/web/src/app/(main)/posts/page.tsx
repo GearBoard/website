@@ -6,12 +6,13 @@ import { CreatePostCard } from "@/features/post/components/CreatePostCard";
 import { useGetMe, useGetPostList, useUpdatePost } from "@/shared/hooks";
 
 export default function MyPosts() {
-  const { data: me } = useGetMe();
+  const { data: me, isLoading: isLoadingMe } = useGetMe();
   const {
     data: postList,
-    isLoading,
+    isLoading: isLoadingPosts,
     mutate,
-  } = useGetPostList(me?.id ? { userId: me.id } : undefined);
+  } = useGetPostList(me?.id ? { userId: me.id } : undefined, !!me?.id);
+  const isLoading = isLoadingMe || isLoadingPosts;
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
 
   const posts = postList?.data ?? [];
@@ -67,7 +68,7 @@ interface EditingPostCardProps {
   onCancel: () => void;
 }
 
-function EditingPostCard({ post, onDone }: EditingPostCardProps) {
+function EditingPostCard({ post, onDone, onCancel }: EditingPostCardProps) {
   const { trigger: updatePost, isMutating } = useUpdatePost(post.id);
 
   return (
@@ -82,6 +83,7 @@ function EditingPostCard({ post, onDone }: EditingPostCardProps) {
         await updatePost({ title, description, tags });
         onDone();
       }}
+      onCancel={onCancel}
     />
   );
 }

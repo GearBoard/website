@@ -6,14 +6,19 @@ export function useGetPostById(id: string) {
   return useSWR(["post", id], () => unwrap(client.api.posts[":id"].$get({ param: { id } })));
 }
 
-export function useGetPostList(query?: {
-  page?: string;
-  limit?: string;
-  search?: string;
-  tag?: string;
-  userId?: string;
-}) {
-  return useSWR(["posts", query], () => unwrap(client.api.posts.$get({ query: query ?? {} })));
+export function useGetPostList(
+  query?: {
+    page?: string;
+    limit?: string;
+    search?: string;
+    tag?: string;
+    userId?: string;
+  },
+  enabled = true
+) {
+  return useSWR(enabled ? ["posts", query] : null, () =>
+    unwrap(client.api.posts.$get({ query: query ?? {} }))
+  );
 }
 
 export function useGetPostComments(postId: string) {
