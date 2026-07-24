@@ -5,11 +5,11 @@ import type { Post } from "../post.repository.js";
 export const CreatePostBodyInputDTO = z.object({
   title: z.string().trim().min(1, "Title is required").max(255, "Title too long"),
   description: z.string().trim().min(1, "Description is required"),
-  tags: z
-    .array(z.string().trim())
+  tagIds: z
+    .array(z.string().trim().min(1, "Invalid tag id"))
     .optional()
     .default([])
-    .transform((tags) => [...new Set(tags)]),
+    .transform((tagIds) => [...new Set(tagIds)]),
   images: z.array(z.string().url("Invalid image URL")).optional().default([]),
 });
 

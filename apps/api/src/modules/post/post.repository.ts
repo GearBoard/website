@@ -1,4 +1,4 @@
-import { Prisma } from "../../../generated/prisma/client.js";
+import { Prisma, type Tag } from "../../../generated/prisma/client.js";
 import { prisma } from "../../config/prisma.js";
 
 const postInclude = {
@@ -22,7 +22,7 @@ export type Post = Prisma.PostGetPayload<{ include: typeof postInclude }>;
 type CreatePostData = {
   title: string;
   description: string;
-  tags: string[];
+  tags: Tag[];
   images: string[];
 };
 
@@ -115,16 +115,9 @@ export const postRepository = {
         title: data.title,
         description: data.description,
         tags: {
-          create: data.tags.map((tagName) => ({
+          create: data.tags.map((tag) => ({
             tag: {
-              connectOrCreate: {
-                where: { name: tagName },
-                create: {
-                  name: tagName,
-                  color: "#C01300",
-                  backgroundColor: "#C0130020",
-                },
-              },
+              connect: { id: tag.id },
             },
           })),
         },

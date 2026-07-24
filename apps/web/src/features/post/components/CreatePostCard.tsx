@@ -30,6 +30,9 @@ const TAG_COLORS = [
   "bg-pink-100 text-pink-600",
 ];
 
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png"];
+
 export function CreatePostCard({
   initialExpanded = false,
   initialImage = null,
@@ -56,28 +59,35 @@ export function CreatePostCard({
   const avatarUrl = me?.image;
 
   useEffect(() => {
-    return () => {
-      if (previewImage?.startsWith("blob:")) {
-        URL.revokeObjectURL(previewImage);
-      }
-    };
-  }, [previewImage]);
+    if (!imageFile) return;
+
+    const objectUrl = URL.createObjectURL(imageFile);
+    setPreviewImage(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [imageFile]);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (previewImage?.startsWith("blob:")) {
-      URL.revokeObjectURL(previewImage);
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setSubmitError("Only JPEG and PNG images are allowed.");
+      event.currentTarget.value = "";
+      return;
     }
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      setSubmitError("Image size must not exceed 10 MB.");
+      event.currentTarget.value = "";
+      return;
+    }
+
+    setSubmitError(null);
     setImageFile(file);
-    setPreviewImage(URL.createObjectURL(file));
   };
 
   const clearImage = () => {
-    if (previewImage?.startsWith("blob:")) {
-      URL.revokeObjectURL(previewImage);
-    }
     setPreviewImage(null);
     setImageFile(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -103,7 +113,9 @@ export function CreatePostCard({
       await createPost({
         title: title.trim(),
         description: content.trim(),
-        tags: tags.map((tag) => tag.trim()).filter(Boolean),
+        tagIds: tags
+          .map((tagName) => availableTags?.find((tag) => tag.name === tagName)?.id)
+          .filter((tagId): tagId is string => Boolean(tagId)),
         images: uploadedImage ? [uploadedImage.url] : previewImage ? [previewImage] : [],
       });
       setTitle("");
