@@ -6,6 +6,9 @@ const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png"];
 export const UploadImageBodyInputDTO = z.object({
   file: z
     .instanceof(File, { message: "File is required and must be a valid file" })
+    .refine((file) => file.size > 0, {
+      message: "File must not be empty",
+    })
     .refine((file) => ALLOWED_IMAGE_TYPES.includes(file.type), {
       message: "Only JPEG and PNG images are allowed",
     })

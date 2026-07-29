@@ -7,15 +7,11 @@ export async function createPostService(
   data: CreatePostBody,
   userId: string
 ): Promise<CreatePostOutputDTO> {
-  const tags = await Promise.all(
-    data.tagIds.map(async (tagId) => {
-      const tag = await tagRepository.findById(tagId);
-      if (!tag) {
-        throw new NotFoundError("Tag not found");
-      }
-      return tag;
-    })
-  );
+  const tags = await tagRepository.findManyByIds(data.tagIds);
+  if (tags.length !== data.tagIds.length) {
+    throw new NotFoundError("Tag not found");
+  }
+
   const post = await postRepository.create(
     {
       title: data.title,

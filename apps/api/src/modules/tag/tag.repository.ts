@@ -8,6 +8,12 @@ export const tagRepository = {
     });
   },
 
+  async findManyByIds(ids: string[]): Promise<Tag[]> {
+    return prisma.tag.findMany({
+      where: { id: { in: ids } },
+    });
+  },
+
   async findAll(): Promise<Tag[]> {
     return prisma.tag.findMany({
       orderBy: {

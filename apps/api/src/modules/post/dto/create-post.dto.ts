@@ -7,6 +7,7 @@ export const CreatePostBodyInputDTO = z.object({
   description: z.string().trim().min(1, "Description is required"),
   tagIds: z
     .array(z.string().trim().min(1, "Invalid tag id"))
+    .max(3, "A post can have at most 3 tags")
     .optional()
     .default([])
     .transform((tagIds) => [...new Set(tagIds)]),

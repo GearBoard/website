@@ -17,7 +17,6 @@ import { cn } from "@/shared/libs/utils";
 interface CreatePostCardProps {
   initialExpanded?: boolean;
   initialImage?: string | null;
-  initialTags?: string[];
   className?: string;
   loading?: boolean;
 }
@@ -36,7 +35,6 @@ const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png"];
 export function CreatePostCard({
   initialExpanded = false,
   initialImage = null,
-  initialTags = [],
   className,
   loading = false,
 }: CreatePostCardProps) {
@@ -46,10 +44,11 @@ export function CreatePostCard({
   const [content, setContent] = useState("");
   const [previewImage, setPreviewImage] = useState<string | null>(initialImage);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [tags, setTags] = useState<string[]>(initialTags);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isTagMenuOpen, setIsTagMenuOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewObjectUrlRef = useRef<string | null>(null);
   const { data: availableTags, isLoading: isLoadingTags } = useGetTags();
   const { trigger: uploadImage, isMutating: isUploadingImage } = useUploadImage();
   const { trigger: createPost, isMutating: isCreatingPost } = useCreatePost();
@@ -59,43 +58,46 @@ export function CreatePostCard({
   const avatarUrl = me?.image;
 
   useEffect(() => {
-    if (!imageFile) return;
+    const objectUrl = previewObjectUrlRef.current;
 
-    const objectUrl = URL.createObjectURL(imageFile);
-    setPreviewImage(objectUrl);
-
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [imageFile]);
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [previewImage]);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-      setSubmitError("Only JPEG and PNG images are allowed.");
+      setSubmitError("รองรับเฉพาะไฟล์ JPEG และ PNG เท่านั้น");
       event.currentTarget.value = "";
       return;
     }
 
     if (file.size > MAX_IMAGE_SIZE) {
-      setSubmitError("Image size must not exceed 10 MB.");
+      setSubmitError("ขนาดรูปภาพต้องไม่เกิน 10 MB");
       event.currentTarget.value = "";
       return;
     }
 
     setSubmitError(null);
+    const objectUrl = URL.createObjectURL(file);
+    previewObjectUrlRef.current = objectUrl;
+    setPreviewImage(objectUrl);
     setImageFile(file);
   };
 
   const clearImage = () => {
+    previewObjectUrlRef.current = null;
     setPreviewImage(null);
     setImageFile(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const toggleTag = (tagName: string) => {
-    setTags((current) =>
-      current.includes(tagName) ? current.filter((tag) => tag !== tagName) : [...current, tagName]
+  const toggleTag = (tagId: string) => {
+    setSelectedTagIds((current) =>
+      current.includes(tagId) ? current.filter((id) => id !== tagId) : [...current, tagId]
     );
   };
 
@@ -113,14 +115,12 @@ export function CreatePostCard({
       await createPost({
         title: title.trim(),
         description: content.trim(),
-        tagIds: tags
-          .map((tagName) => availableTags?.find((tag) => tag.name === tagName)?.id)
-          .filter((tagId): tagId is string => Boolean(tagId)),
+        tagIds: selectedTagIds,
         images: uploadedImage ? [uploadedImage.url] : previewImage ? [previewImage] : [],
       });
       setTitle("");
       setContent("");
-      setTags([]);
+      setSelectedTagIds([]);
       clearImage();
       setIsExpanded(false);
     } catch {
@@ -208,16 +208,16 @@ export function CreatePostCard({
               </div>
             )}
 
-            {tags.length > 0 && (
+            {selectedTagIds.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
-                {tags.map((tag, index) => {
+                {selectedTagIds.map((tagId, index) => {
                   const fallbackColor = TAG_COLORS[index % TAG_COLORS.length];
                   const tagDetails = (availableTags as TagOption[] | undefined)?.find(
-                    (availableTag) => availableTag.name === tag
+                    (availableTag) => availableTag.id === tagId
                   );
                   return (
                     <span
-                      key={tag}
+                      key={tagId}
                       className={cn(
                         "flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium md:text-sm",
                         !tagDetails && fallbackColor
@@ -228,10 +228,12 @@ export function CreatePostCard({
                           : undefined
                       }
                     >
-                      {tag}
+                      {tagDetails?.name ?? tagId}
                       <button
                         type="button"
-                        onClick={() => setTags(tags.filter((t) => t !== tag))}
+                        onClick={() =>
+                          setSelectedTagIds(selectedTagIds.filter((id) => id !== tagId))
+                        }
                         className="hover:opacity-70 transition-opacity outline-none"
                       >
                         <X className="size-3.5" />
@@ -283,12 +285,12 @@ export function CreatePostCard({
                         <p className="px-3 py-2 text-sm text-dark-gray">Loading tags...</p>
                       ) : (availableTags as TagOption[] | undefined)?.length ? (
                         (availableTags as TagOption[]).map((tag) => {
-                          const isSelected = tags.includes(tag.name);
+                          const isSelected = selectedTagIds.includes(tag.id);
                           return (
                             <button
                               key={tag.id}
                               type="button"
-                              onClick={() => toggleTag(tag.name)}
+                              onClick={() => toggleTag(tag.id)}
                               className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-light-gray"
                             >
                               <span
@@ -314,11 +316,7 @@ export function CreatePostCard({
                 iconLeft={<SquarePen className="size-4" />}
                 loading={loading || isUploadingImage || isCreatingPost}
                 disabled={
-                  !title.trim() ||
-                  !content.trim() ||
-                  loading ||
-                  isUploadingImage ||
-                  isCreatingPost
+                  !title.trim() || !content.trim() || loading || isUploadingImage || isCreatingPost
                 }
               >
                 โพสต์
