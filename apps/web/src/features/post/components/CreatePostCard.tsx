@@ -120,14 +120,21 @@ export function CreatePostCard({
         tagIds: selectedTagIds,
         images: uploadedImage ? [uploadedImage.url] : previewImage ? [previewImage] : [],
       });
-      await onPostCreated?.();
-      setTitle("");
-      setContent("");
-      setSelectedTagIds([]);
-      clearImage();
-      setIsExpanded(false);
     } catch {
       setSubmitError("Unable to publish your post right now.");
+      return;
+    }
+
+    setTitle("");
+    setContent("");
+    setSelectedTagIds([]);
+    clearImage();
+    setIsExpanded(false);
+
+    try {
+      await onPostCreated?.();
+    } catch {
+      // The post was created successfully; a feed refresh failure must not restore the form error.
     }
   };
 

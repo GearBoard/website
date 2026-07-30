@@ -544,7 +544,8 @@ prisma.post.findUnique({ where: { id, <span class="kw">deletedAt</span>: <span c
       previousPageData &amp;&amp; pageIndex &gt;= previousPageData.totalPages
         ? <span class="kw">null</span>
         : [<span class="str">"posts"</span>, { page: String(pageIndex + <span class="num">1</span>), limit: String(limit) }],
-    ([, query]) =&gt; <span class="fn">unwrap</span>(client.api.posts.$get({ query }))
+    ([, query]) =&gt; <span class="fn">unwrap</span>(client.api.posts.$get({ query })),
+    { revalidateFirstPage: <span class="kw">false</span> }
   );
 }</pre>
 

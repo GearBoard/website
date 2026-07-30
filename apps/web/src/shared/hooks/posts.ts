@@ -23,7 +23,8 @@ export function useGetInfinitePostList(limit = 10) {
       if (previousPageData && pageIndex >= previousPageData.totalPages) return null;
       return ["posts", { page: String(pageIndex + 1), limit: String(limit) }] as const;
     },
-    ([, query]) => unwrap(client.api.posts.$get({ query }))
+    ([, query]) => unwrap(client.api.posts.$get({ query })),
+    { revalidateFirstPage: false }
   );
 }
 

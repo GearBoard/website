@@ -523,7 +523,8 @@ export function useGetInfinitePostList(limit = 10) {
       previousPageData && pageIndex >= previousPageData.totalPages
         ? null
         : ["posts", { page: String(pageIndex + 1), limit: String(limit) }],
-    ([, query]) => unwrap(client.api.posts.$get({ query }))
+    ([, query]) => unwrap(client.api.posts.$get({ query })),
+    { revalidateFirstPage: false }
   );
 }
 export function useCreatePost() {
