@@ -517,6 +517,15 @@ export function useGetPostList(query?: {
 }) {
   return useSWR(["posts", query], () => unwrap(client.api.posts.$get({ query: query ?? {} })));
 }
+export function useGetInfinitePostList(limit = 10) {
+  return useSWRInfinite(
+    (pageIndex, previousPageData) =>
+      previousPageData && pageIndex >= previousPageData.totalPages
+        ? null
+        : ["posts", { page: String(pageIndex + 1), limit: String(limit) }],
+    ([, query]) => unwrap(client.api.posts.$get({ query }))
+  );
+}
 export function useCreatePost() {
   return useSWRMutation(
     "posts",
@@ -532,6 +541,7 @@ SWR cache key conventions:
 
 - Single resource: `["post", id]`
 - List: `["posts", query]`
+- Infinite feed: paginated `["posts", { page, limit }]` keys managed by `useSWRInfinite`
 - Nested: `["post-comments", postId]`
 - Current user: `"me"`
 

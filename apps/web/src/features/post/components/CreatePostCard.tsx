@@ -19,6 +19,7 @@ interface CreatePostCardProps {
   initialImage?: string | null;
   className?: string;
   loading?: boolean;
+  onPostCreated?: () => void | Promise<void>;
 }
 
 const TAG_COLORS = [
@@ -37,6 +38,7 @@ export function CreatePostCard({
   initialImage = null,
   className,
   loading = false,
+  onPostCreated,
 }: CreatePostCardProps) {
   const { data: me } = useGetMe();
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
@@ -118,6 +120,7 @@ export function CreatePostCard({
         tagIds: selectedTagIds,
         images: uploadedImage ? [uploadedImage.url] : previewImage ? [previewImage] : [],
       });
+      await onPostCreated?.();
       setTitle("");
       setContent("");
       setSelectedTagIds([]);
