@@ -18,6 +18,7 @@ export const env = {
   PORT: getEnvOptional("PORT", "4000"),
   DATABASE_URL: getEnv("DATABASE_URL"),
 
+  BETTER_AUTH_SECRET: getEnv("BETTER_AUTH_SECRET"),
   BETTER_AUTH_URL: getEnv("BETTER_AUTH_URL"),
   BETTER_AUTH_TRUSTED_ORIGIN: getEnvOptional(
     "BETTER_AUTH_TRUSTED_ORIGIN",

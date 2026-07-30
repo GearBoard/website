@@ -213,11 +213,11 @@ Returns first Zod error message. Used as third arg to every `zValidator()` call.
 export const CreatePostBodyInputDTO = z.object({
   title: z.string().trim().min(1, "Title is required").max(255, "Title too long"),
   description: z.string().trim().min(1, "Description is required"),
-  tags: z
-    .array(z.string().trim())
+  tagIds: z
+    .array(z.string().trim().min(1, "Invalid tag id"))
     .optional()
     .default([])
-    .transform((tags) => [...new Set(tags)]),
+    .transform((tagIds) => [...new Set(tagIds)]),
   images: z.array(z.string().url("Invalid image URL")).optional().default([]),
 });
 export type CreatePostBody = z.infer<typeof CreatePostBodyInputDTO>;
@@ -267,7 +267,14 @@ export async function createPostService(
   data: CreatePostBody,
   userId: string
 ): Promise<CreatePostOutputDTO> {
-  const post = await postRepository.create(data, userId);
+  const tags = await Promise.all(
+    data.tagIds.map(async (tagId) => {
+      const tag = await tagRepository.findById(tagId);
+      if (!tag) throw new NotFoundError("Tag not found");
+      return tag;
+    })
+  );
+  const post = await postRepository.create({ ...data, tags }, userId);
   return CreatePostOutputDTO.toDTO(post);
 }
 
@@ -308,7 +315,8 @@ export const postRepository = {
 
 - Soft deletes: every query filters `deletedAt: null`; delete sets `deletedAt: new Date()`
 - Type alias `Post` = `Prisma.PostGetPayload<...>` (private to module, reused by DTOs)
-- Tag upsert: `connectOrCreate` pattern
+- Create Post resolves `tagIds` in the service and connects the existing tags by ID
+- Update Post retains its tag `connectOrCreate` pattern
 - Multi-step mutations: `prisma.$transaction([...])`
 
 ---
@@ -407,7 +415,13 @@ Optional: Google OAuth (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`), AWS S3, GCS
 | GET      | /api/users/:id                   | ✓       | `getUserByIdService`           |
 | PATCH    | /api/users/:id                   | ✓       | `updateUserService`            |
 | DELETE   | /api/users/:id                   | ✓       | `deleteUserService`            |
+| GET      | /api/tags                        | —       | `getTagsService`               |
+| POST     | /api/uploads/image               | ✓       | `uploadImageService`           |
 | POST/GET | /api/auth/\*\*                   | —       | Better-Auth handler            |
+
+Profile and post-image uploads both send a multipart `file` to `/api/uploads/image`,
+which validates JPEG/PNG up to 10 MB and returns a public GCS URL. Create Post sends
+selected `tagIds` and includes that URL in the `images` array sent to `POST /api/posts`.
 
 ---
 
@@ -436,6 +450,8 @@ apps/web/src/
     │   ├── posts.ts         ← useGetPostById, useGetPostList, useCreatePost, ...
     │   ├── comments.ts      ← useCreateReply, useDeleteComment
     │   ├── users.ts         ← useGetMe, useGetUserList, useGetUserById, ...
+    │   ├── tags.ts          ← useGetTags
+    │   ├── uploads.ts       ← useUploadImage
     │   └── index.ts         ← re-exports all
     └── components/
         └── ui/
@@ -506,7 +522,7 @@ export function useCreatePost() {
     "posts",
     (
       _key,
-      { arg }: { arg: { title: string; description: string; tags?: string[]; images?: string[] } }
+      { arg }: { arg: { title: string; description: string; tagIds?: string[]; images?: string[] } }
     ) => unwrap(client.api.posts.$post({ json: arg }))
   );
 }

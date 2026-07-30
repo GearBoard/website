@@ -1,1 +1,1 @@
-export * from "./upload-avatar.service.js";
+export * from "./upload-image.service.js";

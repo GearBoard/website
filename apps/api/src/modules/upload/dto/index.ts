@@ -1,1 +1,1 @@
-export * from "./upload-avatar.dto.js";
+export * from "./upload-image.dto.js";

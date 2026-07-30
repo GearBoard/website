@@ -1,24 +1,23 @@
 "use client";
 
-import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import Image from "next/image";
 import { Image as ImageIcon, Tag, SquarePen, X } from "lucide-react";
 import { Popover } from "radix-ui";
 import { Button } from "@/shared/components";
-import { useGetMe, useGetTags, useUploadImage, type TagOption } from "@/shared/hooks";
+import {
+  useCreatePost,
+  useGetMe,
+  useGetTags,
+  useUploadImage,
+  type TagOption,
+} from "@/shared/hooks";
 import { cn } from "@/shared/libs/utils";
 
 interface CreatePostCardProps {
   initialExpanded?: boolean;
   initialImage?: string | null;
-  initialTags?: string[];
   className?: string;
-  onSubmit?: (input: {
-    title: string;
-    description: string;
-    tags?: string[];
-    images?: string[];
-  }) => Promise<void> | void;
   loading?: boolean;
 }
 
@@ -30,12 +29,13 @@ const TAG_COLORS = [
   "bg-pink-100 text-pink-600",
 ];
 
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png"];
+
 export function CreatePostCard({
   initialExpanded = false,
   initialImage = null,
-  initialTags = [],
   className,
-  onSubmit,
   loading = false,
 }: CreatePostCardProps) {
   const { data: me } = useGetMe();
@@ -44,28 +44,60 @@ export function CreatePostCard({
   const [content, setContent] = useState("");
   const [previewImage, setPreviewImage] = useState<string | null>(initialImage);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [tags, setTags] = useState<string[]>(initialTags);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isTagMenuOpen, setIsTagMenuOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewObjectUrlRef = useRef<string | null>(null);
   const { data: availableTags, isLoading: isLoadingTags } = useGetTags();
   const { trigger: uploadImage, isMutating: isUploadingImage } = useUploadImage();
+  const { trigger: createPost, isMutating: isCreatingPost } = useCreatePost();
 
   const name = me?.name || "John doe";
   const username = me?.name ? me.name.toLowerCase().replace(/\s+/g, ".") : "john.doe";
   const avatarUrl = me?.image;
 
+  useEffect(() => {
+    const objectUrl = previewObjectUrlRef.current;
+
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [previewImage]);
+
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setSubmitError("รองรับเฉพาะไฟล์ JPEG และ PNG เท่านั้น");
+      event.currentTarget.value = "";
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      setSubmitError("ขนาดรูปภาพต้องไม่เกิน 10 MB");
+      event.currentTarget.value = "";
+      return;
+    }
+
+    setSubmitError(null);
+    const objectUrl = URL.createObjectURL(file);
+    previewObjectUrlRef.current = objectUrl;
+    setPreviewImage(objectUrl);
     setImageFile(file);
-    setPreviewImage(URL.createObjectURL(file));
   };
 
-  const toggleTag = (tagName: string) => {
-    setTags((current) =>
-      current.includes(tagName) ? current.filter((tag) => tag !== tagName) : [...current, tagName]
+  const clearImage = () => {
+    previewObjectUrlRef.current = null;
+    setPreviewImage(null);
+    setImageFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const toggleTag = (tagId: string) => {
+    setSelectedTagIds((current) =>
+      current.includes(tagId) ? current.filter((id) => id !== tagId) : [...current, tagId]
     );
   };
 
@@ -80,17 +112,16 @@ export function CreatePostCard({
 
     try {
       const uploadedImage = imageFile ? await uploadImage(imageFile) : null;
-      await onSubmit?.({
+      await createPost({
         title: title.trim(),
         description: content.trim(),
-        tags: tags.map((tag) => tag.trim()).filter(Boolean),
+        tagIds: selectedTagIds,
         images: uploadedImage ? [uploadedImage.url] : previewImage ? [previewImage] : [],
       });
       setTitle("");
       setContent("");
-      setTags([]);
-      setPreviewImage(null);
-      setImageFile(null);
+      setSelectedTagIds([]);
+      clearImage();
       setIsExpanded(false);
     } catch {
       setSubmitError("Unable to publish your post right now.");
@@ -169,7 +200,7 @@ export function CreatePostCard({
                 />
                 <button
                   type="button"
-                  onClick={() => setPreviewImage(null)}
+                  onClick={clearImage}
                   className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   <X className="size-4 md:size-5" />
@@ -177,16 +208,16 @@ export function CreatePostCard({
               </div>
             )}
 
-            {tags.length > 0 && (
+            {selectedTagIds.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
-                {tags.map((tag, index) => {
+                {selectedTagIds.map((tagId, index) => {
                   const fallbackColor = TAG_COLORS[index % TAG_COLORS.length];
                   const tagDetails = (availableTags as TagOption[] | undefined)?.find(
-                    (availableTag) => availableTag.name === tag
+                    (availableTag) => availableTag.id === tagId
                   );
                   return (
                     <span
-                      key={tag}
+                      key={tagId}
                       className={cn(
                         "flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium md:text-sm",
                         !tagDetails && fallbackColor
@@ -197,10 +228,12 @@ export function CreatePostCard({
                           : undefined
                       }
                     >
-                      {tag}
+                      {tagDetails?.name ?? tagId}
                       <button
                         type="button"
-                        onClick={() => setTags(tags.filter((t) => t !== tag))}
+                        onClick={() =>
+                          setSelectedTagIds(selectedTagIds.filter((id) => id !== tagId))
+                        }
                         className="hover:opacity-70 transition-opacity outline-none"
                       >
                         <X className="size-3.5" />
@@ -229,7 +262,7 @@ export function CreatePostCard({
                   ref={fileInputRef}
                   type="file"
                   className="hidden"
-                  accept="image/*"
+                  accept="image/jpeg,image/png"
                   onChange={handleFileChange}
                 />
                 <Popover.Root open={isTagMenuOpen} onOpenChange={setIsTagMenuOpen}>
@@ -252,12 +285,12 @@ export function CreatePostCard({
                         <p className="px-3 py-2 text-sm text-dark-gray">Loading tags...</p>
                       ) : (availableTags as TagOption[] | undefined)?.length ? (
                         (availableTags as TagOption[]).map((tag) => {
-                          const isSelected = tags.includes(tag.name);
+                          const isSelected = selectedTagIds.includes(tag.id);
                           return (
                             <button
                               key={tag.id}
                               type="button"
-                              onClick={() => toggleTag(tag.name)}
+                              onClick={() => toggleTag(tag.id)}
                               className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-light-gray"
                             >
                               <span
@@ -281,8 +314,10 @@ export function CreatePostCard({
               <Button
                 type="submit"
                 iconLeft={<SquarePen className="size-4" />}
-                loading={loading || isUploadingImage}
-                disabled={!title.trim() || !content.trim() || loading || isUploadingImage}
+                loading={loading || isUploadingImage || isCreatingPost}
+                disabled={
+                  !title.trim() || !content.trim() || loading || isUploadingImage || isCreatingPost
+                }
               >
                 โพสต์
               </Button>

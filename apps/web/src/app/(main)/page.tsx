@@ -1,28 +1,11 @@
-"use client";
-
-import CreateComment from "@/features/comment/components/CreateComment";
+import { CreatePostCard } from "@/features/post/components/CreatePostCard";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-neutral-100 p-6">
-      <div className="mx-auto flex max-w-2xl flex-col gap-4">
-        <div className="rounded-xl bg-white p-4 shadow-sm">
-          <h1 className="text-lg font-semibold text-neutral-900">คอมเมนต์</h1>
-          <p className="mt-1 text-sm text-neutral-600">ตัวอย่างคอมโพเนนต์ที่แสดงอยู่บนหน้าจอ</p>
-        </div>
-
-        <CreateComment
-          user={{
-            name: "John doe",
-            username: "john.doe",
-            avatar: "/profile.svg",
-          }}
-          onSubmit={async ({ content, image }) => {
-            console.log("comment submitted", { content, image });
-          }}
-          placeholder="แสดงความคิดเห็นของคุณ..."
-        />
+    <section className="min-h-full bg-light-gray px-4 py-6 md:px-8 md:py-8">
+      <div className="mx-auto w-full max-w-[720px]">
+        <CreatePostCard />
       </div>
-    </main>
+    </section>
   );
 }

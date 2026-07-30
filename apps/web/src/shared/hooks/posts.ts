@@ -27,7 +27,7 @@ export function useCreatePost() {
     "posts",
     (
       _key: string,
-      { arg }: { arg: { title: string; description: string; tags?: string[]; images?: string[] } }
+      { arg }: { arg: { title: string; description: string; tagIds?: string[]; images?: string[] } }
     ) => unwrap(client.api.posts.$post({ json: arg }))
   );
 }
