@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { Loader2 } from "lucide-react";
 import PostCard from "@/features/feed/components/PostCard";
 import { CreatePostCard } from "@/features/post/components/CreatePostCard";
 import { useGetInfinitePostList } from "@/shared/hooks";
@@ -55,7 +56,9 @@ export default function Home() {
         ) : null}
 
         {isLoading ? (
-          <p className="rounded-lg bg-white p-6 text-center text-dark-gray">กำลังโหลดโพสต์...</p>
+          <div className="rounded-lg bg-white p-6" role="status" aria-label="กำลังโหลดโพสต์">
+            <Loader2 className="mx-auto size-6 animate-spin text-primary-red" aria-hidden="true" />
+          </div>
         ) : error ? (
           <div className="rounded-lg bg-white p-6 text-center">
             <p className="text-primary-red">ไม่สามารถโหลดโพสต์ได้</p>
@@ -88,7 +91,9 @@ export default function Home() {
 
         <div ref={loadMoreRef} className="h-px" aria-hidden="true" />
         {isLoadingMore ? (
-          <p className="pb-4 text-center text-sm text-dark-gray">กำลังโหลดโพสต์เพิ่มเติม...</p>
+          <div className="pb-4" role="status" aria-label="กำลังโหลดโพสต์เพิ่มเติม">
+            <Loader2 className="mx-auto size-6 animate-spin text-primary-red" aria-hidden="true" />
+          </div>
         ) : null}
       </div>
     </section>
