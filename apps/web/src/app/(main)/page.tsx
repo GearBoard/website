@@ -43,14 +43,7 @@ export default function Home() {
         {session?.user ? (
           <CreatePostCard
             onPostCreated={async () => {
-              await mutate((pages) => pages, {
-                revalidate: (_page, key) =>
-                  Array.isArray(key) &&
-                  typeof key[1] === "object" &&
-                  key[1] !== null &&
-                  "page" in key[1] &&
-                  key[1].page === "1",
-              });
+              await mutate();
             }}
           />
         ) : null}
