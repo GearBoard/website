@@ -22,6 +22,10 @@ export interface PostCardProps {
   isLiked?: boolean;
   isSaved?: boolean;
   isOwner?: boolean;
+  /** Show the full title/description instead of clamping to 3 lines — used on the post detail page. */
+  expanded?: boolean;
+  /** Strip the card's own background/padding so it can be nested inside a parent that already provides them — used on the post detail page. */
+  bare?: boolean;
   className?: string;
   onClick?: () => void;
   onLikeClick?: () => void;
@@ -48,6 +52,8 @@ export default function PostCard({
   isLiked = false,
   isSaved = false,
   isOwner = false,
+  expanded = false,
+  bare = false,
   className,
   onClick,
   onLikeClick,
@@ -60,16 +66,19 @@ export default function PostCard({
     handler?.();
   };
 
+  const inset = bare ? "px-0" : "px-5";
+
   return (
     <article
       onClick={onClick}
       className={cn(
-        "bg-white rounded-lg overflow-hidden flex flex-col gap-3.5 w-full py-4",
+        "flex flex-col gap-3.5 w-full",
+        !bare && "bg-white rounded-lg overflow-hidden py-4",
         onClick && "cursor-pointer",
         className
       )}
     >
-      <div className="flex items-center justify-between gap-2 px-5">
+      <div className={cn("flex items-center justify-between gap-2", inset)}>
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="relative size-10 shrink-0 rounded-full overflow-hidden">
             <Image
@@ -107,25 +116,30 @@ export default function PostCard({
         </div>
       </div>
 
-      <div className="flex flex-col gap-1.5 -mb-1 px-5">
+      <div className={cn("flex flex-col gap-1.5 -mb-1", inset)}>
         <h3 className="font-semibold text-xl leading-[135%] text-black">{title}</h3>
-        <p className="font-medium text-base leading-[135%] text-black line-clamp-3">
+        <p
+          className={cn(
+            "font-medium text-base leading-[135%] text-black",
+            !expanded && "line-clamp-3"
+          )}
+        >
           {description}
         </p>
       </div>
 
       {imageUrl && (
-        <div className="px-5">
+        <div className={inset}>
           {/* eslint-disable-next-line @next/next/no-img-element -- post image dimensions aren't known ahead of time (not stored in the schema), so next/image's required width/height can't be set; a plain img lets the browser size it to its natural aspect ratio */}
           <img src={imageUrl} alt="" className="w-full h-auto" />
         </div>
       )}
 
-      <div className="px-5">
+      <div className={bare ? "px-0" : "px-7"}>
         <div className="border-t border-gray" />
       </div>
 
-      <div className="flex items-center justify-between gap-2.5 px-5 -mt-1">
+      <div className={cn("flex items-center justify-between gap-2.5 -mt-1", inset)}>
         <div className="flex items-center gap-2 flex-wrap min-w-0">
           {tags.map((tag, i) => (
             <span
