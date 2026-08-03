@@ -5,12 +5,9 @@ type EmptyStateProps = {
   description?: string;
 };
 
-export default function EmptyState({
-  title,
-  description,
-}: EmptyStateProps) {
+export default function EmptyState({ title, description }: EmptyStateProps) {
   return (
-    <div className="flex w-full max-w-[250px] flex-col items-center justify-center text-center">
+    <div className="flex w-[250px] flex-col items-center justify-center text-center">
       <Image
         src="/empty.svg"
         alt="Empty state illustration"
@@ -19,14 +16,10 @@ export default function EmptyState({
         className="mb-4 h-auto w-full max-w-[220px]"
       />
 
-      <h2 className="text-[20px] font-bold text-primary-red">
-        {title}
-      </h2>
+      <h2 className="break-all text-[20px] font-bold text-primary-red">{title}</h2>
 
       {description && (
-        <p className="text-[14px] font-medium text-dark-gray">
-          {description}
-        </p>
+        <p className="break-all text-[14px] font-medium text-dark-gray">{description}</p>
       )}
     </div>
   );
