@@ -19,6 +19,7 @@ interface CreatePostCardProps {
   initialImage?: string | null;
   className?: string;
   loading?: boolean;
+  onPostCreated?: () => void | Promise<void>;
 }
 
 const TAG_COLORS = [
@@ -37,6 +38,7 @@ export function CreatePostCard({
   initialImage = null,
   className,
   loading = false,
+  onPostCreated,
 }: CreatePostCardProps) {
   const { data: me } = useGetMe();
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
@@ -118,13 +120,21 @@ export function CreatePostCard({
         tagIds: selectedTagIds,
         images: uploadedImage ? [uploadedImage.url] : previewImage ? [previewImage] : [],
       });
-      setTitle("");
-      setContent("");
-      setSelectedTagIds([]);
-      clearImage();
-      setIsExpanded(false);
     } catch {
       setSubmitError("Unable to publish your post right now.");
+      return;
+    }
+
+    setTitle("");
+    setContent("");
+    setSelectedTagIds([]);
+    clearImage();
+    setIsExpanded(false);
+
+    try {
+      await onPostCreated?.();
+    } catch {
+      // The post was created successfully; a feed refresh failure must not restore the form error.
     }
   };
 

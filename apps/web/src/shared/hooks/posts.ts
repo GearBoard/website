@@ -1,4 +1,5 @@
 import useSWR from "swr";
+import useSWRInfinite from "swr/infinite";
 import useSWRMutation from "swr/mutation";
 import { client, unwrap } from "../libs/api-client";
 
@@ -14,6 +15,17 @@ export function useGetPostList(query?: {
   userId?: string;
 }) {
   return useSWR(["posts", query], () => unwrap(client.api.posts.$get({ query: query ?? {} })));
+}
+
+export function useGetInfinitePostList(limit = 10) {
+  return useSWRInfinite(
+    (pageIndex, previousPageData) => {
+      if (previousPageData && pageIndex >= previousPageData.totalPages) return null;
+      return ["posts", { page: String(pageIndex + 1), limit: String(limit) }] as const;
+    },
+    ([, query]) => unwrap(client.api.posts.$get({ query })),
+    { revalidateFirstPage: false }
+  );
 }
 
 export function useGetPostComments(postId: string) {

@@ -537,6 +537,16 @@ prisma.post.findUnique({ where: { id, <span class="kw">deletedAt</span>: <span c
   <span class="kw">return</span> <span class="fn">useSWR</span>([<span class="str">"posts"</span>, query], () =&gt;
     <span class="fn">unwrap</span>(client.api.posts.$get({ query: query ?? {} }))
   );
+}
+<span class="kw">export function</span> <span class="fn">useGetInfinitePostList</span>(limit = <span class="num">10</span>) {
+  <span class="kw">return</span> <span class="fn">useSWRInfinite</span>(
+    (pageIndex, previousPageData) =&gt;
+      previousPageData &amp;&amp; pageIndex &gt;= previousPageData.totalPages
+        ? <span class="kw">null</span>
+        : [<span class="str">"posts"</span>, { page: String(pageIndex + <span class="num">1</span>), limit: String(limit) }],
+    ([, query]) =&gt; <span class="fn">unwrap</span>(client.api.posts.$get({ query })),
+    { revalidateFirstPage: <span class="kw">false</span> }
+  );
 }</pre>
 
         <h3>Mutation hook — <span class="path-chip">hooks/posts.ts</span></h3>
@@ -558,6 +568,7 @@ prisma.post.findUnique({ where: { id, <span class="kw">deletedAt</span>: <span c
           <tbody>
             <tr><td><code>useGetPostById(id)</code></td><td>useSWR</td><td><code>["post", id]</code></td></tr>
             <tr><td><code>useGetPostList(query?)</code></td><td>useSWR</td><td><code>["posts", query]</code></td></tr>
+            <tr><td><code>useGetInfinitePostList(limit?)</code></td><td>useSWRInfinite</td><td>Paginated <code>["posts", { page, limit }]</code></td></tr>
             <tr><td><code>useGetPostComments(postId)</code></td><td>useSWR</td><td><code>["post-comments", postId]</code></td></tr>
             <tr><td><code>useCreatePost()</code></td><td>useSWRMutation</td><td><code>"posts"</code></td></tr>
             <tr><td><code>useUpdatePost(id)</code></td><td>useSWRMutation</td><td><code>["post", id]</code></td></tr>
