@@ -8,8 +8,15 @@ import {
   CreateReplyParamsInputDTO,
   CreateReplyBodyInputDTO,
   DeleteCommentParamsInputDTO,
+  LikeCommentParamsInputDTO,
+  UnlikeCommentParamsInputDTO,
 } from "./dto/index.js";
-import { createReplyService, deleteCommentService } from "./service/index.js";
+import {
+  createReplyService,
+  deleteCommentService,
+  likeCommentService,
+  unlikeCommentService,
+} from "./service/index.js";
 
 export const commentRoute = new Hono<{ Variables: AppVariables }>()
   .post(
@@ -34,5 +41,27 @@ export const commentRoute = new Hono<{ Variables: AppVariables }>()
       const { commentId } = c.req.valid("param");
       await deleteCommentService(commentId, user.id);
       return c.json(successResponse(null, "Comment deleted successfully"), 200);
+    }
+  )
+  .post(
+    "/:commentId/like",
+    requireAuth,
+    zValidator("param", LikeCommentParamsInputDTO, validationHook),
+    async (c) => {
+      const user = c.get("user");
+      const { commentId } = c.req.valid("param");
+      const result = await likeCommentService(commentId, user.id);
+      return c.json(successResponse(result, "Comment liked"), 201);
+    }
+  )
+  .delete(
+    "/:commentId/like",
+    requireAuth,
+    zValidator("param", UnlikeCommentParamsInputDTO, validationHook),
+    async (c) => {
+      const user = c.get("user");
+      const { commentId } = c.req.valid("param");
+      const result = await unlikeCommentService(commentId, user.id);
+      return c.json(successResponse(result, "Comment unliked"), 200);
     }
   );

@@ -33,11 +33,12 @@ model User {
   accounts Account[]
 
   // Relations
-  posts      Post[]
-  comments   Comment[]
-  likes      Like[]
-  bookmarks  Bookmark[]
-  department Department? @relation(fields: [departmentId], references: [id])
+  posts        Post[]
+  comments     Comment[]
+  likes        Like[]
+  commentLikes CommentLike[]
+  bookmarks    Bookmark[]
+  department   Department? @relation(fields: [departmentId], references: [id])
 }
 
 model Session {
@@ -154,6 +155,7 @@ model Comment {
   userId    String
   parentId  String? // for reply(can be null)
   content   String    @db.Text
+  likeCount Int       @default(0)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -164,6 +166,7 @@ model Comment {
   replies Comment[] @relation("CommentReplies")
 
   images CommentImage[]
+  likes  CommentLike[]
 }
 
 model CommentImage {
@@ -183,6 +186,17 @@ model Like {
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@id([userId, postId])
+}
+
+model CommentLike {
+  userId    String
+  commentId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@id([userId, commentId])
 }
 
 model Bookmark {

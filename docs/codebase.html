@@ -206,7 +206,7 @@
 │   └── auth/          <span class="cm">← LoginForm, RegistrationForm, types</span>
 └── shared/
     ├── libs/          <span class="cm">← api-client.ts, auth-client.ts, utils.ts</span>
-    ├── hooks/         <span class="cm">← posts.ts, comments.ts, users.ts, index.ts</span>
+    ├── hooks/         <span class="cm">← posts.ts, comments.ts, users.ts, tags.ts, uploads.ts, index.ts</span>
     └── components/ui/ <span class="cm">← Button, Input, Modal, Dropdown, Textarea, Navbar</span></div>
       </div>
     </section>
@@ -240,7 +240,9 @@ app.onError((err, c) =&gt; {
         <pre><span class="kw">export const</span> apiRoutes = <span class="kw">new</span> <span class="ty">Hono</span>()
   .route(<span class="str">"/api/posts"</span>, postRoute)
   .route(<span class="str">"/api/comments"</span>, commentRoute)
-  .route(<span class="str">"/api/users"</span>, userRoute);
+  .route(<span class="str">"/api/users"</span>, userRoute)
+  .route(<span class="str">"/api/tags"</span>, tagRoute)
+  .route(<span class="str">"/api/uploads"</span>, uploadRoute);
 
 <span class="kw">export type</span> <span class="ty">AppType</span> = <span class="kw">typeof</span> apiRoutes;</pre>
 
@@ -311,8 +313,8 @@ app.onError((err, c) =&gt; {
         <pre><span class="kw">export const</span> CreatePostBodyInputDTO = z.object({
   title: z.string().trim().min(<span class="num">1</span>, <span class="str">"Title is required"</span>).max(<span class="num">255</span>, <span class="str">"Title too long"</span>),
   description: z.string().trim().min(<span class="num">1</span>, <span class="str">"Description is required"</span>),
-  tags: z.array(z.string().trim()).optional().default([])
-    .transform((tags) =&gt; [...<span class="kw">new</span> <span class="ty">Set</span>(tags)]),    <span class="cm">// deduplicate</span>
+  tagIds: z.array(z.string().trim().min(<span class="num">1</span>, <span class="str">"Invalid tag id"</span>)).optional().default([])
+    .transform((tagIds) =&gt; [...<span class="kw">new</span> <span class="ty">Set</span>(tagIds)]),    <span class="cm">// deduplicate</span>
   images: z.array(z.string().url(<span class="str">"Invalid image URL"</span>)).optional().default([]),
 });
 <span class="kw">export type</span> <span class="ty">CreatePostBody</span> = z.infer&lt;<span class="kw">typeof</span> CreatePostBodyInputDTO&gt;;</pre>
@@ -353,7 +355,12 @@ app.onError((err, c) =&gt; {
 
         <h3>Read service</h3>
         <pre><span class="kw">export async function</span> <span class="fn">createPostService</span>(data: <span class="ty">CreatePostBody</span>, userId: <span class="ty">string</span>): <span class="ty">Promise&lt;CreatePostOutputDTO&gt;</span> {
-  <span class="kw">const</span> post = <span class="kw">await</span> postRepository.create(data, userId);
+  <span class="kw">const</span> tags = <span class="kw">await</span> Promise.all(data.tagIds.map(<span class="kw">async</span> (tagId) =&gt; {
+    <span class="kw">const</span> tag = <span class="kw">await</span> tagRepository.findById(tagId);
+    <span class="kw">if</span> (!tag) <span class="kw">throw new</span> <span class="ty">NotFoundError</span>(<span class="str">"Tag not found"</span>);
+    <span class="kw">return</span> tag;
+  }));
+  <span class="kw">const</span> post = <span class="kw">await</span> postRepository.create({ ...data, tags }, userId);
   <span class="kw">return</span> <span class="ty">CreatePostOutputDTO</span>.<span class="fn">toDTO</span>(post);
 }</pre>
 
@@ -439,7 +446,7 @@ prisma.post.findUnique({ where: { id, <span class="kw">deletedAt</span>: <span c
             <tr><td><code>Post</code></td><td>title, description, isClosed, likeCount, commentCount, userId, deletedAt</td><td>Soft delete.</td></tr>
             <tr><td><code>PostImage</code></td><td>url, postId</td><td><code>onDelete: Cascade</code></td></tr>
             <tr><td><code>Tag</code></td><td>name (unique)</td><td>Global tag registry.</td></tr>
-            <tr><td><code>PostTag</code></td><td>postId + tagId (composite PK)</td><td>Join table. Tag upsert via <code>connectOrCreate</code>.</td></tr>
+            <tr><td><code>PostTag</code></td><td>postId + tagId (composite PK)</td><td>Create Post resolves and connects existing tags by ID.</td></tr>
             <tr><td><code>Comment</code></td><td>content, userId, postId, parentId (self-ref), deletedAt</td><td>Replies via self-reference. Cascade delete on post.</td></tr>
             <tr><td><code>Like</code></td><td>userId + postId (composite PK)</td><td>—</td></tr>
             <tr><td><code>Bookmark</code></td><td>userId + postId (composite PK)</td><td>—</td></tr>
@@ -517,6 +524,7 @@ prisma.post.findUnique({ where: { id, <span class="kw">deletedAt</span>: <span c
     <section id="web-hooks">
       <div class="card frontend">
         <h2>🪝 SWR Hooks</h2>
+        <p style="margin-bottom:1rem; font-size:13px; color:#475569;">Profile Form and Create Post both use <code>useUploadImage</code> to send a JPEG/PNG multipart <code>file</code> to <code>POST /api/uploads/image</code>. Create Post then passes selected <code>tagIds</code> and the returned GCS URL in the <code>images</code> array handled by <code>useCreatePost</code>.</p>
         <p style="margin-bottom:1rem; font-size:13px; color:#475569;">All data fetching goes through <code>shared/hooks/</code>. GETs use <code>useSWR</code>; mutations use <code>useSWRMutation</code>. Import from <code>@/shared/hooks</code>.</p>
 
         <h3>GET hook — <span class="path-chip">hooks/posts.ts</span></h3>
@@ -529,13 +537,23 @@ prisma.post.findUnique({ where: { id, <span class="kw">deletedAt</span>: <span c
   <span class="kw">return</span> <span class="fn">useSWR</span>([<span class="str">"posts"</span>, query], () =&gt;
     <span class="fn">unwrap</span>(client.api.posts.$get({ query: query ?? {} }))
   );
+}
+<span class="kw">export function</span> <span class="fn">useGetInfinitePostList</span>(limit = <span class="num">10</span>) {
+  <span class="kw">return</span> <span class="fn">useSWRInfinite</span>(
+    (pageIndex, previousPageData) =&gt;
+      previousPageData &amp;&amp; pageIndex &gt;= previousPageData.totalPages
+        ? <span class="kw">null</span>
+        : [<span class="str">"posts"</span>, { page: String(pageIndex + <span class="num">1</span>), limit: String(limit) }],
+    ([, query]) =&gt; <span class="fn">unwrap</span>(client.api.posts.$get({ query })),
+    { revalidateFirstPage: <span class="kw">false</span> }
+  );
 }</pre>
 
         <h3>Mutation hook — <span class="path-chip">hooks/posts.ts</span></h3>
         <pre><span class="kw">export function</span> <span class="fn">useCreatePost</span>() {
   <span class="kw">return</span> <span class="fn">useSWRMutation</span>(
     <span class="str">"posts"</span>,
-    (_key: <span class="ty">string</span>, { arg }: { arg: { title: <span class="ty">string</span>; description: <span class="ty">string</span>; tags?: <span class="ty">string</span>[] } }) =&gt;
+    (_key: <span class="ty">string</span>, { arg }: { arg: { title: <span class="ty">string</span>; description: <span class="ty">string</span>; tagIds?: <span class="ty">string</span>[] } }) =&gt;
       <span class="fn">unwrap</span>(client.api.posts.$post({ json: arg }))
   );
 }
@@ -550,6 +568,7 @@ prisma.post.findUnique({ where: { id, <span class="kw">deletedAt</span>: <span c
           <tbody>
             <tr><td><code>useGetPostById(id)</code></td><td>useSWR</td><td><code>["post", id]</code></td></tr>
             <tr><td><code>useGetPostList(query?)</code></td><td>useSWR</td><td><code>["posts", query]</code></td></tr>
+            <tr><td><code>useGetInfinitePostList(limit?)</code></td><td>useSWRInfinite</td><td>Paginated <code>["posts", { page, limit }]</code></td></tr>
             <tr><td><code>useGetPostComments(postId)</code></td><td>useSWR</td><td><code>["post-comments", postId]</code></td></tr>
             <tr><td><code>useCreatePost()</code></td><td>useSWRMutation</td><td><code>"posts"</code></td></tr>
             <tr><td><code>useUpdatePost(id)</code></td><td>useSWRMutation</td><td><code>["post", id]</code></td></tr>

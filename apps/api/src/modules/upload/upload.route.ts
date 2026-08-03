@@ -4,16 +4,16 @@ import type { AppVariables } from "../../common/types/index.js";
 import { requireAuth } from "../../common/middleware/auth.middleware.js";
 import { successResponse } from "../../common/utils/response.js";
 import { validationHook } from "../../common/utils/validation-hook.js";
-import { UploadAvatarBodyInputDTO } from "./dto/index.js";
-import { uploadAvatarService } from "./service/index.js";
+import { UploadImageBodyInputDTO } from "./dto/index.js";
+import { uploadImageService } from "./service/index.js";
 
 export const uploadRoute = new Hono<{ Variables: AppVariables }>().post(
-  "/avatar",
+  "/image",
   requireAuth,
-  zValidator("form", UploadAvatarBodyInputDTO, validationHook),
+  zValidator("form", UploadImageBodyInputDTO, validationHook),
   async (c) => {
     const data = c.req.valid("form");
-    const result = await uploadAvatarService(data.file);
-    return c.json(successResponse(result, "Avatar uploaded successfully"), 201);
+    const result = await uploadImageService(data.file);
+    return c.json(successResponse(result, "Image uploaded successfully"), 201);
   }
 );
