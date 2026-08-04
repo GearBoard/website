@@ -147,7 +147,7 @@ function CommentActions({
         type="button"
         onClick={() => onSubmit?.()}
         disabled={disabled || loading}
-        className="flex items-center justify-center md:w-[85px] md:h-[38px] w-[88px] h-[31px] gap-3 rounded-lg bg-primary-red md:text-md text-sm font-semi-bold text-white"
+        className="flex items-center justify-center md:w-[85px] md:h-[38px] w-[88px] h-[31px] gap-3 rounded-lg bg-primary-red md:text-md text-sm font-semibold text-white"
       >
         {loading ? (
           <span className="text-xs">กำลังส่ง...</span>
@@ -162,7 +162,7 @@ function CommentActions({
   );
 }
 
-export default function CreateComment({
+export default function ReplyComment({
   user,
   onSubmit,
   placeholder = "เขียนความคิดเห็น...",
