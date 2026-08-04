@@ -7,7 +7,7 @@ import { Textarea } from "@/shared/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import { SquarePen } from "lucide-react";
 import { useSession } from "@/shared/libs/auth-client";
-import { useGetDepartments, useUpdateUser, useGetMe, useUploadAvatar } from "@/shared/hooks";
+import { useGetDepartments, useUpdateUser, useGetMe, useUploadImage } from "@/shared/hooks";
 
 export default function ProfileForm() {
   const router = useRouter();
@@ -15,7 +15,7 @@ export default function ProfileForm() {
   const { data: me } = useGetMe();
   const { data: departments = [], error: departmentsError } = useGetDepartments();
   const { trigger: updateUser, isMutating: isLoading } = useUpdateUser(session?.user.id);
-  const { trigger: uploadAvatar, isMutating: isUploading } = useUploadAvatar();
+  const { trigger: uploadImage, isMutating: isUploading } = useUploadImage();
 
   const [edits, setEdits] = useState<{
     username?: string;
@@ -70,7 +70,7 @@ export default function ProfileForm() {
     try {
       let imageUrl = me?.image;
       if (avatar) {
-        const result = await uploadAvatar(avatar);
+        const result = await uploadImage(avatar);
         imageUrl = result.url;
       }
 

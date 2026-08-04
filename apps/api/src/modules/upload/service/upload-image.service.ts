@@ -1,7 +1,8 @@
 import { uploadToGCS } from "../../../common/services/gcsUploader.js";
 import { BadRequestError } from "../../../common/errors/app-error.js";
+import { UploadImageOutputDTO } from "../dto/index.js";
 
-export async function uploadAvatarService(file: File) {
+export async function uploadImageService(file: File): Promise<UploadImageOutputDTO> {
   if (!file) {
     throw new BadRequestError("File is required");
   }
@@ -16,5 +17,5 @@ export async function uploadAvatarService(file: File) {
     size: file.size,
   });
 
-  return result;
+  return UploadImageOutputDTO.toDTO(result);
 }

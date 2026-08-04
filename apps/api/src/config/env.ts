@@ -12,12 +12,12 @@ function getEnvOptional(key: string, defaultValue: string): string {
   return process.env[key] ?? defaultValue;
 }
 
-
 export const env = {
   NODE_ENV: getEnvOptional("NODE_ENV", "development"),
   PORT: getEnvOptional("PORT", "4000"),
   DATABASE_URL: getEnv("DATABASE_URL"),
 
+  BETTER_AUTH_SECRET: getEnv("BETTER_AUTH_SECRET"),
   BETTER_AUTH_URL: getEnv("BETTER_AUTH_URL"),
   BETTER_AUTH_TRUSTED_ORIGIN: getEnvOptional(
     "BETTER_AUTH_TRUSTED_ORIGIN",

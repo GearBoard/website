@@ -1,4 +1,5 @@
 import useSWR from "swr";
+import useSWRInfinite from "swr/infinite";
 import useSWRMutation from "swr/mutation";
 import { client, unwrap } from "../libs/api-client";
 
@@ -6,14 +7,32 @@ export function useGetPostById(id: string) {
   return useSWR(["post", id], () => unwrap(client.api.posts[":id"].$get({ param: { id } })));
 }
 
-export function useGetPostList(query?: {
-  page?: string;
-  limit?: string;
-  search?: string;
-  tag?: string;
-  userId?: string;
-}) {
-  return useSWR(["posts", query], () => unwrap(client.api.posts.$get({ query: query ?? {} })));
+export function useGetPostList(
+  query?: {
+    page?: string;
+    limit?: string;
+    search?: string;
+    tag?: string;
+    userId?: string;
+  } | null
+) {
+  return useSWR(query === null ? null : ["posts", query], () =>
+    unwrap(client.api.posts.$get({ query: query ?? {} }))
+  );
+}
+
+export function useGetInfinitePostList(limit = 10, search?: string) {
+  return useSWRInfinite(
+    (pageIndex, previousPageData) => {
+      if (previousPageData && pageIndex >= previousPageData.totalPages) return null;
+      return [
+        "posts",
+        { page: String(pageIndex + 1), limit: String(limit), ...(search ? { search } : {}) },
+      ] as const;
+    },
+    ([, query]) => unwrap(client.api.posts.$get({ query })),
+    { revalidateFirstPage: false }
+  );
 }
 
 export function useGetPostComments(postId: string) {
@@ -27,7 +46,7 @@ export function useCreatePost() {
     "posts",
     (
       _key: string,
-      { arg }: { arg: { title: string; description: string; tags?: string[]; images?: string[] } }
+      { arg }: { arg: { title: string; description: string; tagIds?: string[]; images?: string[] } }
     ) => unwrap(client.api.posts.$post({ json: arg }))
   );
 }
