@@ -18,6 +18,9 @@ interface BaseProps {
   error?: boolean;
   errorMessage?: string;
   required?: boolean;
+  disabled?: boolean;
+  /** Number of items to show before enabling scroll */
+  maxVisibleItems?: number;
 }
 
 interface SingleProps extends BaseProps {
@@ -43,6 +46,8 @@ export function Dropdown(props: DropdownProps) {
     error,
     errorMessage,
     required,
+    disabled,
+    maxVisibleItems,
   } = props;
   const hasError = error || !!errorMessage;
   const [open, setOpen] = useState(false);
@@ -85,12 +90,15 @@ export function Dropdown(props: DropdownProps) {
       <Popover.Trigger asChild>
         <button
           type="button"
+          disabled={disabled}
           className={cn(
             "cursor-pointer flex w-full items-center justify-between rounded-lg border-[1.5px] border-gray px-3 py-2 md:px-4 h-10",
             "text-sm bg-white text-black outline-none transition-colors md:text-base",
             "hover:border-primary-red focus-visible:border-primary-red",
             open && "border-primary-red",
             hasError && "border-primary-red bg-primary-red/10",
+            disabled &&
+              "cursor-not-allowed opacity-50 bg-gray/10 hover:border-gray focus-visible:border-gray",
             !label && !errorMessage ? className : undefined
           )}
         >
@@ -108,9 +116,13 @@ export function Dropdown(props: DropdownProps) {
         <Popover.Content
           align="start"
           sideOffset={10}
-          style={{ width: "var(--radix-popover-trigger-width)" }}
+          style={{
+            width: "var(--radix-popover-trigger-width)",
+            ...(maxVisibleItems ? { maxHeight: `${maxVisibleItems * 40 + 16}px` } : {}),
+          }}
           className={cn(
-            "z-50 flex flex-col gap-1 overflow-hidden rounded-lg bg-white p-2 shadow-primary-red",
+            "z-50 flex flex-col gap-1 rounded-lg bg-white p-2 shadow-primary-red",
+            maxVisibleItems ? "overflow-y-auto" : "overflow-hidden",
             "data-[state=open]:animate-in data-[state=closed]:animate-out",
             "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
             "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",

@@ -1,64 +1,97 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Button, Input, Dropdown } from "@/shared/components";
 import { Textarea } from "@/shared/components/ui/textarea";
-import { DEPARTMENTS } from "../constants/departments";
 import { useRouter } from "next/navigation";
 import { SquarePen } from "lucide-react";
+import { useSession } from "@/shared/libs/auth-client";
+import { useGetDepartments, useUpdateUser, useGetMe, useUploadImage } from "@/shared/hooks";
 
 export default function ProfileForm() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const { data: me } = useGetMe();
+  const { data: departments = [], error: departmentsError } = useGetDepartments();
+  const { trigger: updateUser, isMutating: isLoading } = useUpdateUser(session?.user.id);
+  const { trigger: uploadImage, isMutating: isUploading } = useUploadImage();
 
-  // Form state
-  const [formData, setFormData] = useState({
-    username: "",
-    department: "",
-    about: "",
-  });
+  const [edits, setEdits] = useState<{
+    username?: string;
+    department?: string;
+    about?: string;
+  }>({});
+
+  const formData = {
+    username: edits.username ?? me?.name ?? "",
+    department: edits.department ?? me?.departmentId ?? "",
+    about: edits.about ?? me?.description ?? "",
+  };
 
   // Avatar state
   const [avatar, setAvatar] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const previewUrl = avatarPreview ?? me?.image ?? null;
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [isLoading, setIsLoading] = useState(false);
+  // Cleanup object URL
+  useEffect(() => {
+    return () => {
+      if (avatarPreview) {
+        URL.revokeObjectURL(avatarPreview);
+      }
+    };
+  }, [avatarPreview]);
 
   // Validation
-  const isFormValid = formData.username.trim().length > 0 && formData.department.length > 0;
+  const isFormValid =
+    formData.username.trim().length > 0 && formData.department.length > 0 && !departmentsError;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (avatarPreview) {
+        URL.revokeObjectURL(avatarPreview);
+      }
       const objectUrl = URL.createObjectURL(file);
-      setPreviewUrl(objectUrl);
+      setAvatarPreview(objectUrl);
       setAvatar(file);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isFormValid) return;
+    setSubmitError(null);
 
-    setIsLoading(true);
+    if (!isFormValid || !session?.user.id) return;
+
     try {
-      // Simulate API call
-      console.log("Submitting profile:", { ...formData, avatar });
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      let imageUrl = me?.image;
+      if (avatar) {
+        const result = await uploadImage(avatar);
+        imageUrl = result.url;
+      }
+
+      await updateUser({
+        name: formData.username,
+        departmentId: formData.department,
+        description: formData.about,
+        ...(imageUrl ? { image: imageUrl } : {}),
+      });
 
       // Redirect to home after successful onboarding
       router.push("/");
     } catch (error) {
       console.error("Failed to update profile", error);
-    } finally {
-      setIsLoading(false);
+      setSubmitError("ไม่สามารถอัปเดตโปรไฟล์ได้ กรุณาลองใหม่อีกครั้ง");
     }
   };
 
-  const departmentOptions = DEPARTMENTS.map((dept) => ({
-    value: dept,
-    label: dept,
+  const departmentOptions = departments.map((dept) => ({
+    value: dept.id,
+    label: dept.name,
   }));
 
   return (
@@ -112,7 +145,7 @@ export default function ProfileForm() {
           id="profile-username"
           placeholder="john.doe"
           value={formData.username}
-          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+          onChange={(e) => setEdits({ ...edits, username: e.target.value })}
           required
         />
 
@@ -121,25 +154,39 @@ export default function ProfileForm() {
           placeholder="เลือกภาควิชา"
           options={departmentOptions}
           value={formData.department}
-          onChange={(val) => setFormData({ ...formData, department: val as string })}
+          onChange={(val) => setEdits({ ...edits, department: val as string })}
+          maxVisibleItems={5}
           required
+          disabled={!!departmentsError}
         />
+
+        {departmentsError ? (
+          <p role="alert" className="text-sm text-primary-red">
+            ไม่สามารถโหลดรายชื่อภาควิชาขณะนี้ โปรดลองใหม่อีกครั้ง
+          </p>
+        ) : null}
 
         <Textarea
           label="เกี่ยวกับ"
           id="profile-about"
           placeholder="บอกเล่าเกี่ยวกับตัวคุณ..."
           value={formData.about}
-          onChange={(e) => setFormData({ ...formData, about: e.target.value })}
+          onChange={(e) => setEdits({ ...edits, about: e.target.value })}
           className="min-h-[120px]"
         />
       </form>
 
+      {submitError ? (
+        <p role="alert" className="text-sm text-primary-red">
+          {submitError}
+        </p>
+      ) : null}
+
       <Button
         form="profile-form"
         type="submit"
-        loading={isLoading}
-        disabled={!isFormValid || isLoading}
+        loading={isLoading || isUploading}
+        disabled={!isFormValid || isLoading || isUploading || !!departmentsError}
         size="lg"
       >
         ยืนยัน

@@ -101,6 +101,12 @@ NotFoundError · ForbiddenError · UnauthorizedError · BadRequestError · Confl
 Use `zValidator("param" | "query" | "json", Schema, validationHook)` in the route.
 Read validated input with `c.req.valid(...)` — never `c.req.param()` or `c.req.json()` directly.
 
+### Image uploads
+
+Profile and post images both use the authenticated `POST /api/uploads/image` endpoint.
+It accepts multipart form data in the `file` field, uploads JPEG/PNG files (maximum
+10 MB) to GCS, and returns `{ url }`.
+
 ### Auth context
 
 Authenticated user is injected into Hono context by `requireAuth` middleware.

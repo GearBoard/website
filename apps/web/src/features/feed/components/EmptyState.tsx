@@ -17,7 +17,7 @@ export default function EmptyState({
   imageHeight = 120,
 }: EmptyStateProps) {
   return (
-    <div className="flex w-full max-w-[250px] flex-col items-center justify-center text-center">
+    <div className="flex w-[250px] flex-col items-center justify-center text-center">
       <Image
         src={imageSrc}
         alt="Empty state illustration"
@@ -29,9 +29,7 @@ export default function EmptyState({
       {title && <h2 className="text-[20px] font-bold text-primary-red">{title}</h2>}
 
       {description && (
-        <p className="text-[14px] font-medium text-dark-gray">
-          {description}
-        </p>
+        <p className="break-all text-[14px] font-medium text-dark-gray">{description}</p>
       )}
     </div>
   );

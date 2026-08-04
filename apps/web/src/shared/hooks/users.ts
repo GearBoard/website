@@ -20,9 +20,9 @@ export function useGetUserById(id: string) {
   return useSWR(["user", id], () => unwrap(client.api.users[":id"].$get({ param: { id } })));
 }
 
-export function useUpdateUser(id: string) {
+export function useUpdateUser(id?: string) {
   return useSWRMutation(
-    ["user", id],
+    id ? ["user", id] : null,
     (
       _key: unknown,
       {
@@ -35,7 +35,13 @@ export function useUpdateUser(id: string) {
           departmentId?: string | null;
         };
       }
-    ) => unwrap(client.api.users[":id"].$patch({ param: { id }, json: arg }))
+    ) => {
+      if (!id) {
+        throw new Error("User ID is required");
+      }
+
+      return unwrap(client.api.users[":id"].$patch({ param: { id }, json: arg }));
+    }
   );
 }
 

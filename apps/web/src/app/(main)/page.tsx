@@ -1,3 +1,112 @@
+"use client";
+
+import { useEffect, useMemo, useRef } from "react";
+import { Loader2 } from "lucide-react";
+import PostCard from "@/features/feed/components/PostCard";
+import EmptyState from "@/features/feed/components/EmptyState";
+import { CreatePostCard } from "@/features/post/components/CreatePostCard";
+import { useGetInfinitePostList } from "@/shared/hooks";
+import { authClient } from "@/shared/libs/auth-client";
+import { useSearch } from "@/shared/contexts/SearchContext";
+
 export default function Home() {
-  return <></>;
+  const { data: session } = authClient.useSession();
+  const { search } = useSearch();
+  const { data, error, isLoading, isValidating, size, setSize, mutate } = useGetInfinitePostList(
+    10,
+    search
+  );
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    void setSize(1);
+  }, [search, setSize]);
+  const posts = useMemo(
+    () =>
+      Array.from(
+        new Map((data ?? []).flatMap((page) => page.data).map((post) => [post.id, post])).values()
+      ),
+    [data]
+  );
+  const lastPage = data?.at(-1);
+  const hasMore = lastPage ? lastPage.page < lastPage.totalPages : false;
+  const isLoadingMore = isValidating && size > 1;
+
+  useEffect(() => {
+    const target = loadMoreRef.current;
+    if (!target || !hasMore || isValidating) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) void setSize((currentSize) => currentSize + 1);
+      },
+      { rootMargin: "300px" }
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [hasMore, isValidating, setSize]);
+
+  return (
+    <section className="min-h-full bg-light-gray px-4 py-6 md:px-8 md:py-8">
+      <div className="mx-auto flex w-full max-w-[720px] flex-col gap-4">
+        {session?.user ? (
+          <CreatePostCard
+            onPostCreated={async () => {
+              await mutate();
+            }}
+          />
+        ) : null}
+
+        {isLoading ? (
+          <div className="rounded-lg bg-white p-6" role="status" aria-label="กำลังโหลดโพสต์">
+            <Loader2 className="mx-auto size-6 animate-spin text-primary-red" aria-hidden="true" />
+          </div>
+        ) : error ? (
+          <div className="rounded-lg bg-white p-6 text-center">
+            <p className="text-primary-red">ไม่สามารถโหลดโพสต์ได้</p>
+            <button
+              type="button"
+              className="mt-2 font-medium text-primary-red underline"
+              onClick={() => void mutate()}
+            >
+              ลองอีกครั้ง
+            </button>
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="flex justify-center rounded-lg bg-white p-6">
+            {search ? (
+              <EmptyState
+                title="ไม่พบโพสต์ที่ค้นหา"
+                description={`ลองค้นหาด้วยคำอื่น แทน "${search}"`}
+              />
+            ) : (
+              <p className="text-dark-gray">ยังไม่มีโพสต์</p>
+            )}
+          </div>
+        ) : (
+          posts.map((post) => (
+            <PostCard
+              key={post.id}
+              title={post.title}
+              description={post.description}
+              tags={post.tags}
+              likeCount={post.likeCount}
+              commentCount={post.commentCount}
+              authorInfo={post.authorInfo}
+              createdAt={post.createdAt}
+              imageUrl={post.images[0]}
+              isOwner={session?.user?.id === post.authorInfo.id}
+            />
+          ))
+        )}
+
+        <div ref={loadMoreRef} className="h-px" aria-hidden="true" />
+        {isLoadingMore ? (
+          <div className="pb-4" role="status" aria-label="กำลังโหลดโพสต์เพิ่มเติม">
+            <Loader2 className="mx-auto size-6 animate-spin text-primary-red" aria-hidden="true" />
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
 }

@@ -85,7 +85,6 @@ export async function uploadToGCS(input: GCSUploadInput): Promise<GCSUploadSucce
         contentType: finalMimeType,
         resumable: false,
         metadata,
-        predefinedAcl: "publicRead",
       });
     } else {
       await pipeline(
@@ -94,7 +93,6 @@ export async function uploadToGCS(input: GCSUploadInput): Promise<GCSUploadSucce
           contentType: finalMimeType,
           resumable: false,
           metadata,
-          predefinedAcl: "publicRead",
         })
       );
     }
@@ -102,7 +100,8 @@ export async function uploadToGCS(input: GCSUploadInput): Promise<GCSUploadSucce
     const url = `https://storage.googleapis.com/${env.GCS_BUCKET_NAME}/${key}`;
     return { url };
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
     console.error("GCS Upload Error:", error);
-    throw new Error("Failed to upload file to GCS");
+    throw new Error(`Failed to upload file to GCS: ${message}`);
   }
 }

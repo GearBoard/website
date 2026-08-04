@@ -97,4 +97,36 @@ export const commentRepository = {
       });
     });
   },
+
+  async findLike(userId: string, commentId: string) {
+    return prisma.commentLike.findUnique({
+      where: { userId_commentId: { userId, commentId } },
+    });
+  },
+
+  async like(userId: string, commentId: string): Promise<number> {
+    const comment = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      await tx.commentLike.create({ data: { userId, commentId } });
+      return tx.comment.update({
+        where: { id: commentId },
+        data: { likeCount: { increment: 1 } },
+      });
+    });
+
+    return comment.likeCount;
+  },
+
+  async unlike(userId: string, commentId: string): Promise<number> {
+    const comment = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      await tx.commentLike.delete({
+        where: { userId_commentId: { userId, commentId } },
+      });
+      return tx.comment.update({
+        where: { id: commentId },
+        data: { likeCount: { decrement: 1 } },
+      });
+    });
+
+    return comment.likeCount;
+  },
 };
