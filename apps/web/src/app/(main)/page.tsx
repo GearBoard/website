@@ -3,15 +3,24 @@
 import { useEffect, useMemo, useRef } from "react";
 import { Loader2 } from "lucide-react";
 import PostCard from "@/features/feed/components/PostCard";
+import EmptyState from "@/features/feed/components/EmptyState";
 import { CreatePostCard } from "@/features/post/components/CreatePostCard";
 import { useGetInfinitePostList } from "@/shared/hooks";
 import { authClient } from "@/shared/libs/auth-client";
+import { useSearch } from "@/shared/contexts/SearchContext";
 
 export default function Home() {
   const { data: session } = authClient.useSession();
-  const { data, error, isLoading, isValidating, size, setSize, mutate } =
-    useGetInfinitePostList(10);
+  const { search } = useSearch();
+  const { data, error, isLoading, isValidating, size, setSize, mutate } = useGetInfinitePostList(
+    10,
+    search
+  );
   const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    void setSize(1);
+  }, [search, setSize]);
   const posts = useMemo(
     () =>
       Array.from(
@@ -64,7 +73,16 @@ export default function Home() {
             </button>
           </div>
         ) : posts.length === 0 ? (
-          <p className="rounded-lg bg-white p-6 text-center text-dark-gray">ยังไม่มีโพสต์</p>
+          <div className="flex justify-center rounded-lg bg-white p-6">
+            {search ? (
+              <EmptyState
+                title="ไม่พบโพสต์ที่ค้นหา"
+                description={`ลองค้นหาด้วยคำอื่น แทน "${search}"`}
+              />
+            ) : (
+              <p className="text-dark-gray">ยังไม่มีโพสต์</p>
+            )}
+          </div>
         ) : (
           posts.map((post) => (
             <PostCard

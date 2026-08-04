@@ -12,7 +12,6 @@ function getEnvOptional(key: string, defaultValue: string): string {
   return process.env[key] ?? defaultValue;
 }
 
-
 export const env = {
   NODE_ENV: getEnvOptional("NODE_ENV", "development"),
   PORT: getEnvOptional("PORT", "4000"),

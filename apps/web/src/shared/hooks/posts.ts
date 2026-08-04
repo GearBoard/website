@@ -17,11 +17,14 @@ export function useGetPostList(query?: {
   return useSWR(["posts", query], () => unwrap(client.api.posts.$get({ query: query ?? {} })));
 }
 
-export function useGetInfinitePostList(limit = 10) {
+export function useGetInfinitePostList(limit = 10, search?: string) {
   return useSWRInfinite(
     (pageIndex, previousPageData) => {
       if (previousPageData && pageIndex >= previousPageData.totalPages) return null;
-      return ["posts", { page: String(pageIndex + 1), limit: String(limit) }] as const;
+      return [
+        "posts",
+        { page: String(pageIndex + 1), limit: String(limit), ...(search ? { search } : {}) },
+      ] as const;
     },
     ([, query]) => unwrap(client.api.posts.$get({ query })),
     { revalidateFirstPage: false }
