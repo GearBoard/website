@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { PostCard } from "@/features/feed";
+import EmptyState from "@/features/feed/components/EmptyState";
 import { CreatePostCard } from "@/features/post/components/CreatePostCard";
-import { ConfirmModal } from "@/shared/components/ConfirmModal";
-import { useDeletePost, useGetMe, useGetPostList, useUpdatePost } from "@/shared/hooks";
+import Loading from "@/shared/components/ui/Loading";
+import { useGetMe, useGetPostList, useUpdatePost } from "@/shared/hooks";
 
 export default function MyPosts() {
   const { data: me } = useGetMe();
@@ -14,16 +15,15 @@ export default function MyPosts() {
     mutate,
   } = useGetPostList(me?.id ? { userId: me.id } : undefined);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
-  const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
 
   const posts = postList?.data ?? [];
 
   return (
     <div className="flex flex-col gap-4 max-w-2xl mx-auto w-full py-6">
       {isLoading ? (
-        <p className="text-center text-dark-gray">กำลังโหลด...</p>
+        <Loading />
       ) : posts.length === 0 ? (
-        <p className="text-center text-dark-gray">คุณยังไม่มีโพสต์</p>
+        <EmptyState title="คุณยังไม่มีโพสต์" />
       ) : (
         posts.map((post) =>
           editingPostId === post.id ? (
@@ -39,6 +39,7 @@ export default function MyPosts() {
           ) : (
             <PostCard
               key={post.id}
+              postId={post.id}
               title={post.title}
               description={post.description}
               tags={post.tags}
@@ -49,59 +50,12 @@ export default function MyPosts() {
               imageUrl={post.images[0] ?? null}
               isOwner
               onEditClick={() => setEditingPostId(post.id)}
-              onDeleteClick={() => setDeletingPostId(post.id)}
+              onDeleted={mutate}
             />
           )
         )
       )}
-
-      <DeletePostConfirmModal
-        postId={deletingPostId}
-        onCancel={() => setDeletingPostId(null)}
-        onDeleted={() => {
-          setDeletingPostId(null);
-          mutate();
-        }}
-      />
     </div>
-  );
-}
-
-interface DeletePostConfirmModalProps {
-  postId: string | null;
-  onCancel: () => void;
-  onDeleted: () => void;
-}
-
-function DeletePostConfirmModal({ postId, onCancel, onDeleted }: DeletePostConfirmModalProps) {
-  const { trigger: deletePost, isMutating } = useDeletePost(postId ?? "");
-  const [error, setError] = useState<string | null>(null);
-
-  async function handleConfirm() {
-    setError(null);
-    try {
-      await deletePost();
-      onDeleted();
-    } catch {
-      setError("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
-    }
-  }
-
-  return (
-    <ConfirmModal
-      open={!!postId}
-      onOpenChange={(open) => {
-        if (!open) onCancel();
-      }}
-      title="ลบโพสต์"
-      message="คุณแน่ใจหรือไม่ว่าต้องการลบโพสต์นี้? การกระทำนี้ไม่สามารถย้อนกลับได้"
-      confirmLabel="ลบ"
-      cancelLabel="ยกเลิก"
-      onConfirm={handleConfirm}
-      onCancel={onCancel}
-      isLoading={isMutating}
-      errorMessage={error ?? undefined}
-    />
   );
 }
 

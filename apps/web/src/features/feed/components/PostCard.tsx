@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { Heart, MessageCircle, Bookmark, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { Popover } from "radix-ui";
 import { cn, formatRelativeTime } from "@/shared/libs/utils";
+import { ConfirmModal } from "@/shared/components/ConfirmModal";
+import { useDeletePost } from "@/shared/hooks";
 
 export interface PostCardAuthor {
   id: string;
@@ -12,6 +15,7 @@ export interface PostCardAuthor {
 }
 
 export interface PostCardProps {
+  postId: string;
   title: string;
   description: string;
   tags: string[];
@@ -30,7 +34,7 @@ export interface PostCardProps {
   onSaveClick?: () => void;
   onMenuClick?: () => void;
   onEditClick?: () => void;
-  onDeleteClick?: () => void;
+  onDeleted?: () => void;
 }
 
 const TAG_COLOR_CLASSES = [
@@ -40,6 +44,7 @@ const TAG_COLOR_CLASSES = [
 ];
 
 export default function PostCard({
+  postId,
   title,
   description,
   tags,
@@ -58,12 +63,27 @@ export default function PostCard({
   onSaveClick,
   onMenuClick,
   onEditClick,
-  onDeleteClick,
+  onDeleted,
 }: PostCardProps) {
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const { trigger: deletePost, isMutating: isDeleting } = useDeletePost(postId);
+
   const stop = (handler?: () => void) => (e: React.MouseEvent) => {
     e.stopPropagation();
     handler?.();
   };
+
+  async function handleConfirmDelete() {
+    setDeleteError(null);
+    try {
+      await deletePost();
+      setIsConfirmingDelete(false);
+      onDeleted?.();
+    } catch {
+      setDeleteError("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
+    }
+  }
 
   return (
     <article
@@ -137,7 +157,7 @@ export default function PostCard({
                   </button>
                   <button
                     type="button"
-                    onClick={stop(onDeleteClick)}
+                    onClick={stop(() => setIsConfirmingDelete(true))}
                     className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-primary-red transition-colors hover:bg-primary-red/10"
                   >
                     <Trash2 className="size-4" />
@@ -149,6 +169,23 @@ export default function PostCard({
           )}
         </div>
       </div>
+
+      {isOwner && (
+        <ConfirmModal
+          open={isConfirmingDelete}
+          onOpenChange={(open) => {
+            if (!open) setIsConfirmingDelete(false);
+          }}
+          title="ลบโพสต์"
+          message="คุณแน่ใจหรือไม่ว่าต้องการลบโพสต์นี้? การกระทำนี้ไม่สามารถย้อนกลับได้"
+          confirmLabel="ลบ"
+          cancelLabel="ยกเลิก"
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setIsConfirmingDelete(false)}
+          isLoading={isDeleting}
+          errorMessage={deleteError ?? undefined}
+        />
+      )}
 
       <div className="flex flex-col gap-1.5 -mb-1 px-5">
         <h3 className="font-semibold text-xl leading-[135%] text-black">{title}</h3>
