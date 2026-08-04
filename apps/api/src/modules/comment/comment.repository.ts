@@ -4,23 +4,43 @@ import { prisma } from "../../config/prisma.js";
 const commentInclude = {
   images: true,
   user: true,
-  replies: {
-    where: {
-      deletedAt: null,
-    },
-    include: {
-      images: true,
-      user: true,
-    },
-    orderBy: {
-      createdAt: "asc",
-    },
-  },
 } satisfies Prisma.CommentInclude;
 
-export type Comment = Prisma.CommentGetPayload<{ include: typeof commentInclude }>;
+type CommentWithUser = Prisma.CommentGetPayload<{ include: typeof commentInclude }>;
+
+export interface Comment extends CommentWithUser {
+  replies?: Comment[];
+}
 
 type CommentData = { content: string; images?: string | null };
+
+function buildCommentTree(flat: CommentWithUser[]): Comment[] {
+  const nodeById = new Map<string, Comment>();
+  const visibleById = new Map<string, boolean>();
+  const roots: Comment[] = [];
+
+  // flat is ordered by createdAt asc, so a parent is always visited before its
+  // children - visibleById.get(parentId) is populated by the time we need it.
+  for (const comment of flat) {
+    const parentVisible = comment.parentId ? (visibleById.get(comment.parentId) ?? false) : true;
+    const visible = comment.deletedAt === null && parentVisible;
+    visibleById.set(comment.id, visible);
+    if (!visible) continue;
+
+    const node: Comment = { ...comment, replies: [] };
+    nodeById.set(comment.id, node);
+
+    const parent = comment.parentId ? nodeById.get(comment.parentId) : undefined;
+    if (parent) {
+      parent.replies!.push(node);
+    } else {
+      roots.push(node);
+    }
+  }
+
+  roots.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  return roots;
+}
 
 export const commentRepository = {
   async findById(id: string): Promise<Comment | null> {
@@ -33,13 +53,15 @@ export const commentRepository = {
   },
 
   async findManyByPostId(postId: string): Promise<Comment[]> {
+    // Deleted comments are fetched too (and filtered out in buildCommentTree)
+    // so a deleted ancestor doesn't sever the link to its still-active descendants.
     const comments = await prisma.comment.findMany({
-      where: { postId, parentId: null, deletedAt: null },
+      where: { postId },
       include: commentInclude,
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: "asc" },
     });
 
-    return comments as Comment[];
+    return buildCommentTree(comments);
   },
 
   async create(userId: string, postId: string, data: CommentData): Promise<Comment> {
@@ -86,13 +108,23 @@ export const commentRepository = {
 
   async softDelete(id: string): Promise<void> {
     await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      await tx.comment.update({
-        where: { id, deletedAt: null },
-        data: { deletedAt: new Date() },
-      });
+      const idsToDelete = [id];
+      let frontier = [id];
+
+      while (frontier.length > 0) {
+        const children = await tx.comment.findMany({
+          where: { parentId: { in: frontier }, deletedAt: null },
+          select: { id: true },
+        });
+        if (children.length === 0) break;
+
+        const childIds = children.map((child) => child.id);
+        idsToDelete.push(...childIds);
+        frontier = childIds;
+      }
 
       await tx.comment.updateMany({
-        where: { parentId: id, deletedAt: null },
+        where: { id: { in: idsToDelete } },
         data: { deletedAt: new Date() },
       });
     });
