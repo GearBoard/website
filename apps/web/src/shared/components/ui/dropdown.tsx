@@ -97,7 +97,8 @@ export function Dropdown(props: DropdownProps) {
             "hover:border-primary-red focus-visible:border-primary-red",
             open && "border-primary-red",
             hasError && "border-primary-red bg-primary-red/10",
-            disabled && "cursor-not-allowed opacity-50 bg-gray/10 hover:border-gray focus-visible:border-gray",
+            disabled &&
+              "cursor-not-allowed opacity-50 bg-gray/10 hover:border-gray focus-visible:border-gray",
             !label && !errorMessage ? className : undefined
           )}
         >
@@ -117,9 +118,7 @@ export function Dropdown(props: DropdownProps) {
           sideOffset={10}
           style={{
             width: "var(--radix-popover-trigger-width)",
-            ...(maxVisibleItems
-              ? { maxHeight: `${maxVisibleItems * 40 + 16}px` }
-              : {}),
+            ...(maxVisibleItems ? { maxHeight: `${maxVisibleItems * 40 + 16}px` } : {}),
           }}
           className={cn(
             "z-50 flex flex-col gap-1 rounded-lg bg-white p-2 shadow-primary-red",

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -8,6 +8,8 @@ import { Search, Menu } from "lucide-react";
 import GithubIcon from "@/shared/components/icons/GithubIcon";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
+import { useDebouncedValue } from "@/shared/hooks";
+import { useSearch } from "@/shared/contexts/SearchContext";
 
 interface NavbarProps {
   isAuthenticated?: boolean;
@@ -17,6 +19,13 @@ interface NavbarProps {
 export const Navbar = ({ isAuthenticated = false, onMenuClick }: NavbarProps) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const router = useRouter();
+  const { setSearch } = useSearch();
+  const [searchInput, setSearchInput] = useState("");
+  const debouncedSearchInput = useDebouncedValue(searchInput, 350);
+
+  useEffect(() => {
+    setSearch(debouncedSearchInput.trim());
+  }, [debouncedSearchInput, setSearch]);
 
   return (
     <nav className="bg-white border-b border-gray">
@@ -36,7 +45,14 @@ export const Navbar = ({ isAuthenticated = false, onMenuClick }: NavbarProps) =>
         {/* Search Bar — desktop only, fills space between logo and actions */}
         <div className="hidden md:flex flex-1 justify-center mx-8">
           <div className="w-full max-w-[478px]">
-            <Input type="text" placeholder="ค้นหา" aria-label="ค้นหา" icon={<Search />} />
+            <Input
+              type="search"
+              placeholder="ค้นหา"
+              aria-label="ค้นหา"
+              icon={<Search />}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
           </div>
         </div>
 
@@ -109,7 +125,15 @@ export const Navbar = ({ isAuthenticated = false, onMenuClick }: NavbarProps) =>
       {/* Mobile search bar — expands below navbar on search icon click */}
       {isSearchOpen && (
         <div id="mobile-search-bar" className="md:hidden px-6 pb-[10px]">
-          <Input type="text" placeholder="ค้นหา" aria-label="ค้นหา" icon={<Search />} autoFocus />
+          <Input
+            type="search"
+            placeholder="ค้นหา"
+            aria-label="ค้นหา"
+            icon={<Search />}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            autoFocus
+          />
         </div>
       )}
     </nav>

@@ -67,6 +67,26 @@ export const postRepository = {
             mode: "insensitive",
           },
         },
+        {
+          tags: {
+            some: {
+              tag: {
+                name: {
+                  contains: search,
+                  mode: "insensitive",
+                },
+              },
+            },
+          },
+        },
+        {
+          user: {
+            name: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        },
       ];
     }
 
