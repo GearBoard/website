@@ -5,7 +5,14 @@ import { ArrowLeft, ChevronDown, Loader2, MessageCircleX } from "lucide-react";
 import PostCard from "@/features/feed/components/PostCard";
 import AboutCard from "@/features/feed/components/AboutCard";
 import CreateComment from "@/features/comment/components/CreateComment";
-import { useGetPostById, useCreateComment, useUploadImage, useGetMe } from "@/shared/hooks";
+import CommentItem from "@/features/comment/components/CommentItem";
+import {
+  useGetPostById,
+  useGetPostComments,
+  useCreateComment,
+  useUploadImage,
+  useGetMe,
+} from "@/shared/hooks";
 import { authClient } from "@/shared/libs/auth-client";
 
 export default function PostDetailPage() {
@@ -14,11 +21,15 @@ export default function PostDetailPage() {
   const { data: session } = authClient.useSession();
   const { data: me } = useGetMe();
   const { data: post, error, isLoading, mutate } = useGetPostById(id);
+  const { data: comments, mutate: mutateComments } = useGetPostComments(id);
   const { trigger: uploadImage } = useUploadImage();
   const { trigger: createComment } = useCreateComment(id);
 
   const name = me?.name || "John doe";
   const username = me?.name ? me.name.toLowerCase().replace(/\s+/g, ".") : "john.doe";
+  const currentUser = { name, username, avatar: me?.image ?? undefined };
+
+  const topLevelComments = (comments ?? []).filter((c) => !c.parentId);
 
   const handleCommentSubmit = async ({ content, image }: { content: string; image?: File }) => {
     let images: string | undefined;
@@ -27,7 +38,7 @@ export default function PostDetailPage() {
       images = result.url;
     }
     await createComment({ content, images });
-    await mutate();
+    await Promise.all([mutate(), mutateComments()]);
   };
 
   return (
@@ -77,10 +88,7 @@ export default function PostDetailPage() {
                 bare
               />
 
-              <CreateComment
-                user={{ name, username, avatar: me?.image ?? undefined }}
-                onSubmit={handleCommentSubmit}
-              />
+              <CreateComment user={currentUser} onSubmit={handleCommentSubmit} />
 
               <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
@@ -92,21 +100,38 @@ export default function PostDetailPage() {
                       {post.commentCount}
                     </span>
                   </div>
-                  <button
-                    type="button"
-                    className="flex items-center gap-1 font-medium text-base leading-[135%] text-dark-gray"
-                  >
-                    ใหม่ล่าสุด
-                    <ChevronDown className="size-4" />
-                  </button>
+                  {topLevelComments.length > 0 && (
+                    <button
+                      type="button"
+                      className="flex items-center gap-1 font-medium text-base leading-[135%] text-dark-gray"
+                    >
+                      ใหม่ล่าสุด
+                      <ChevronDown className="size-4" />
+                    </button>
+                  )}
                 </div>
 
-                <div className="flex flex-col items-center gap-1 py-16">
-                  <MessageCircleX className="size-[54px] text-gray" strokeWidth={1.5} />
-                  <p className="text-center font-bold text-xl leading-[135%] text-gray">
-                    ยังไม่มีความคิดเห็น
-                  </p>
-                </div>
+                {topLevelComments.length === 0 ? (
+                  <div className="flex flex-col items-center gap-1 py-16">
+                    <MessageCircleX className="size-[54px] text-gray" strokeWidth={1.5} />
+                    <p className="text-center font-bold text-xl leading-[135%] text-gray">
+                      ยังไม่มีความคิดเห็น
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-8">
+                    {topLevelComments.map((comment) => (
+                      <CommentItem
+                        key={comment.id}
+                        comment={comment}
+                        currentUser={currentUser}
+                        onReplyCreated={async () => {
+                          await mutateComments();
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
