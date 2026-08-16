@@ -14,3 +14,15 @@ export function useDeleteComment(commentId: string) {
     unwrap(client.api.comments[":commentId"].$delete({ param: { commentId } }))
   );
 }
+
+export function useLikeComment(commentId: string) {
+  return useSWRMutation(["comment-like", commentId], () =>
+    unwrap(client.api.comments[":commentId"].like.$post({ param: { commentId } }))
+  );
+}
+
+export function useUnlikeComment(commentId: string) {
+  return useSWRMutation(["comment-like", commentId], () =>
+    unwrap(client.api.comments[":commentId"].like.$delete({ param: { commentId } }))
+  );
+}

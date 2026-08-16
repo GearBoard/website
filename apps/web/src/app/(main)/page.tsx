@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import PostCard from "@/features/feed/components/PostCard";
 import EmptyState from "@/features/feed/components/EmptyState";
@@ -10,6 +11,7 @@ import { authClient } from "@/shared/libs/auth-client";
 import { useSearch } from "@/shared/contexts/SearchContext";
 
 export default function Home() {
+  const router = useRouter();
   const { data: session } = authClient.useSession();
   const { search } = useSearch();
   const { data, error, isLoading, isValidating, size, setSize, mutate } = useGetInfinitePostList(
@@ -96,6 +98,8 @@ export default function Home() {
               createdAt={post.createdAt}
               imageUrl={post.images[0]}
               isOwner={session?.user?.id === post.authorInfo.id}
+              onClick={() => router.push(`/post/${post.id}`)}
+              onCommentClick={() => router.push(`/post/${post.id}`)}
             />
           ))
         )}
